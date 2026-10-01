@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Second Source</title>
+  <style>
+    body { font-family: sans-serif; max-width: 1200px; margin: 24px auto; padding: 0 16px; }
+    .row { display: flex; gap: 8px; align-items: center; }
+    #question { flex: 1; }
+    .cols { display: flex; gap: 32px; align-items: flex-start; }
+    .col { flex: 1; min-width: 0; }
+    .circles { display: flex; gap: 8px; }
+    .circle { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; color: #000; font-weight: bold; cursor: default; }
+    #answer { white-space: pre-wrap; }
+    .hl-red { background: #ffc2c2; }
+    .hl-yellow { background: #fff0a0; }
+    .hl-green { background: #c8f0c8; }
+    .claim { border-top: 1px solid #ccc; padding: 8px 0; }
+    .claim-text { font-style: italic; }
+    .verdict { font-weight: bold; }
+    .uncited { text-decoration: underline dotted; }
+    .flag { font-size: 0.8em; font-weight: bold; color: #a00; margin-left: 4px; }
+    .sources { font-size: 0.9em; margin: 4px 0 0 0; padding-left: 20px; }
+  </style>
+</head>
+<body>
+  <div class="row">
+    <input id="question" type="text" />
+    <button id="send">Send</button>
+    <label><input id="verify-on" type="checkbox" checked /> Check answers</label>
+  </div>
+  <p id="status"></p>
+  <div class="cols">
+    <div class="col">
+      <h3>First answer</h3>
+      <p class="circles">
+        <span id="c-red" class="circle" style="background: red"></span>
+        <span id="c-yellow" class="circle" style="background: gold"></span>
+        <span id="c-green" class="circle" style="background: green"></span>
+      </p>
+      <p><strong>Summary:</strong> <span id="summary"></span></p>
+      <p><strong>Answer:</strong></p>
+      <div id="answer"></div>
+    </div>
+    <div class="col" id="verify-col">
+      <h3>Checked against reliable sources</h3>
+      <div id="verified"></div>
+    </div>
+  </div>
+  <script>
+    const q = document.getElementById("question");
+    const send = document.getElementById("send");
+    const verifyOn = document.getElementById("verify-on");
+    const status = document.getElementById("status");
+    const summary = document.getElementById("summary");
+    const answer = document.getElementById("answer");
+    const verified = document.getElementById("verified");
+    const verifyCol = document.getElementById("verify-col");
+    const COLORS = ["red", "yellow", "green"];
+    const circle = (c) => document.getElementById("c-" + c);
+    const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+
+    // Placeholder thresholds (Ben, 9/22): green above 95, yellow 80-95, red below 80.
+    function colorFor(c) { if (c > 95) return "green"; if (c >= 80) return "yellow"; return "red"; }
+
+    for (const color of COLORS) {
+      circle(color).addEventListener("mouseenter", () => answer.querySelectorAll(`[data-color="${color}"]`).forEach((s) => s.classList.add("hl-" + color)));
+      circle(color).addEventListener("mouseleave", () => answer.querySelectorAll(`[data-color="${color}"]`).forEach((s) => s.classList.remove("hl-" + color)));
+    }
+    verifyOn.addEventListener("change", () => { verifyCol.style.display = verifyOn.checked ? "" : "none"; });
+
+    async function post(url, body) {
+      const res = await fetch(url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      return data;
+    }
+
+    function showVerifier(out) {
+      verified.textContent = "";
+      for (const s of out.sections) {
+        const box = el("div", "claim");
+        const head = el("p");
+        head.append(el("span", "verdict", (s.verdict || "No verdict") + ": "), el("span", "claim-text", s.claim));
+        box.append(head);
+        const body = el("p");
+        for (const p of s.parts) {
+          const text = p.text;
+          if (!text.trim()) continue;
+          const span = el("span", p.uncited ? "uncited" : "", text);
+          body.append(span);
+          // Anything Verifier says without a citation is flagged (Ben, 9/23).
+          if (p.uncited) body.append(el("span", "flag", "[no source]"));
+        }
+        box.append(body);
+        box.append(el("p", "", `Reliable sources cited: ${s.sourceCount}`));
+        if (s.sources.length) {
+          const ul = el("ul", "sources");
+          for (const src of s.sources) {
+            const li = el("li"); const a = el("a", "", src.title || src.host);
+            a.href = src.url; a.target = "_blank"; a.rel = "noopener";
+            li.append(a, document.createTextNode(" (" + src.host + ")")); ul.append(li);
+          }
+          box.append(ul);
+        }
+        verified.append(box);
+      }
+    }
+
+    send.addEventListener("click", async () => {
+      // The user can't move forward until both answers are in (blocking).
+      q.disabled = true; send.disabled = true; verifyOn.disabled = true;
+      COLORS.forEach((c) => (circle(c).textContent = ""));
+      summary.textContent = ""; answer.textContent = ""; verified.textContent = "";
+      status.textContent = "Thinking...";
+      try {
+        const data = await post("/ask", { question: q.value });
+        summary.textContent = data.summary;
+        for (const seg of data.segments) {
+          const span = el("span", "", seg.text);
+          const c = seg.confidence;
+          if (typeof c === "number") {
+            const color = colorFor(c);
+            span.dataset.color = color;
+            span.addEventListener("mouseenter", () => { circle(color).textContent = c; span.classList.add("hl-" + color); });
+            span.addEventListener("mouseleave", () => { circle(color).textContent = ""; span.classList.remove("hl-" + color); });
+          }
+          answer.appendChild(span);
+        }
+        const claims = data.segments.filter((s) => typeof s.confidence === "number").map((s) => s.text.trim());
+        if (verifyOn.checked && claims.length) {
+          status.textContent = `Checking ${claims.length} claim${claims.length > 1 ? "s" : ""} against reliable sources...`;
+          showVerifier(await post("/verify", { question: q.value, claims }));
+        }
+        status.textContent = "";
+      } catch (err) {
+        status.textContent = "ERROR: " + err.message;
+      }
+      q.disabled = false; send.disabled = false; verifyOn.disabled = false;
+    });
+  </script>
+</body>
+</html>
