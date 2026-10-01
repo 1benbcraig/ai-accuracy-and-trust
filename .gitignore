@@ -1,0 +1,6 @@
+# API keys and private data stay off GitHub
+.env
+log.jsonl
+verify-results*.csv
+verify-compare.csv
+.DS_Store
