@@ -40,6 +40,8 @@
     .piece-text { font-weight: bold; margin: 6px 0 2px; }
     .no-source { font-weight: bold; color: #a00; }
     .bucket-label { font-weight: bold; margin: 2px 0; }
+    .value-field { display: block; width: 100%; box-sizing: border-box; margin: 6px 0; padding: 4px; font-size: 1em; }
+    .note { font-size: 0.9em; color: #666; }
     .list-label { font-weight: bold; margin: 6px 0 2px; }
     .para { margin: 4px 0 8px 12px; padding-left: 8px; border-left: 3px solid #ccc; }
     .para-src { font-size: 0.9em; margin-top: 2px; }
@@ -112,6 +114,21 @@
     // One box per sentence (Ben, 10/7). Inside it, each claim the Replier scored gets its own line, then its own
     // quoted evidence and links, or "No source found". Count is per claim (Ben, 10/7).
     const FAILED = ["Verifier's reply couldn't be read", "Verifier gave no answer for this claim"];
+    // Bucket 3 (Ben, 10/12): a plain form, no warmth. What 2S gives back from it is not built yet.
+    function showOpinionForm() {
+      verified.textContent = "";
+      const box = el("div", "claim");
+      box.append(el("p", "bucket-label", "Opinion or decision question"));
+      box.append(el("p", "", "List 3 to 5 things you value most about this decision."));
+      for (let i = 1; i <= 5; i++) { const f = el("input", "value-field"); f.placeholder = i <= 3 ? `${i}.` : `${i}. (optional)`; box.append(f); }
+      box.append(el("p", "note", "Not built yet: what 2S gives back from these, and the \u201csuggest\u201d button."));
+      verified.append(box);
+    }
+    function showNotCheckable() {
+      verified.textContent = "";
+      verified.append(el("p", "bucket-label", "Not a checkable question. Nothing to verify."));
+    }
+
     function showVerifier(out) {
       verified.textContent = "";
       const boxes = [];
@@ -185,7 +202,10 @@
           answer.appendChild(span);
         }
         const claims = data.segments.filter((s) => typeof s.confidence === "number").map((s) => s.text.trim());
-        if (verifyOn.checked && claims.length) {
+        // The gate (Ben, 10/13): only checkable questions go to the Verifier. The Replier's answer always shows.
+        if (verifyOn.checked && data.gate === "opinion") showOpinionForm();
+        else if (verifyOn.checked && data.gate === "none") showNotCheckable();
+        else if (verifyOn.checked && claims.length) {
           status.textContent = `Checking ${claims.length} claim${claims.length > 1 ? "s" : ""} against reliable sources...`;
           showVerifier(await post("/verify", { question: q.value, segments: data.segments })); // Verifier gets each piece with its sentence (Ben, 10/7)
         }

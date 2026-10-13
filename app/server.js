@@ -38,7 +38,7 @@ Reply with only this JSON and nothing else:
 // max_uses 5 is Claude's pick, to cap cost per question. The Replier's prompt is unchanged.
 const WEB_SEARCH = { type: "web_search_20250305", name: "web_search", max_uses: 5 };
 
-async function ask(question) {
+async function askOnce(question) {
   const key = readKey();
   if (!key) throw new Error("No API key found. Add it to the .env file (see setup steps).");
   const messages = [{ role: "user", content: question }];
@@ -71,11 +71,41 @@ async function ask(question) {
     }
     if (parsed && !Array.isArray(parsed.segments)) parsed = null; // not an answer; keep looking
   }
-  if (!parsed) throw new Error("Claude's reply wasn't in the expected format. Raw reply:\n" + text);
+  if (!parsed) {
+    const err = new Error("Claude's reply wasn't in the expected format. Raw reply:\n" + text);
+    err.formatError = true; err.rawText = text; err.usage = data.usage;
+    throw err;
+  }
   const multiple = answers.length > 1 ? { answersInReply: answers.length, usedAnswer: usedAnswer + 1 } : null;
   const searches = content.filter((c) => c.type === "server_tool_use").map((c) => c.input?.query);
   const resultUrls = content.filter((c) => c.type === "web_search_tool_result").flatMap((c) => (Array.isArray(c.content) ? c.content.map((r) => r.url) : []));
-  return { parsed, usage: data.usage, searches, resultUrls, repaired, multiple, rawReply: repaired || multiple ? text : undefined };
+  const citeTags = stripCiteTags(parsed);
+  return { parsed, usage: data.usage, searches, resultUrls, repaired, multiple, citeTags, rawReply: repaired || multiple ? text : undefined };
+}
+
+// When the Replier searches, it may wrap quoted facts in <cite index="1-4">...</cite> tags inside its answer.
+// 2S removes the tags only and keeps every word (Ben, 10/13). Which search result each piece pointed to is kept for the log.
+function stripCiteTags(parsed) {
+  const found = [];
+  const strip = (t) => String(t).replace(/<cite\b[^>]*>/gi, "").replace(/<\/cite>/gi, "");
+  (parsed.segments || []).forEach((seg, i) => {
+    const t = String(seg.text ?? "");
+    const idx = [...t.matchAll(/<cite\b[^>]*index="([^"]*)"[^>]*>/gi)].map((m) => m[1]);
+    if (idx.length || /<\/?cite\b/i.test(t)) { found.push({ piece: i + 1, index: idx }); seg.text = strip(t); }
+  });
+  if (typeof parsed.summary === "string" && /<\/?cite\b/i.test(parsed.summary)) parsed.summary = strip(parsed.summary);
+  return found;
+}
+
+// If the Replier's reply still can't be read after the fixes above, ask it the same question once more (Ben, 10/13).
+// Costs about one more Replier call, only when it happens. The log keeps the unreadable first reply.
+async function ask(question) {
+  try { return await askOnce(question); }
+  catch (err) {
+    if (!err.formatError) throw err;
+    const second = await askOnce(question);
+    return { ...second, retried: { firstReply: err.rawText, firstUsage: err.usage } };
+  }
 }
 
 // Splits the reply into its top-level {...} blocks, ignoring braces inside quoted text.
@@ -112,6 +142,28 @@ function repairBrackets(t) {
     out += c;
   }
   return { text: out, removed };
+}
+
+// The gate (Ben, 10/2; built 10/13): one short Claude call sorts the question before anything is checked.
+// It runs at the same time as the Replier, so it adds no wait. The Replier always answers (Ben, 10/13).
+const GATE_PROMPT = `Sort the user's message into exactly one category. Reply with only the category word.
+CHECKABLE: it asks for facts that outside sources could confirm or contradict.
+OPINION: it asks for a personal decision or a judgment that depends on what the person values, such as "should I..." or "is it worth...".
+NONE: it is not a question to check, such as creative writing, drafting or editing text, code, or small talk.
+If a message asks about facts, choose CHECKABLE even if the topic is debated. Choose OPINION only when the answer depends on the person's own values or situation.`;
+const GATE_LABELS = { CHECKABLE: "checkable", OPINION: "opinion", NONE: "none" };
+async function gate(question) {
+  const key = readKey();
+  const res = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: { "x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json" },
+    body: JSON.stringify({ model: MODEL, max_tokens: 10, system: GATE_PROMPT, messages: [{ role: "user", content: question }] }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(`Gate API error ${res.status}: ${data?.error?.message ?? JSON.stringify(data)}`);
+  const word = (data.content || []).filter((b) => b.type === "text").map((b) => b.text).join("").trim().toUpperCase().match(/CHECKABLE|OPINION|NONE/)?.[0];
+  // If the gate's reply can't be read, the question is treated as checkable (the old behavior), and the log says so.
+  return { label: word ? GATE_LABELS[word] : "checkable", readable: !!word, usage: data.usage };
 }
 
 // Log: one line per event in log.jsonl. Verifier entries store web addresses and Verifier's own words, not page text.
@@ -153,10 +205,12 @@ http.createServer(async (req, res) => {
   if (req.method === "POST" && req.url === "/ask") {
     try {
       const { question } = await readBody(req);
-      const { parsed, usage, searches, resultUrls, repaired, multiple, rawReply } = await ask(question);
+      const [{ parsed, usage, searches, resultUrls, repaired, multiple, rawReply, retried, citeTags }, gateOut] = await Promise.all([ask(question), gate(question)]);
+      parsed.gate = gateOut.label;
       // Replier's searches and the addresses it got back are logged (no page text) (Ben, 10/8).
       // If the bracket repair ran, the log says what was removed and keeps the Replier's original reply (Ben, 10/12).
-      logResult({ time: new Date().toISOString(), kind: "replier", model: MODEL, question, summary: parsed.summary, segments: parsed.segments, usage, searches, resultUrls, ...(repaired ? { repairedBrackets: repaired } : {}), ...(multiple || {}), ...(rawReply ? { rawReply } : {}) });
+      logResult({ time: new Date().toISOString(), kind: "replier", model: MODEL, question, summary: parsed.summary, segments: parsed.segments, usage, searches, resultUrls,
+        gate: { label: gateOut.label, readable: gateOut.readable, usage: gateOut.usage }, ...(repaired ? { repairedBrackets: repaired } : {}), ...(multiple || {}), ...(rawReply ? { rawReply } : {}), ...(citeTags && citeTags.length ? { citeTags } : {}), ...(retried ? { askedAgain: true, firstReply: retried.firstReply, firstUsage: retried.firstUsage } : {}) });
       return send(res, 200, parsed);
     } catch (err) { return send(res, 500, { error: err.message }); }
   }
