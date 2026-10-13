@@ -4,3 +4,6 @@ log.jsonl
 verify-results*.csv
 verify-compare.csv
 .DS_Store
+
+# Test-mode results include quoted page text (Exa terms)
+planted-results.jsonl
