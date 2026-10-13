@@ -14,11 +14,12 @@ The name comes from the newsroom rule of confirming a claim with a second, indep
 
 ## Status
 
-A rough first version, being improved through use.
+A rough version, being improved through use. Updated October 12, 2026.
 
-- **Working:** the first answer with per-claim confidence scores; a checker ("Verifier") that searches, keeps only pages from about 24,000 reliable sites, and cites the exact passages it relies on.
-- **Tested:** on 30 questions with known answers, 10 of them containing a planted error, Verifier's verdicts matched the answer key 29 times out of 30 in the latest run. That's a single run, so treat it as a first signal, not proof.
-- **Known problems:** Verifier sometimes quotes a source without formally citing it, and it rarely reaches the goal of three independent sources per claim.
+- **Working:** the first answer ("Replier"), with a confidence score for each claim and Anthropic's web search when it needs current facts; a checker ("Verifier") that searches about 1,200 trusted sites, keeps only pages on a list of about 24,000 reliable sources, and shows each piece of evidence in the source's own words. Verifier only points to source sentences; it never writes its own. Both use Claude Sonnet 5.5.
+- **Tested:** all 10 planted errors caught on the current setup. Across 32 claims from 8 real questions, 29 were backed by two or three different sites. Small and mostly easy questions, so a first signal, not proof.
+- **Being built:** contested claims, opinions, and questions with no findable answer (see the devlog, October 12).
+- **Known problems:** Verifier hasn't yet caught a mistake the Replier made on its own, and when the Replier hedges, a disputed point can pass as settled.
 
 ## What's here
 
@@ -42,4 +43,11 @@ You'll need [Node.js](https://nodejs.org) 18 or newer, an [Anthropic API key](ht
 2. In a terminal, from the `app` folder, run `node server.js`.
 3. Open http://localhost:3000.
 
-Each question costs roughly 1 to 2 cents per claim checked. The test run (`node verify-test.js`) checks all 30 test questions and costs about $1.
+A question costs roughly 4 cents, more when the first answer searches the web.
+
+Tests, from the `app` folder:
+- `node pointer-test.js` (with the app running) sends four known-answer questions through the app and prints what Verifier found. Add your own questions in quotes after the command.
+- `node planted-test.js` feeds deliberately wrong claims from the test set straight to Verifier. Its results file quotes page text, so it's kept out of this repository.
+- `verify-test.js` is the older 30-question test from October 1. It doesn't run with the current code.
+
+The page also saves a screenshot of itself after each answer to a `Documentarian` folder next to `app`; create that folder first.

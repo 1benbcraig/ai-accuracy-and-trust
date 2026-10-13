@@ -148,13 +148,112 @@ The second pass agreed with every "false" verdict, so it added nothing in this r
 
 **Documenting as we go.** Ben captures screenshots for later case-study use. He considered letting Claude capture them automatically, but that needed screen-recording permission for the Mac's Terminal. He declined, preferring the narrowest access that works.
 
+**Later that day: a fix for uncited quotes.** Ben chose the simplest of three fixes: when Verifier quotes a source without citing it, the app looks for the quote, word for word, in the pages it gave Verifier, and links it if found. A companion rule stopped short linking phrases ("TechCrunch reports that") from being flagged as unsourced. Both were removed a week later, when Verifier was rebuilt so it can't write its own words at all (see October 7).
+
+## October 2 — Narrowing the scope, and a second idea
+
+**A gate before the buckets.** Before sorting a question into a bucket, 2S first decides whether it's a checkable question at all. A poem, a story or an email draft gets a normal answer, with no confidence colors and no checking.
+
+**Calling it a lie.** Ben decided the project's writing should say "lie" plainly (or "inaccurate"), not "softened." From the user's side, a cushioned false claim and an outright false one break trust the same way. (The September 21 entry above uses the older wording.)
+
+**Keeping it small.** Ben chose the narrower version of the project over a bigger, more political one. Tests of the AI's weak spots stay focused on what it knows about itself: its limits, its mistakes, and confusion about its own products.
+
+**A second idea, kept separate: start from facts.** In a voice session Ben sketched a different design. An *extractive* core finds and returns existing text, so it can't invent anything. A deliberately limited writing layer on top turns only those checked facts into plain sentences. A dial would let the user trade plain-but-safe output for smoother prose, with the accuracy cost shown beside it. This is an idea, not a tested design. (On October 6 Ben decided it will be a quick mock-up with fake data, not a real system.)
+
+**Considered and rejected: a cheaper back-and-forth.** Ben weighed having a writer and a checker talk back and forth to cut costs, and dropped it. Checking is expensive because it needs an outside search, not because of how often the two parts talk.
+
+**This devlog went public** on October 1, with keys, logs and test results left out.
+
+## October 5 — Why don't AI models say "I don't know"?
+
+Ben asked why chatbots so rarely admit uncertainty, and whether the history of legal and medical AI supports his thesis. Full findings and links are in [`research/sources-and-links.md`](research/sources-and-links.md), section "Research run 10/5." In short:
+
+- **More than one cause.** OpenAI says standard scoring rewards guessing. Studies of the human ratings used in training find a mild bias against hedging words. Training models to "think step by step" lowered how often they declined unanswerable questions in one benchmark. Anthropic's own developer docs list "allow Claude to say 'I don't know'" as the first fix for false answers. They tell developers to give Claude that permission in their instructions. The docs don't say why it isn't the default, or that leaving it out was a deliberate choice; reading it as "not allowed unless permitted" is Ben's inference, not Anthropic's statement.
+- **Not found:** any lab saying it made models sound more confident because users preferred it. The company statements found say the opposite.
+- **Legal and medical history:** partly supported. Earlier legal tools mostly sorted and extracted; from 2022–2023 the money went to generative tools. Retrieval-based legal tools still invented content in a 2024 Stanford test (17% to 34% of the time). No source was found on *why* firms kept using them after being burned.
+
+**A change in how research is done.** The web tool Claude uses returns a small model's summary of a page, not the page itself, and that had produced garbled dates and unclear percentages. From here on, Claude re-reads the most important sources in full before they're relied on. The first re-reads already corrected two figures: a "37% of multi-agent failures" figure wasn't in the paper it was attributed to, and a "24% drop" turned out to be undefined (the paper never says percentage points or percent).
+
+## October 6 — Two prototypes
+
+Ben settled the plan: **prototype 1** is Second Source, the real build, and it gets finished. **Prototype 2** is the start-from-facts idea, built only as a quick mock-up with fake data to show how the dial would work. It can't show the accuracy cost is real; it only illustrates the idea.
+
+## October 7 — Verifier rebuilt so it can't write its own words
+
+**Ben tried his own Verifier instructions first.** The result had a new problem: the app couldn't read the verdicts, and Verifier repeated and reworded the claims it was checking. Ben's principle from that: **"We never want Verifier to generate its own summary."** Verifier should point to evidence, not write.
+
+**The rebuild, called the pointer design.** 2S now numbers every sentence of every source page. Verifier replies only with those numbers: which sentences confirm each claim and which contradict it. 2S, not Verifier, sets the verdict and shows the source's own words. Nothing Verifier writes reaches the page, so it can't add mistakes of its own. The uncited-quote fix from October 1 had no job left and was removed. A claim with sources on both sides gets its own verdict: "Sources disagree."
+
+**Bugs, all ours:**
+
+- Three of the first four test questions showed no verdict, because Verifier wrote each claim's text where the code expected its number. One added line in its instructions fixed it.
+- "U.S." ended a sentence early, so "California is the most populous U.S." was checked as a half sentence. Fixed.
+- One test ran old code because the app wasn't restarted after a change, and Claude hadn't said to restart. A small line now sits at the bottom of the page showing when the code changed and warning when a restart is needed.
+
+**Planted errors: 10 of 10 caught**, using a test mode that feeds the ten deliberately wrong claims straight to Verifier.
+
+**Ben's biggest concern: not enough sources.** Across that day's runs, only about 28% of the pages the search returned were on the reliable-source list, and most claims got one site or none. The fixes, built that night:
+
+- **Search only trusted sites.** One test search run four ways: with no filter, 5 of 10 results were on the list. Limited to 1,200 trusted news and reference sites, all 10 were, from 7 different sites. Ben chose that set. (The search service accepts at most 1,200 sites per search, so government and journal sites aren't in it; every result is still checked against the full list.)
+- **No single site can fill every slot:** at most two pages per site per search, and one pick per site in each list of sources.
+
+**Quotes came back.** Ben had first asked for links only in the Verifier box, then found a bare link unhelpful. Now each piece of evidence is quoted in the box, in the source's own words, with the link there for anyone who wants more.
+
+**Splitting answers into claims.** Verifier was tried at splitting sentences into single facts itself. It worked in tests but still let one supported fact make a neighboring unsupported one look backed up, so it was replaced the next day.
+
+## October 8 — An honest test
+
+**One way of splitting claims.** Verifier now checks the exact pieces the first answer already scored for confidence, as written. Each piece gets its own sources, or a plain "No source found." Ben: one claim splitter, and it lives on the first answer's side.
+
+**Ben called the test so far dishonest.** The first answer ("Replier") was a bare call to the smallest model with no web search, answering from memory, while Verifier showed up with live sources. Verifier looked good for free. The point of the project is to check answers like the ones Claude.ai gives, so the Replier should act like Claude.ai:
+
+- **It now has Anthropic's own web search,** on the open web, and decides for itself when to search. Ben: "the point is to get the Replier to output just like Claude.ai," so it uses Anthropic's tool rather than the separate search service Verifier uses.
+- **Both answers moved to Claude Sonnet 5.5,** a stronger model. Ben's rule: whenever one changes model, both do.
+
+One honest gap, raised by Claude: the Replier still answers in scored pieces, which Claude.ai doesn't do. It's close to Claude.ai, not identical.
+
+## October 12 — First real results, and buckets 2–4 designed
+
+**What the new setup did on real questions:**
+
+| | Claims | 3 sites | 2 sites | 1 site | None |
+|---|---|---|---|---|---|
+| October 7 (before the sourcing fixes, older model) | 35 | 3 | 8 | 13 | 11 |
+| October 12 (8 questions) | 32 | 13 | 16 | 1 | 2 |
+
+The model and the sourcing changed at the same time, so this can't say which one made the difference, and most of the questions were easy. Six of the October 7 claims with no sources came from a bug.
+
+- **The Replier searched when it needed to.** For the 2026 Nobel Prize in Physics and Saturn's moon count, it searched once each and gave current answers. For settled facts it answered from memory.
+- **Planted errors: still 10 of 10** on the new model.
+- **One false "not found":** a physicist's birthplace and year that were correct.
+- **The Verifier has not yet caught a mistake the Replier made on its own.** On harder questions the Replier hedged instead of erring.
+- **Cost:** about 3.5 to 4 cents a question when the Replier doesn't search, more when it does.
+
+**Hedged claims always pass.** Asked whether the Nile or the Amazon is longer, the Replier wrote "the Nile is traditionally considered the longer river" and "some studies argue that the Amazon is slightly longer." Both are true as worded, so both came back supported. The dispute was described in the answer, but nothing flagged it as a dispute. This shaped the bucket 2 rule below.
+
+**A patch Ben chose knowingly.** The new model wrote broken formatting in 3 of 10 replies (an extra closing bracket), which stopped the app. Claude's first choice was to simply ask again. Ben chose to have the code remove the stray bracket instead. Claude noted this edits the Replier's output, which sits uneasily with the rule that nothing rewrites the first answer; it only removes stray punctuation, never words, and the log keeps the original.
+
+**Buckets 2–4 designed**, in a voice session with Ben making each call:
+
+- **Each claim gets its own bucket,** not the whole question, sorted *after* the search from what the sources say. Wording alone can't tell a settled claim from a disputed one. The gate still runs first, since a poem needs no search.
+- **Contested claims (bucket 2):** a claim is contested if sources contradict each other, *or* if the sources agree the matter is unsettled, even when the Replier stated it flatly.
+- **Dropped: the "share of expert opinion" percentage.** That number rarely exists, so the app would have to invent it. Still open: how to avoid showing a fringe view and a consensus view as equals. One option Ben liked: report how many of the sources found take each side.
+- **Opinions inside a factual answer:** the Verifier doesn't judge the opinion. It checks that someone really holds it, and quotes them. A vague "some players feel" gets checked for who actually said it; if no one did, it's labeled an opinion with no source.
+- **No answer found (bucket 4):** always "No source found," never "this can't be known." Ben: "No source found is actually more accurate, because that's close to the truth of what the tool is doing."
+- **Whole-question opinions (bucket 3),** such as "should I take this job?": a plain form, no warmth. Ben: "We cannot introduce personality. We cannot introduce warmth. It defies the whole project." It asks the user to list 3 to 5 things they value most about the decision, and builds its answer only from those. A "suggest" button, which the user has to press, shows factors commonly weighed for that kind of decision, each cited to its source.
+
+**Built the same day:** the Verifier side of buckets 2 and 4 and opinion claims. It passed checks with made-up data; real test runs are next. The gate and the bucket 3 form come after.
+
+**This devlog will now be kept current,** updated after each session that changes the code or makes decisions.
+
 ---
 
 ## Open questions
 
 - What should a confidence number mean, and does the AI's own confidence predict its accuracy at all?
-- Why does Verifier sometimes quote sources without citing them?
-- How can Verifier reliably reach three independent sources?
-- How should a question be sorted into a bucket, and what do buckets 2–4 look like in the interface?
+- Will Verifier catch a mistake the Replier makes on its own, not just ones we plant?
+- How should a contested claim show which side has more support, without inventing a percentage?
+- How should each label (contested, opinion, no source found) look on the page?
+- How can Verifier reliably reach three independent sources? It now usually gets two.
 - Is softened wording (a true fact made misleading) in scope?
 - How should risk of harm eventually combine with accuracy?
