@@ -5,10 +5,20 @@
   <title>Second Source</title>
   <style>
     body { font-family: sans-serif; max-width: 1200px; margin: 24px auto; padding: 0 16px; }
-    .row { display: flex; gap: 8px; align-items: center; }
+    .row { display: flex; gap: 16px; align-items: center; } /* gap doubled from 8px (Ben, 10/2) */
     #question { flex: 1; }
+    /* Question box keeps the height it had at twice the default text size (39px); its text matches the Send button (Ben, 10/1). */
+    #question { font-size: 1.17em; box-sizing: border-box; height: 39px; }
+    /* Send and "Check answers" text match the "Default answer" heading size (Ben, 10/1). */
+    #send, #verify-label { font-size: 1.17em; }
+    #question { padding: 2px 4px; }
+    #send { padding: 2px 12px; box-sizing: border-box; height: 39px; } /* same height as the question box (Ben, 10/2) */
+    #verify-on { width: 18px; height: 18px; }
     .cols { display: flex; gap: 32px; align-items: flex-start; }
     .col { flex: 1; min-width: 0; }
+    .heads h3 { margin-bottom: 4px; } /* halved from 8px (Ben, 10/2) */
+    .head-right { display: flex; justify-content: space-between; align-items: baseline; }
+    .head-line { border: 0; border-top: 1px solid #ccc; margin: 0; }
     .circles { display: flex; gap: 8px; }
     .circle { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; color: #000; font-weight: bold; cursor: default; }
     #answer { white-space: pre-wrap; }
@@ -16,37 +26,58 @@
     .hl-yellow { background: #fff0a0; }
     .hl-green { background: #c8f0c8; }
     .claim { border-top: 1px solid #ccc; padding: 8px 0; }
+    .claim:first-child { border-top: 0; } /* the full-width line under the headings replaces it (Ben, 10/2) */
     .claim-text { font-style: italic; }
     .verdict { font-weight: bold; }
     .uncited { text-decoration: underline dotted; }
     .flag { font-size: 0.8em; font-weight: bold; color: #a00; margin-left: 4px; }
+    /* Build line pinned to the bottom of the window (Ben, 10/7). Page gets bottom padding so it never covers content. */
+    #build { position: fixed; left: 0; right: 0; bottom: 0; margin: 0; padding: 4px 16px; font-size: 0.8em; color: #666; background: #fff; border-top: 1px solid #ddd; }
+    body { padding-bottom: 40px; }
+    #build.stale { color: #a00; font-weight: bold; }
     .sources { font-size: 0.9em; margin: 4px 0 0 0; padding-left: 20px; }
+    .piece { margin: 8px 0 12px 0; }
+    .piece-text { font-weight: bold; margin: 6px 0 2px; }
+    .no-source { font-weight: bold; color: #a00; }
+    .bucket-label { font-weight: bold; margin: 2px 0; }
+    .list-label { font-weight: bold; margin: 6px 0 2px; }
+    .para { margin: 4px 0 8px 12px; padding-left: 8px; border-left: 3px solid #ccc; }
+    .para-src { font-size: 0.9em; margin-top: 2px; }
   </style>
 </head>
 <body>
   <div class="row">
     <input id="question" type="text" />
-    <button id="send">Send</button>
-    <label><input id="verify-on" type="checkbox" checked /> Check answers</label>
+    <button id="send">Submit</button>
   </div>
   <p id="status"></p>
+  <!-- Headings sit in their own row so one line can run under both, full width (Ben, 10/2). -->
+  <div class="cols heads">
+    <h3 class="col">Default answer</h3>
+    <!-- "Check answers" sits on the headings row, right aligned (Ben, 10/2). -->
+    <div class="col head-right">
+      <h3 id="verify-head">Verifier</h3>
+      <label id="verify-label"><input id="verify-on" type="checkbox" checked /> Check answers</label>
+    </div>
+  </div>
+  <hr class="head-line" />
   <div class="cols">
     <div class="col">
-      <h3>First answer</h3>
+      <p><strong>Reasoning:</strong> <span id="summary"></span></p>
       <p class="circles">
         <span id="c-red" class="circle" style="background: red"></span>
         <span id="c-yellow" class="circle" style="background: gold"></span>
         <span id="c-green" class="circle" style="background: green"></span>
       </p>
-      <p><strong>Summary:</strong> <span id="summary"></span></p>
       <p><strong>Answer:</strong></p>
       <div id="answer"></div>
     </div>
     <div class="col" id="verify-col">
-      <h3>Checked against reliable sources</h3>
       <div id="verified"></div>
     </div>
   </div>
+  <p id="build"></p>
+  <script src="/html2canvas.min.js"></script>
   <script>
     const q = document.getElementById("question");
     const send = document.getElementById("send");
@@ -67,7 +98,9 @@
       circle(color).addEventListener("mouseenter", () => answer.querySelectorAll(`[data-color="${color}"]`).forEach((s) => s.classList.add("hl-" + color)));
       circle(color).addEventListener("mouseleave", () => answer.querySelectorAll(`[data-color="${color}"]`).forEach((s) => s.classList.remove("hl-" + color)));
     }
-    verifyOn.addEventListener("change", () => { verifyCol.style.display = verifyOn.checked ? "" : "none"; });
+    const verifyHead = document.getElementById("verify-head");
+    // Hiding Verifier hides its heading too; the heading keeps its space so the line still runs full width.
+    verifyOn.addEventListener("change", () => { verifyCol.style.display = verifyOn.checked ? "" : "none"; verifyHead.style.visibility = verifyOn.checked ? "" : "hidden"; });
 
     async function post(url, body) {
       const res = await fetch(url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
@@ -76,36 +109,60 @@
       return data;
     }
 
+    // One box per sentence (Ben, 10/7). Inside it, each claim the Replier scored gets its own line, then its own
+    // quoted evidence and links, or "No source found". Count is per claim (Ben, 10/7).
+    const FAILED = ["Verifier's reply couldn't be read", "Verifier gave no answer for this claim"];
     function showVerifier(out) {
       verified.textContent = "";
+      const boxes = [];
       for (const s of out.sections) {
+        let b = boxes.find((x) => x.sentence === s.sentence);
+        if (!b) { b = { sentence: s.sentence, claims: [] }; boxes.push(b); }
+        b.claims.push(s);
+      }
+      for (const b of boxes) {
         const box = el("div", "claim");
-        const head = el("p");
-        head.append(el("span", "verdict", (s.verdict || "No verdict") + ": "), el("span", "claim-text", s.claim));
-        box.append(head);
-        const body = el("p");
-        for (const p of s.parts) {
-          const text = p.text;
-          if (!text.trim()) continue;
-          const span = el("span", p.uncited ? "uncited" : "", text);
-          body.append(span);
-          // Anything Verifier says without a citation is flagged (Ben, 9/23).
-          if (p.uncited) body.append(el("span", "flag", "[no source]"));
-        }
-        box.append(body);
-        box.append(el("p", "", `Reliable sources cited: ${s.sourceCount}`));
-        if (s.sources.length) {
-          const ul = el("ul", "sources");
-          for (const src of s.sources) {
-            const li = el("li"); const a = el("a", "", src.title || src.host);
-            a.href = src.url; a.target = "_blank"; a.rel = "noopener";
-            li.append(a, document.createTextNode(" (" + src.host + ")")); ul.append(li);
+        box.append(el("p", "claim-text", b.sentence));
+        for (const s of b.claims) {
+          const piece = el("div", "piece");
+          piece.append(el("p", "piece-text", "\u201c" + s.claim + "\u201d"));
+          // Contested claims and opinions get a plain label (Ben, 10/12). How labels look is a UI question for later.
+          if (s.bucket === "contested") piece.append(el("p", "bucket-label", "Contested: " + s.verdict.toLowerCase()));
+          if (s.bucket === "opinion") piece.append(el("p", "bucket-label", "Opinion"));
+          const lists = (s.kind === "opinion" ? [["Held by", s.confirms || []]]
+            : [["Supports", s.confirms || []], ["Contradicts", s.contradicts || []], ["Says this is unsettled", s.unsettled || []]]).filter(([, l]) => l.length);
+          for (const [label, list] of lists) {
+            piece.append(el("p", "list-label", label + ":"));
+            for (const p of list) {
+              const q = el("div", "para", "\u201c" + p.quote + "\u201d");
+              const src = el("div", "para-src");
+              const a = el("a", "", p.host); a.href = p.url; a.target = "_blank"; a.rel = "noopener"; a.title = p.title || "";
+              src.append(a); q.append(src); piece.append(q);
+            }
           }
-          box.append(ul);
+          if (!lists.length) piece.append(el("p", "no-source", FAILED.includes(s.verdict) ? s.verdict : "No source found"));
+          else piece.append(el("p", "", `Reliable sources cited: ${s.sourceCount}`));
+          box.append(piece);
         }
         verified.append(box);
       }
     }
+
+    // Build line (Ben, 10/7): shows which version is running; warns when the app needs a restart.
+    const buildLine = document.getElementById("build");
+    const when = (t) => new Date(t).toLocaleString([], { month: "numeric", day: "numeric", hour: "numeric", minute: "2-digit" });
+    async function showBuild() {
+      try {
+        const b = await (await fetch("/version")).json();
+        buildLine.textContent = `Build: code ${when(b.codeChanged)} · page ${when(b.pageChanged)} · app started ${when(b.started)}` +
+          (b.stale ? " · CODE CHANGED SINCE START: restart the app" : "");
+        buildLine.className = b.stale ? "stale" : "";
+      } catch { buildLine.textContent = "Build: unknown (app may need a restart)"; }
+    }
+    showBuild();
+
+    // Enter in the question box works the same as clicking Submit (Ben, 10/7).
+    q.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.isComposing) { e.preventDefault(); send.click(); } });
 
     send.addEventListener("click", async () => {
       // The user can't move forward until both answers are in (blocking).
@@ -130,14 +187,26 @@
         const claims = data.segments.filter((s) => typeof s.confidence === "number").map((s) => s.text.trim());
         if (verifyOn.checked && claims.length) {
           status.textContent = `Checking ${claims.length} claim${claims.length > 1 ? "s" : ""} against reliable sources...`;
-          showVerifier(await post("/verify", { question: q.value, claims }));
+          showVerifier(await post("/verify", { question: q.value, segments: data.segments })); // Verifier gets each piece with its sentence (Ben, 10/7)
         }
         status.textContent = "";
       } catch (err) {
         status.textContent = "ERROR: " + err.message;
       }
       q.disabled = false; send.disabled = false; verifyOn.disabled = false;
+      await showBuild();
+      saveScreenshot();
     });
+
+    // Automatic screenshots (Ben, 10/7): after each answer, the page draws itself and the app saves it to Documentarian.
+    async function saveScreenshot() {
+      try {
+        const canvas = await html2canvas(document.body, { backgroundColor: "#ffffff", scale: window.devicePixelRatio || 1 });
+        await post("/screenshot", { image: canvas.toDataURL("image/png"), question: q.value });
+      } catch (err) {
+        status.textContent = "Screenshot not saved: " + err.message;
+      }
+    }
   </script>
 </body>
 </html>
