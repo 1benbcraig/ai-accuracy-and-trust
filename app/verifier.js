@@ -93,7 +93,15 @@ function trustedSites() {
   return TRUSTED;
 }
 
-async function exaSearch(query) {
+// Exa allows at most 10 searches per second (its own error message, 10/13). 2S runs at most 5 at a time and, if Exa
+// still answers "too many requests" (429), waits 1.5 seconds and tries that search once more. No extra cost.
+const MAX_PARALLEL_SEARCHES = 5;
+async function inBatches(items, size, fn) {
+  const out = [];
+  for (let i = 0; i < items.length; i += size) out.push(...await Promise.all(items.slice(i, i + size).map(fn)));
+  return out;
+}
+async function exaSearch(query, retried = false) {
   const key = readEnv("EXA_API_KEY");
   if (!key) throw new Error("No Exa key found in .env (EXA_API_KEY).");
   const res = await fetch("https://api.exa.ai/search", {
@@ -102,6 +110,7 @@ async function exaSearch(query) {
     body: JSON.stringify({ query, type: "auto", numResults: RESULTS_PER_SEARCH, includeDomains: trustedSites(), contents: { text: { maxCharacters: CHARS_PER_PAGE } } }),
   });
   const data = await res.json();
+  if (res.status === 429 && !retried) { await new Promise((r) => setTimeout(r, 1500)); return exaSearch(query, true); }
   if (!res.ok) throw new Error(`Exa error ${res.status}: ${data?.error ?? JSON.stringify(data)}`);
   return data;
 }
@@ -164,7 +173,7 @@ function sentencesOf(text) {
 
 // ---------- step 1: search (one per distinct sentence, shared) ----------
 async function searchSentences(question, sentences) {
-  const searches = await Promise.all(sentences.map(async (sentence) => {
+  const searches = await inBatches(sentences, MAX_PARALLEL_SEARCHES, async (sentence) => {
     const query = `${sentence} (context: ${question})`;
     const data = await exaSearch(query);
     const all = (data.results || []).map((r) => ({ url: r.url, title: r.title, published: r.publishedDate, text: r.text, list: onList(r.url) }));
@@ -176,7 +185,7 @@ async function searchSentences(question, sentences) {
       if (kept.length >= PAGES_PER_CLAIM) break;
     }
     return { sentence, query, cost: data.costDollars?.total ?? null, returned: all.map((r) => r.url), kept };
-  }));
+  });
   return { searches };
 }
 
