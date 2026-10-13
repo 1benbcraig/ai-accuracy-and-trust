@@ -58,18 +58,39 @@ async function ask(question) {
   }
   // The answer is the JSON in the text blocks. Search results and citations ride alongside and are kept for the log.
   const text = content.filter((c) => c.type === "text").map((c) => c.text).join("");
-  const json = text.slice(text.indexOf("{"), text.lastIndexOf("}") + 1);
-  let parsed, repaired = null;
-  try { parsed = JSON.parse(json); }
-  catch {
-    // Bracket repair (Ben, 10/12, option 2): if the reply has a stray closing bracket, remove it and try again.
-    const fixed = repairBrackets(json);
-    try { parsed = JSON.parse(fixed.text); repaired = fixed.removed; }
-    catch { throw new Error("Claude's reply wasn't in the expected format. Raw reply:\n" + text); }
+  // If the Replier sent more than one complete answer (for example a reply, then "Correction: ... Here it is:" and a
+  // second copy), use the last one that can be read: the Replier's own correction (Ben, 10/13). No words are changed.
+  const answers = topLevelObjects(text);
+  let parsed, repaired = null, usedAnswer = null;
+  for (let i = answers.length - 1; i >= 0 && !parsed; i--) {
+    try { parsed = JSON.parse(answers[i]); usedAnswer = i; }
+    catch {
+      // Bracket repair (Ben, 10/12, option 2): if the reply has a stray closing bracket, remove it and try again.
+      const fixed = repairBrackets(answers[i]);
+      try { parsed = JSON.parse(fixed.text); repaired = fixed.removed; usedAnswer = i; } catch {}
+    }
+    if (parsed && !Array.isArray(parsed.segments)) parsed = null; // not an answer; keep looking
   }
+  if (!parsed) throw new Error("Claude's reply wasn't in the expected format. Raw reply:\n" + text);
+  const multiple = answers.length > 1 ? { answersInReply: answers.length, usedAnswer: usedAnswer + 1 } : null;
   const searches = content.filter((c) => c.type === "server_tool_use").map((c) => c.input?.query);
   const resultUrls = content.filter((c) => c.type === "web_search_tool_result").flatMap((c) => (Array.isArray(c.content) ? c.content.map((r) => r.url) : []));
-  return { parsed, usage: data.usage, searches, resultUrls, repaired, rawReply: repaired ? text : undefined };
+  return { parsed, usage: data.usage, searches, resultUrls, repaired, multiple, rawReply: repaired || multiple ? text : undefined };
+}
+
+// Splits the reply into its top-level {...} blocks, ignoring braces inside quoted text.
+// A block left unclosed at the end of the reply is kept as is (the bracket repair may still read it).
+function topLevelObjects(t) {
+  const out = []; let depth = 0, start = -1, inStr = false, esc = false;
+  for (let i = 0; i < t.length; i++) {
+    const c = t[i];
+    if (inStr) { if (esc) esc = false; else if (c === "\\") esc = true; else if (c === '"') inStr = false; continue; }
+    if (c === '"') { if (depth > 0) inStr = true; continue; }
+    if (c === "{" ) { if (depth === 0) start = i; depth++; }
+    else if (c === "}" && depth > 0) { depth--; if (depth === 0) { out.push(t.slice(start, i + 1)); start = -1; } }
+  }
+  if (start >= 0) out.push(t.slice(start, t.lastIndexOf("}") + 1));
+  return out;
 }
 
 // Removes stray closing brackets only: a ")" anywhere outside quoted text, or a "]" or "}" that doesn't close
@@ -132,10 +153,10 @@ http.createServer(async (req, res) => {
   if (req.method === "POST" && req.url === "/ask") {
     try {
       const { question } = await readBody(req);
-      const { parsed, usage, searches, resultUrls, repaired, rawReply } = await ask(question);
+      const { parsed, usage, searches, resultUrls, repaired, multiple, rawReply } = await ask(question);
       // Replier's searches and the addresses it got back are logged (no page text) (Ben, 10/8).
       // If the bracket repair ran, the log says what was removed and keeps the Replier's original reply (Ben, 10/12).
-      logResult({ time: new Date().toISOString(), kind: "replier", model: MODEL, question, summary: parsed.summary, segments: parsed.segments, usage, searches, resultUrls, ...(repaired ? { repairedBrackets: repaired, rawReply } : {}) });
+      logResult({ time: new Date().toISOString(), kind: "replier", model: MODEL, question, summary: parsed.summary, segments: parsed.segments, usage, searches, resultUrls, ...(repaired ? { repairedBrackets: repaired } : {}), ...(multiple || {}), ...(rawReply ? { rawReply } : {}) });
       return send(res, 200, parsed);
     } catch (err) { return send(res, 500, { error: err.message }); }
   }

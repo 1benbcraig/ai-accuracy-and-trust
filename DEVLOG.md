@@ -246,6 +246,18 @@ The model and the sourcing changed at the same time, so this can't say which one
 
 **This devlog will now be kept current,** updated after each session that changes the code or makes decisions.
 
+## October 13 — First bucket tests
+
+The first real runs of the contested, opinion and "no source" labels, on four questions: Nile vs. Amazon, whether *Tears of the Kingdom* is just an expansion of *Breath of the Wild*, how many grains of sand are on Earth, and whether coffee is good for you.
+
+- **Contested claims showed up.** "The question is disputed…" in the Nile answer came back "Sources say this is unsettled," quoting Scientific American, VOA and France 24. In the coffee answer, "added sugar, syrups and cream can cancel out much of the benefit" came back "Sources disagree," with a Harvard Gazette article on the other side.
+- **Opinions were labeled as opinions.** "Plain coffee in moderation is a healthy choice for most people" was labeled an opinion and shown with who holds it.
+- **A possible first catch of the Replier's own mistake, unconfirmed.** Asked about grains of sand, the Replier credited the well-known 7.5 quintillion estimate to "a 1990s-era University of Hawaii estimate." The day before, asked the same question, it had said 2008. Verifier marked the claim contradicted, citing a 2012 Telegraph article. NPR's 2012 piece credits "a group of researchers at the University of Hawaii" and gives no year. Which part the Telegraph contradicts hasn't been checked yet.
+- **An overreach, partly fixed.** In the first run, "*Tears of the Kingdom* is a standalone sequel, not an expansion" came back contested because reviewers had called it "Breath of the Wild 1.5." That's an opinion about the game, not a dispute over whether it's a sequel. Ben approved one added line telling Verifier to count only sources that say the fact itself is disputed, not opinions or reactions about it. In the rerun the reviewer quotes dropped out, but the claim still came back contested on one Polygon sentence. Still open.
+- **Fixed: the Replier answering twice.** Once, the Replier wrote its answer, then "Correction: … Here it is:" and a second copy, and the app couldn't read either. It now uses the last complete answer in the reply. No words are changed, and the log notes when this happens.
+- **Planted errors: still 10 of 10.**
+- **Cost grows with answer length.** A four-sentence answer cost about 5 cents to check; the ten-sentence coffee answer about 12.
+
 ---
 
 ## Open questions

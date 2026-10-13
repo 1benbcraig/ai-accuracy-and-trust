@@ -240,7 +240,7 @@ Each claim comes with the sentence it was taken from. Check only the claim, exac
 
 First, mark each claim's kind: "fact" if it states something that can be true or false, or "opinion" if it states a view, preference or judgment (including vague ones such as "some players feel" or "critics argue").
 
-For a fact: under "confirms", list the source sentences that directly confirm it. Under "contradicts", list the source sentences that directly contradict it. Under "unsettled", list the source sentences that say the matter itself is disputed, debated or unsettled, even if those sources agree with each other.
+For a fact: under "confirms", list the source sentences that directly confirm it. Under "contradicts", list the source sentences that directly contradict it. Under "unsettled", list the source sentences that say the matter itself is disputed, debated or unsettled, even if those sources agree with each other. List only source sentences that say the fact itself is disputed or unknown, for example that experts or measurements disagree. Do not list sentences that only give an opinion or a reaction about the fact.
 
 For an opinion: do not judge whether the opinion is right. Under "confirms", list only source sentences in which a person or outlet actually states or holds that view. Leave "contradicts" and "unsettled" empty.
 
