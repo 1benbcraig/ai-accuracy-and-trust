@@ -148,10 +148,14 @@ function repairBrackets(t) {
 // It runs at the same time as the Replier, so it adds no wait. The Replier always answers (Ben, 10/13).
 const GATE_PROMPT = `Sort the user's message into exactly one category. Reply with only the category word.
 CHECKABLE: it asks for facts that outside sources could confirm or contradict.
-OPINION: it asks for a personal decision or a judgment that depends on what the person values, such as "should I..." or "is it worth...".
-NONE: it is not a question to check, such as creative writing, drafting or editing text, code, or small talk.
+OPINION: the whole question asks the person to make a personal decision or judgment that depends on their own values or situation, such as "should I..." or "is it worth...".
+CREATIVE: it asks for creative writing, such as a poem, story, joke or song.
+DRAFT: it asks to write, draft, rewrite or edit text such as an email, letter or post.
+CHAT: small talk or a greeting.
+OTHER: anything else that is not a question of fact, such as writing code.
 If a message asks about facts, choose CHECKABLE even if the topic is debated. Choose OPINION only when the answer depends on the person's own values or situation.`;
-const GATE_LABELS = { CHECKABLE: "checkable", OPINION: "opinion", NONE: "none" };
+// Bucket zero (Ben, 10/13): creative, draft, chat and other inputs are not checked, and the page says why.
+const GATE_LABELS = { CHECKABLE: "checkable", OPINION: "opinion", CREATIVE: "none", DRAFT: "none", CHAT: "none", OTHER: "none" };
 async function gate(question) {
   const key = readKey();
   const res = await fetch("https://api.anthropic.com/v1/messages", {
@@ -161,9 +165,9 @@ async function gate(question) {
   });
   const data = await res.json();
   if (!res.ok) throw new Error(`Gate API error ${res.status}: ${data?.error?.message ?? JSON.stringify(data)}`);
-  const word = (data.content || []).filter((b) => b.type === "text").map((b) => b.text).join("").trim().toUpperCase().match(/CHECKABLE|OPINION|NONE/)?.[0];
+  const word = (data.content || []).filter((b) => b.type === "text").map((b) => b.text).join("").trim().toUpperCase().match(/CHECKABLE|OPINION|CREATIVE|DRAFT|CHAT|OTHER/)?.[0];
   // If the gate's reply can't be read, the question is treated as checkable (the old behavior), and the log says so.
-  return { label: word ? GATE_LABELS[word] : "checkable", readable: !!word, usage: data.usage };
+  return { label: word ? GATE_LABELS[word] : "checkable", reason: word && GATE_LABELS[word] === "none" ? word.toLowerCase() : null, readable: !!word, usage: data.usage };
 }
 
 // Log: one line per event in log.jsonl. Verifier entries store web addresses and Verifier's own words, not page text.
@@ -206,11 +210,11 @@ http.createServer(async (req, res) => {
     try {
       const { question } = await readBody(req);
       const [{ parsed, usage, searches, resultUrls, repaired, multiple, rawReply, retried, citeTags }, gateOut] = await Promise.all([ask(question), gate(question)]);
-      parsed.gate = gateOut.label;
+      parsed.gate = gateOut.label; parsed.gateReason = gateOut.reason;
       // Replier's searches and the addresses it got back are logged (no page text) (Ben, 10/8).
       // If the bracket repair ran, the log says what was removed and keeps the Replier's original reply (Ben, 10/12).
       logResult({ time: new Date().toISOString(), kind: "replier", model: MODEL, question, summary: parsed.summary, segments: parsed.segments, usage, searches, resultUrls,
-        gate: { label: gateOut.label, readable: gateOut.readable, usage: gateOut.usage }, ...(repaired ? { repairedBrackets: repaired } : {}), ...(multiple || {}), ...(rawReply ? { rawReply } : {}), ...(citeTags && citeTags.length ? { citeTags } : {}), ...(retried ? { askedAgain: true, firstReply: retried.firstReply, firstUsage: retried.firstUsage } : {}) });
+        gate: { label: gateOut.label, reason: gateOut.reason, readable: gateOut.readable, usage: gateOut.usage }, ...(repaired ? { repairedBrackets: repaired } : {}), ...(multiple || {}), ...(rawReply ? { rawReply } : {}), ...(citeTags && citeTags.length ? { citeTags } : {}), ...(retried ? { askedAgain: true, firstReply: retried.firstReply, firstUsage: retried.firstUsage } : {}) });
       return send(res, 200, parsed);
     } catch (err) { return send(res, 500, { error: err.message }); }
   }

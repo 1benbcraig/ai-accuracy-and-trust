@@ -114,19 +114,39 @@
     // One box per sentence (Ben, 10/7). Inside it, each claim the Replier scored gets its own line, then its own
     // quoted evidence and links, or "No source found". Count is per claim (Ben, 10/7).
     const FAILED = ["Verifier's reply couldn't be read", "Verifier gave no answer for this claim"];
-    // Bucket 3 (Ben, 10/12): a plain form, no warmth. What 2S gives back from it is not built yet.
+    // Bucket 3 (Ben, 10/12): a plain form, no warmth. For now it shows the user's own list back, next to the
+    // Replier's answer; no summary, since that would mean the Verifier writing its own words (Ben, 10/13).
     function showOpinionForm() {
       verified.textContent = "";
       const box = el("div", "claim");
       box.append(el("p", "bucket-label", "Opinion or decision question"));
       box.append(el("p", "", "List 3 to 5 things you value most about this decision."));
-      for (let i = 1; i <= 5; i++) { const f = el("input", "value-field"); f.placeholder = i <= 3 ? `${i}.` : `${i}. (optional)`; box.append(f); }
-      box.append(el("p", "note", "Not built yet: what 2S gives back from these, and the \u201csuggest\u201d button."));
+      const fields = [];
+      for (let i = 1; i <= 5; i++) { const f = el("input", "value-field"); f.placeholder = i <= 3 ? `${i}.` : `${i}. (optional)`; fields.push(f); box.append(f); }
+      const msg = el("p", "note", "");
+      const done = el("button", "", "Show my list");
+      done.addEventListener("click", () => {
+        const values = fields.map((f) => f.value.trim()).filter(Boolean);
+        if (values.length < 3) { msg.textContent = "Please list at least 3."; return; }
+        const out = el("div", "claim");
+        out.append(el("p", "bucket-label", "What you value most about this decision:"));
+        const ol = el("ol", ""); values.forEach((v) => ol.append(el("li", "", v))); out.append(ol);
+        out.append(el("p", "note", "Compare these with the default answer on the left."));
+        verified.textContent = ""; verified.append(out);
+      });
+      box.append(done, msg);
       verified.append(box);
     }
-    function showNotCheckable() {
+    // Bucket zero (Ben, 10/13): say why nothing is checked, never go blank.
+    const ZERO_REASONS = {
+      creative: "This looks like a creative request. Creative requests are out of scope, so nothing here was checked.",
+      draft: "This looks like a request to draft or edit text. Drafts are out of scope, so nothing here was checked.",
+      chat: "This looks like small talk, so there is nothing here to check.",
+      other: "This doesn't look like a question of fact, so nothing here was checked.",
+    };
+    function showNotCheckable(reason) {
       verified.textContent = "";
-      verified.append(el("p", "bucket-label", "Not a checkable question. Nothing to verify."));
+      verified.append(el("p", "bucket-label", ZERO_REASONS[reason] || ZERO_REASONS.other));
     }
 
     function showVerifier(out) {
@@ -204,7 +224,7 @@
         const claims = data.segments.filter((s) => typeof s.confidence === "number").map((s) => s.text.trim());
         // The gate (Ben, 10/13): only checkable questions go to the Verifier. The Replier's answer always shows.
         if (verifyOn.checked && data.gate === "opinion") showOpinionForm();
-        else if (verifyOn.checked && data.gate === "none") showNotCheckable();
+        else if (verifyOn.checked && data.gate === "none") showNotCheckable(data.gateReason);
         else if (verifyOn.checked && claims.length) {
           status.textContent = `Checking ${claims.length} claim${claims.length > 1 ? "s" : ""} against reliable sources...`;
           showVerifier(await post("/verify", { question: q.value, segments: data.segments })); // Verifier gets each piece with its sentence (Ben, 10/7)

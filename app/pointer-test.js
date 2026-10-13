@@ -27,7 +27,7 @@ const logFile = path.join(__dirname, "log.jsonl");
     const a = await post("/ask", { question });
     console.log("DEFAULT ANSWER: " + a.segments.map((s) => s.text).join(""));
     const claims = a.segments.filter((s) => typeof s.confidence === "number").map((s) => s.text.trim());
-    console.log("GATE: " + a.gate);
+    console.log("GATE: " + a.gate + (a.gateReason ? " (" + a.gateReason + ")" : ""));
     if (a.gate && a.gate !== "checkable") { console.log("(not sent to the Verifier: " + (a.gate === "opinion" ? "bucket 3 form" : "nothing to check") + ")"); continue; }
     const v = await post("/verify", { question, segments: a.segments });
     console.log("\nVERIFIER BOXES:");
