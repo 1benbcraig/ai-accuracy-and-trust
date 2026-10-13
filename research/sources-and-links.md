@@ -209,6 +209,161 @@ These aren't source-list entries — they're stats that appeared in the 9/18 ses
 
 ---
 
+## Unverified leads from the 10/2 voice session (extraction AI core concept)
+
+**All items here came from a voice session on 2026-10-02. None has a link yet. None has been checked against a source. Do not quote any figure in a deliverable until it has a source and the full text has been opened.** They back the extraction-core idea in the project's working guide (not published). **Update 10/5:** each item was re-checked; see "E. Status of the unverified figures" in the section below. The items under this heading are left as originally reported.
+
+**Multi-agent cost and failure**
+
+- **~15x token cost.** Claim: multi-agent back-and-forth systems run roughly 15 times the token cost of a single-pass answer. Said to be cited to multiple industry sources, including a claim attributed to Anthropic's own internal guidance. The specific sources aren't identified. Unverified, no link yet.
+- **~37% of multi-agent failures from handoff miscommunication.** Claim: one production trace study found about 37% of multi-agent failures came from miscommunication between agents during handoffs, not model error. The study isn't identified. Unverified, no link yet.
+
+**Legal AI hallucination case tracking**
+
+- One database: roughly 200 cases in mid-2025, rising to 1,761 by July 2026. Database not identified. Unverified, no link yet.
+- A separate count: 1,313 court proceedings and 496 sanctioned attorneys across 106 countries. Count not identified. Unverified, no link yet.
+
+**Healthcare**
+
+- Healthcare hallucination rate estimated at 10–20%, depending on task and model. Attributed to AllAboutAI (2026). Not independently verified. AllAboutAI's type (practitioner or marketing) not yet checked. Unverified, no link yet.
+- An insurance-company executive was quoted saying no U.S. malpractice case has yet had AI as the central claim. Executive, company and outlet not identified. Unverified, no link yet.
+
+**Extractive and template-based language generation**
+
+- Claim: extractive and template-based natural language generation (NLG) is established, older technology, with a zero hallucination rate for pure template systems. Unverified, no link yet.
+- Claim: healthcare and legal both mostly adopted generative LLMs instead, then added safety features such as citations and uncertainty flagging afterward, rather than building on the inherently safer architecture. Unverified, no link yet.
+- Claim: one legal study found professionals rated LLM-generated answers as more empathetic and better structured than a real human expert's answer. The study isn't identified. It is offered as one explanation for the shift away from rigid template systems despite the risk. Unverified, no link yet.
+
+**Searches per AI request**
+
+- How many searches a typical AI request triggers internally. No public data found. Unverified, no link yet.
+
+**Note:** the legal figures above are separate from the "52%" LegalHalluLens lead in "Accuracy: why AI gets things wrong" and the project's working notes. They measure different things (case counts vs. an error rate).
+
+---
+
+## Research run 10/5: the three pillars, and why models don't say "I don't know"
+
+**How this was checked:** each page below was opened with a tool that returns a machine summary of the page. Full papers were not read. Numbers and quotes come from those summaries, so open the full text before quoting anything in a deliverable. Where a source is a vendor or a secondhand write-up, it says so.
+
+### A. Why don't AI models say "I don't know"? (Ben's question, 10/5)
+
+Short version of what was found: the evidence points to more than one cause, and no source was found in which a lab says it deliberately made models sound more confident because users asked. The company statements found say the opposite (they want uncertainty flagged). Findings, by cause:
+
+**1. Scoring rewards guessing (the labs say so themselves)**
+- OpenAI, "Why language models hallucinate," Sept 5, 2025. Company post. "standard training and evaluation procedures reward guessing over acknowledging uncertainty." Its example: a model with 24% accuracy and a 75% error rate outranks one with 22% accuracy and a 26% error rate. It says later training stages "should remove" hallucinations but this "is not fully successful," partly because of the scoring. It also quotes its Model Spec: "it is better to indicate uncertainty or ask for clarification than provide confident information that may be incorrect." https://openai.com/index/why-language-models-hallucinate/ (Same research as the Nature paper by Kalai et al. listed above.)
+
+**2. Human preference data and reward models lean against uncertainty wording**
+- Zhou, Hwang, Ren, Sap — "Relying on the Unreliable," arXiv, Jan 2024 (revised July 2024). Preprint. Looked at four preference datasets (OpenAI WebGPT comparisons, Summarize with Feedback, a synthetic pairwise set, Anthropic's Helpful and Harmless). Hedging words ("weakeners") appeared more in rejected texts (5.02%) than chosen ones (4.47%), and were preferred 8% less often than confident wording. Authors' words: "annotators don't have a bias for certainty, rather there is a bias against weakeners." Caveat: the effect is small and the datasets are older ones. https://arxiv.org/abs/2401.06730
+- Leng, Huang, Zhu, Huang — "Taming Overconfidence in LLMs: Reward Calibration in RLHF," arXiv, Oct 2024 (revised Feb 2025). Preprint. Finds that reward models used in standard RLHF training "exhibit inherent biases towards high-confidence scores regardless of the actual quality of responses," which leads models to express overconfidence. Proposes fixes. https://arxiv.org/abs/2410.09724
+- Sharma et al. (Anthropic) — "Towards Understanding Sycophancy in Language Models," ICLR 2024. Peer-reviewed. "both humans and preference models (PMs) prefer convincingly-written sycophantic responses over correct ones a non-negligible fraction of the time"; optimizing against preference models "sometimes sacrifices truthfulness in favor of sycophancy." This is about agreeing with users, not about sounding confident, but it is the same training mechanism. Written by the company that makes Claude. https://arxiv.org/abs/2310.13548
+
+**3. A lab using user feedback signals (agreeableness, not confidence)**
+- OpenAI, "Sycophancy in GPT-4o," April 29, 2025. Company post. OpenAI says it incorporates "user signals like thumbs-up / thumbs-down feedback," and that in the update it "focused too much on short-term feedback," so the model "skewed towards responses that were overly supportive but disingenuous." This shows the mechanism exists at a lab. It does not say the labs tuned for confident tone. https://openai.com/index/sycophancy-in-gpt-4o/
+
+**4. What users prefer (partly supports Ben's understanding)**
+- Kim et al. (Microsoft Research) — "I'm Not Sure, But...," 2024 (already listed above): first-person hedging lowered users' confidence in the system and their agreement with its answers, and raised accuracy. https://arxiv.org/abs/2405.00623
+- Zhou et al. (above): users "rely heavily on LM generations, whether or not they are marked by certainty."
+- A 2026 study on sycophantic AI, read only through a third-party review site (not the paper): participants rated sycophantic answers about 9% higher quality and 13% more likely to reuse. Again about agreeing, not confidence. Secondhand; find the original before using. https://www.themoonlight.io/en/review/sycophantic-ai-decreases-prosocial-intentions-and-promotes-dependence
+
+**5. It may also be a training problem, not only a scoring one**
+- Kirichenko et al. (Meta and others) — "AbstentionBench," arXiv, June 2025. Preprint. Tests whether models decline to answer questions that shouldn't be answered (missing information, false premises, unknowable, outdated). 20 datasets, 20 models. The "24%" figure comes from two comparisons of a "reasoning" model (trained to think step by step before answering) against the same base model without that training: s1.1 32B vs. Qwen 2.5 32B Instruct, and DeepSeek R1 Distill Llama 70B vs. Llama 3.3 70B Instruct. The measure is "abstention recall": of the questions the model should have declined, the share it did decline, averaged over the 20 datasets. Paper's words: reasoning models "show an average of 24% drop in abstention compared to their non-reasoning counterparts." Full text re-read 10/5 (browser, whole page): the paper never says whether 24% means percentage points or a share of the starting rate, in the abstract, intro or text I searched; the exact meaning is unsettled (figures not read). Paper also says the drop shows up "even for math and science domains" the reasoning models are trained on, and that models often give a definitive answer "even when their reasoning chains express uncertainty." In its Tülu checkpoint test, the paper says abstention degraded after the final reinforcement-learning-on-verifiable-answers (RLVR) stage. Only two reasoning models are in that comparison. On size: "Increasing model scale in Llama does not improve abstention." Authors' explanations: models "often hallucinate the missing problem context," and a hypothesis (not tested) that "reward model misspecification" leaves "models biased to provide definitive and confident responses." Prompting helps but "does not resolve" the problem. https://arxiv.org/abs/2506.09038
+
+**5b. Vendor documentation: the default is not to abstain unless told to**
+- Anthropic's developer docs, "Reduce hallucinations": the first listed technique is "Allow Claude to say 'I don't know': Explicitly give Claude permission to admit uncertainty. This simple technique can drastically reduce false information." The docs imply that permission has to be given. Written by the company that makes Claude. https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/reduce-hallucinations
+
+**6. What a lab says it is doing now, and one reported reaction**
+- Anthropic, "Introducing Claude Opus 4.8," May 28, 2026. Company post. Says the model is "more likely to flag uncertainties about its work and less likely to make unsupported claims." https://www.anthropic.com/news/claude-opus-4-8 (Written by the company that makes Claude.)
+- Reported user reaction: AI Weekly, summarizing a Gizmodo article, says unnamed Reddit users complained about hedging and wordiness. Anecdotal; the Gizmodo original was not opened, and no usage or retention data was found. https://aiweekly.co/node/2327
+
+**Not found:** any lab statement that it made models sound more confident because users preferred it; internal user-preference data from any lab.
+
+### B. Pillar 1: how legal and medical AI actually evolved
+
+**What the sources support:**
+- *Before generative AI, legal tools were mostly classification and extraction.* Technology-assisted review (predictive coding) ranked documents using human-coded examples; courts accepted it (OpenText vendor report, which says so about itself). Kira Systems' software was used by Axiom to "extract relevant clauses and metadata fields" from contracts (ABA Journal, Aug 8, 2017; Axiom's president: "Contract review is the first application in which AI produces reliable results"). In 2016 Thomson Reuters was reported to be developing a Watson-based product (one line, no details). Sources: https://www.opentext.com/en/media/report/tar-to-har-how-llms-are-ushering-in-legal-3-0-report-en.pdf · https://www.abajournal.com/news/article/axiom_machine_learning_contract_review · https://www.lawnext.com/2016/03/proof-concept-artificial-intelligence-law.html
+- *Then money moved to generative tools.* Casetext (founded 2013) built CoCounsel on GPT-4; Thomson Reuters agreed to buy it for $650 million on June 29, 2023 (Legal Dive). Harvey: $5M seed Nov 2022 led by the OpenAI Startup Fund; $21M Series A Apr 2023; $80M Series B Dec 2023 at $715M (Sacra, a research site). Harvey later dropped its own legal model for outside frontier models and a LexisNexis citation partnership. https://www.legaldive.com/news/thomson-reuters-casetext-purchase-casetext-cocounsel-generative-ai-legal-tech/654306/ · https://www.sacra.com/c/harvey
+- *Medical documentation followed a similar path.* The original Nuance DAX relied on human reviewers; DAX Copilot (Sept 27, 2023) integrates GPT-4. https://www.healthcaredive.com/news/dax-copilot-nuance-automated-doctor-tool-artificial-intelligence-healthcare/694818/
+- *Legal AI with retrieval still hallucinated.* Stanford RegLab/HAI (Magesh et al., May 23, 2024) tested Lexis+ AI, Ask Practical Law AI and Westlaw AI-Assisted Research, all built on retrieval-augmented generation: Lexis+ AI and Practical Law hallucinated "more than 17% of the time," Westlaw "more than 34%." Vendors had advertised "hallucination-free" citations. https://hai.stanford.edu/news/ai-trial-legal-models-hallucinate-1-out-6-or-more-benchmarking-queries
+- *Sanctions for hallucinated filings are real and growing.* Damien Charlotin's AI Hallucination Cases database (maintained by a French lawyer; crowd-sourced, by his own caveat not definitive) listed 2,149 cases as of Oct 5, 2026: 1,473 in the U.S., 1,233 involving self-represented litigants, 854 involving lawyers. https://www.damiencharlotin.com/hallucinations/
+- *One reason professionals may like generative answers:* Nyarko et al., SSRN working paper, May 27, 2026: 16 U.S. law professors judged 2,918 anonymized comparisons on contract-law tutoring answers; the AI answers won 75.33% of the time against peers' answers, and 3.53% of AI answers were flagged harmful vs. 12.06% of professors' answers. https://law.stanford.edu/publications/law-professors-prefer-ai-over-peer-answers/
+
+**What was not found:** any source on why firms kept using generative tools after being burned, or on whether "power and sexiness" drove the move. The sources show what was bought and built, not the reasons. "Extractive first, then generative" is supported only loosely: earlier tools were classification and extraction, but no source describes a deliberate industry choice of one over the other.
+
+### C. Pillar 2: extractive vs. generative on pure extraction tasks
+
+No neutral, apples-to-apples comparison was found. What exists:
+- Choose Your QA Model Wisely (arXiv 2203.07522, ACL workshop 2022): across nine models, generative readers did better on long context, extractive readers on short context, and extractive readers generalized better to new domains. https://arxiv.org/abs/2203.07522
+- John Snow Labs (a vendor selling clinical NLP): claims 96% vs. GPT-4o's 79% F1 on detecting patient identifiers, and doctors preferring its output 35% to 24%. Vendor marketing; not independently checked. https://www.johnsnowlabs.com/what-structured-nlp-does-that-llms-still-cant-precision-extraction-at-billion-document-scale
+- Kim, Chung, Aghaeepour, Kim, Int J Med Sci, Feb 3, 2025: GPT-3.5 and GPT-4 extracting from 60 clinical case reports. Results varied by item (sex 95% vs. 70%; BMI 57% vs. 78%, GPT-4 lower), and GPT-4 reached 100% on failed items once the prompt gave definitions. No extractive baseline. https://pmc.ncbi.nlm.nih.gov/articles/PMC11866537
+- A 2023 medRxiv study compared only GPT-4 and LLaMA-2 on clinical notes; no extractive baseline, so it doesn't answer the question.
+
+### D. Pillar 3: chained retrieve/extract, generate, verify
+
+- RARR (Gao et al., Google, arXiv Oct 2022, ACL 2023): generates text first, then finds evidence and edits unsupported content. The order is generate, then verify. https://arxiv.org/abs/2210.08726
+- VerifAI (arXiv 2604.08549, 2026): biomedical question answering that chains a retrieval step, a citation-aware generator, and a verification step that splits answers into single claims and checks each against the retrieved evidence. Authors report retrieval MAP@10 of 42.7%, verification beating GPT-4 on the HealthVer benchmark, and fewer hallucinated citations than zero-shot baselines. Author-reported; not independently checked. This is the closest match found to the retrieve, generate, verify chain. https://arxiv.org/abs/2604.08549
+- Retrieval-augmented generation (retrieve first, then generate) is already what the legal research tools above use; the Stanford study shows it did not remove hallucination.
+- Not found: a system that generates only from facts already verified by an extractive core, which is the "Hemingway mod" idea in the project's working guide (see the devlog, October 2). This was one search pass, not a full survey.
+- What legal and medical fields use today (from the sources above): retrieval-based legal research tools (Lexis+ AI, Westlaw AI, CoCounsel, Harvey) and GPT-4-based clinical note drafting (DAX Copilot). What is emerging was not researched in depth.
+
+### F. Why did the money move to generative tools? (Ben, 10/5 follow-up)
+
+Short version: the sources give several stated reasons, none of them a single decisive one, and nothing found supports or rules out "power and sexiness" as a motive. All of the founder and company accounts below are self-reported and secondhand through page summaries; some summaries contained date inconsistencies, so dates here are only the ones that are cross-checked elsewhere in this doc.
+
+**Reasons given by the people who built the tools**
+- *Earlier extraction tools needed per-task training and had limits.* Alexander Hudek, co-founder and CTO of Kira Systems (interview published March 18, 2020, updated Dec 9, 2022): lawyers feed examples of each provision into the system to train it; Kira's standard is at least 90% recall on most fields; keeping training data is often not possible because of client data-deletion obligations; and deep learning at the time was "only matching non-deep learning approaches, or at best getting a very small increase." This describes limits of the older approach, but predates GPT-4 and doesn't say the industry left it for that reason. https://www.unite.ai/alexander-hudek-co-founder-cto-of-kira-systems-interview-series
+- *A capability jump, per founders.* Jake Heller (Casetext CEO), first-person account: before GPT-4 the company used traditional language-processing and machine learning; once it had GPT-4 access, "We stopped everything that we were doing and said we're going to build something totally new." He says his team worked to reach 97–99% accuracy targets and treated every customer complaint as a new test case. Founder account; one-sided. https://yespress.io/how-we-built-an-ai-app-and-sold-it-for-650-million
+- *Harvey's founders' test.* Winston Weinberg and Gabe Pereyra tested GPT-3 on questions from Reddit's r/legaladvice; Weinberg says attorneys shown the answers (not told they were AI) would have sent 86 of 100 with no edits (TechCrunch, Nov 14, 2025, and an OpenAI customer story). Weinberg on retrieval alone: "If you just do retrieval, you can answer very simple questions about areas of law that you aren't really an expert in, but that's actually not that useful for most attorneys." Conflict of interest: the OpenAI customer story is OpenAI's own, and the OpenAI Startup Fund was Harvey's early investor. https://techcrunch.com/2025/11/14/inside-harvey-how-a-first-year-legal-associate-built-one-of-silicon-valleys-hottest-startups · https://openai.com/index/harvey
+- *A widely quoted capability claim that was later disputed.* OpenAI's March 2023 GPT-4 report put GPT-4 at about the 90th percentile of bar exam takers. Eric Martínez's re-analysis estimates about the 62nd percentile against first-time takers overall, about the 48th against those who passed, and about the 15th on essays against licensed attorneys, and calls OpenAI's figure "likely overinflated." Whether the 90th-percentile claim influenced legal buyers or investors was not established. https://law-ai.org/re-evaluating-gpt-4s-bar-exam-performance/
+
+**Reasons given by buyers and investors**
+- Thomson Reuters, on buying Casetext ($650M, June 29, 2023): CEO Steve Hasker called it "another step in our 'build, partner and buy' strategy" for generative AI, alongside about $100M a year of AI investment. https://www.legaldive.com/news/thomson-reuters-casetext-purchase-casetext-cocounsel-generative-ai-legal-tech/654306/
+- Crunchbase News (undated in the summary; covers 2024–2025): about 79% of legal-related startup investment since 2024, nearly $2.2 billion, went to companies that also fit its AI categories. It cites a Goldman Sachs finding that "44% of legal work could eventually be automated" and a Thomson Reuters analysis that AI could free up about four hours a week within a year. Examples: Clio $900M (2024), Harvey $300M at a $3 billion valuation (Feb 2025). This shows where money went and the reasons reported, not investors' own words. https://news.crunchbase.com/venture/legal-tech-startup-investment-ai-clio-harvey/
+- Medical: the Nuance/Microsoft press release (March 20, 2023) gives clinician burnout and paperwork burden as the reasons and the reach to 550,000 Dragon Medical users; it does not cite cost or the limits of human review. The earlier DAX used human reviewers (Healthcare Dive, Sept 2023). Company press release. https://news.nuance.com/2023-03-20-Nuance-and-Microsoft-Announce-the-First-Fully-AI-Automated-Clinical-Documentation-Application-for-Healthcare
+
+**What the sources, taken together, support:** founders and buyers describe generative models as able to draft and answer in plain language without per-task training, and investors and consultants described a large share of legal work as automatable. **What was not found:** buyer surveys on why firms chose generative over extractive tools; any source that attributes the shift to hype or appeal; and why buyers kept buying after hallucination findings.
+
+### G. Are legal and medical professionals sacrificing accuracy? Evidence on harms and reasons (Ben's question, 10/5)
+
+**How this section was checked:** for these pages the fetch tool was told to quote verbatim. It still returns a small model's answer, not the raw page. Two pages (Mayo Clinic Proceedings: Digital Health; a ClinicalTrials.gov record) returned errors and were not read. Quotes below are as returned by the tool.
+
+**Short version:** a lot of research on harms exists; my first pass was too narrow. No source was found that asks professionals whether they knowingly accept lower accuracy. The sources instead describe professionals who are time-pressed, trust the tool more than they should, or don't verify. Those are different explanations from "accepting inaccuracy," and the sources don't settle which one dominates.
+
+**Legal: measured harms**
+- Dahl, Magesh, Suzgun, Ho — "Large Legal Fictions," Journal of Legal Analysis 16(1), 2024. Peer-reviewed. General-purpose chatbots hallucinated "between 58% of the time with ChatGPT 4 and 88% with Llama 2" on questions about federal court cases; models often failed to correct users' false assumptions and could not reliably detect their own errors; risks "highest for those who stand to benefit from LLMs the most -- pro se litigants." https://arxiv.org/abs/2401.01301
+- Stanford (above, section B): retrieval-based legal research tools hallucinated 17% to 34% in 2024.
+- Charlotin database (above): 2,149 cases listed as of Oct 5, 2026.
+- Kemp, blog post, May 1, 2026 (author is a licensed California lawyer not currently practicing; uses ComplexDiscovery and Charlotin data): at least $145,000 in sanctions for AI citation errors in Q1 2026; typical sanctions rose from about $1,000–$5,000 in 2024 to $110,000 in one 2026 case; "Not one of the sanctioned lawyers in these six cases had a functioning AI verification practice in place." One lawyer "admitted he used ChatGPT to generate citations under time pressure and did not verify them." A blog and only six cases, so treat as illustrative. https://davidkemp.ai/blog/citation-sanctions-in-q1-2026/
+
+**Legal: reasons given for continued use**
+- Thomson Reuters 2025 survey (more than 1,700 respondents, U.S./U.K./Canada, early 2025; run by a vendor of legal AI): 26% already use generative AI (14% in 2024); concerns "tend to center on accuracy and misinformation"; the leading reason to support adoption is "The potential to save time and improve productivity"; "Only 20% ... are measuring the technology's return-on-investment." https://legal.thomsonreuters.com/blog/genai-report-executive-summary-for-legal-professionals-tri/
+- Scientific American, "Lawyers know AI can hallucinate. Judges have warned them. Courts have sanctioned them for it. They keep citing fake AI cases anyway" (page summary only). It gives no lawyer's own explanation. Researchers quoted: Alan Wagner (Penn State): "Humans essentially have a tendency to believe that machines have more knowledge than they do, don't break and are infallible"; Sophie Nightingale (Lancaster): "AI guidance has a quite specific ability to engender biases"; Chi B. Vu (Boston University): "awareness alone isn't enough." The article adds that accuracy warnings "compete with advertising that highlights the technology's potential and with workplace pressures to use it to save time." https://www.scientificamerican.com/article/why-lawyers-keep-citing-fake-cases-invented-by-ai/
+- Yuvaraj — "The Verification-Value Paradox," Monash University Law Review (draft). Scholarly argument, not a measurement: gains in efficiency "will be met by a correspondingly greater imperative to manually verify any outputs," so the net value of AI "is often negligible to lawyers." https://arxiv.org/abs/2510.20109
+
+**Medical: measured harms**
+- Yi et al., *Radiology*, Nov 19, 2024 (RSNA press release): 220 physicians read chest X-rays with simulated AI advice. When the advice was wrong, accuracy fell to 23.6% (one explanation type) and 26.1% (another). https://www.rsna.org/media/press/i/2552
+- Qazi et al., medRxiv preprint, Sept 8, 2025: randomized trial, 44 physicians trained in AI use. Those given flawed LLM recommendations scored 73.3% vs. 84.9% for those given error-free advice (a 14-point drop). Small and not yet peer-reviewed. https://www.medrxiv.org/content/10.1101/2025.08.23.25334280v2
+- ECRI, top health technology hazards for 2026 (Jan 21, 2026): misuse of AI chatbots ranked first. "chatbots can provide false or misleading information that could result in significant patient harm"; one chatbot approved placing an electrosurgical electrode over a patient's shoulder blade, advice that "would leave the patient at risk of burns"; "More than 40 million people daily turn to ChatGPT for health information." https://home.ecri.org/blogs/ecri-news/misuse-of-ai-chatbots-tops-annual-list-of-health-technology-hazards
+- UCLA randomized trial of two AI scribe tools, *NEJM AI* 2025: 238 physicians, 14 specialties, about 72,000 encounters. Physicians reported notes "occasionally" had clinically significant inaccuracies, mostly omissions or pronoun errors; "One mild patient safety event was reported." https://www.uclahealth.org/news/release/ucla-study-finds-ai-scribes-may-reduce-documentation-time
+
+**Medical: measured benefits (the other side of the trade)**
+- Same UCLA trial: one tool cut documentation time by 41 seconds per note (4:30 to 3:49); the other's change was not statistically significant; both tools showed roughly 7% improvement in burnout scores. A modest benefit.
+
+**Not found:** an aggregate count of patient harm from AI scribes; any survey asking lawyers or clinicians whether they knowingly accept lower accuracy for speed; the Mayo Clinic scribe-safety paper's results (page returned an error).
+
+### E. Status of the unverified figures from the 10/2 voice session
+
+- **~15x token cost: confirmed from a primary source, with a wording fix.** Anthropic engineering blog, June 13, 2025: "agents typically use about 4× more tokens than chat interactions, and multi-agent systems use about 15× more tokens than chats." It compares with chat (not "a single-pass answer") and comes from Anthropic's public engineering post about its research system, not internal guidance. https://www.anthropic.com/engineering/multi-agent-research-system
+- **~37% of multi-agent failures from handoff miscommunication: not confirmed.** The likely source, Cemri et al., "Why Do Multi-Agent LLM Systems Fail?" (arXiv Mar 2025; 1,642 traces, 7 frameworks), reports in its latest version: system design issues 43.9%, inter-agent misalignment 31.35%, task verification 24.75%. The 37% figure was not found. Full text re-read 10/5: version 1 (browser, whole page) gives no overall inter-agent percentage in its text, only that failure types are split across three categories; the latest version lists per-mode shares for inter-agent misalignment (2.20%, 6.80%, 7.40%, 0.85%, 1.90%, 13.20%), which add to about 32% by my arithmetic (the paper's own category total is not in the text I read). It may be from another study. Inter-agent misalignment is also broader than handoff miscommunication. https://arxiv.org/abs/2503.13657
+- **Legal case counts:** the 1,761-by-July-2026 and roughly-200-in-mid-2025 figures were not found. Charlotin's database shows 1,624 cases on June 18, 2026 (via Vaquill, a vendor blog) and 2,149 on Oct 5, 2026 (the database itself). https://www.vaquill.ai/blog/hallucination-tracker-charlotin-risk-manager A republished wire story gives about 1,600 cases across 35 countries and says hallucinations "increased eightfold in the past year": https://www.notices.mce.ca.gov/2026/06/courts-cracking-down-on-error-strewn-ai-assisted-legal-briefs/
+- **1,313 proceedings, 496 sanctioned attorneys, 106 countries: not usable.** It comes from a vendor blog (HAQQ, April 2026) citing its own database ("Legal Data Hunter"), which can't be independently checked. The "106 countries" figure there describes that database's coverage, not countries with hallucination cases. https://haqq.ai/blog/when-ai-lies-to-the-court.html
+- **Insurance executive quote: found, via a page summary.** Deepika Srivastava, Chief Operating Officer of The Doctors Company, in Medical Economics, Oct 8, 2025: "There has been no documented malpractice case in the U.S. where AI is central to the claim." Check the exact wording on the page. https://www.medicaleconomics.com/view/ai-on-trial-how-artificial-intelligence-is-reshaping-medical-malpractice
+- **Healthcare hallucination rate of 10–20% (AllAboutAI, 2026): not verified.** The AllAboutAI page returned an access error; no other source found.
+- **Pure template systems have zero hallucination: not verified.** Two NLG hallucination surveys (Ji et al., 2022, and a 2022 faithfulness survey) only discuss neural systems and don't make this comparison. https://arxiv.org/abs/2202.03629
+- **Professionals rating LLM answers more empathetic and better structured: not found.** The closest study found is the law-professors study in section B above, which reports win rates and harm flags, not empathy or structure.
+
+---
+
 ## Side topic: agents (not research sources)
 
 These came up while deciding how to run the research. They won't go in the reports.
