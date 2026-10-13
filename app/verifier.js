@@ -273,10 +273,13 @@ async function claudeVerify(question, items, src) {
 // Verdict and bucket per claim, set by 2S from Verifier's lists (Ben, 10/12):
 // a fact is contested (bucket 2) if sources contradict each other, or if sources say the matter is unsettled;
 // an opinion is checked only for who holds it; nothing found is "Not found" (bucket 4, shown as "No source found").
+const MIN_UNSETTLED_SITES = 2; // Ben, 10/13
 function verdictFor(confirms, contradicts, unsettled = [], kind = "fact") {
   if (kind === "opinion") return confirms.length ? "Opinion, source found" : "Opinion, no source found";
   if (confirms.length && contradicts.length) return "Sources disagree";
-  if (unsettled.length) return "Sources say this is unsettled";
+  // "Unsettled" only counts when at least two different sites say so (Ben, 10/13), so one opinion piece can't make a
+  // fact look disputed. Each list already holds at most one pick per site, so its length is the number of sites.
+  if (unsettled.length >= MIN_UNSETTLED_SITES) return "Sources say this is unsettled";
   if (confirms.length) return "Supported";
   if (contradicts.length) return "Contradicted";
   return "Not found";
