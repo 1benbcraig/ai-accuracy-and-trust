@@ -14,12 +14,13 @@ The name comes from the newsroom rule of confirming a claim with a second, indep
 
 ## Status
 
-A rough version, being improved through use. Updated October 12, 2026.
+A rough version, being improved through use. Updated October 14, 2026.
 
 - **Working:** the first answer ("Replier"), with a confidence score for each claim and Anthropic's web search when it needs current facts; a checker ("Verifier") that searches about 1,200 trusted sites, keeps only pages on a list of about 24,000 reliable sources, and shows each piece of evidence in the source's own words. Verifier only points to source sentences; it never writes its own. Both use Claude Sonnet 5.5.
 - **Tested:** all 10 planted errors caught on the current setup. Across 32 claims from 8 real questions, 29 were backed by two or three different sites. Small and mostly easy questions, so a first signal, not proof.
-- **Being built:** contested claims, opinions, and questions with no findable answer (see the devlog, October 12).
-- **Known problems:** Verifier hasn't yet caught a mistake the Replier made on its own, and when the Replier hedges, a disputed point can pass as settled.
+- **Also working (October 13):** labels for contested claims, opinions (with who holds them) and claims with no source found; a short first step that sets aside creative writing, drafts and small talk, and says why they aren't checked.
+- **First real catch:** asked whether Claude's chat and Cowork had merged, the Replier said they hadn't; Verifier contradicted that with Fortune and The Verge (September 16, 2026), plus three other claims.
+- **Known problems:** the Replier sometimes leaves checkable statements unscored, so Verifier never sees them; one word with two meanings ("standalone") can pass as support; creative requests are deliberately not checked.
 
 ## What's here
 
