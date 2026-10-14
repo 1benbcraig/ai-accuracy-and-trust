@@ -200,8 +200,10 @@ http.createServer(async (req, res) => {
       if (slug.length > 40) slug = slug.slice(0, 41).replace(/-[^-]*$/, ""); // cut at a word break
       slug = slug || "question";
       const dir = path.join(__dirname, "..", "Documentarian");
-      let name = `${stamp}_2S_${slug}.png`; let n = 2;
-      while (fs.existsSync(path.join(dir, name))) name = `${stamp}_2S_${slug}-${n++}.png`;
+      // Branch tag (Ben, 10/14): the app folder's name goes in the file name, so shots from each copy can be told apart.
+      const branch = path.basename(__dirname).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "app";
+      let name = `${stamp}_2S_${branch}_${slug}.png`; let n = 2;
+      while (fs.existsSync(path.join(dir, name))) name = `${stamp}_2S_${branch}_${slug}-${n++}.png`;
       fs.writeFileSync(path.join(dir, name), Buffer.from(image.replace(/^data:image\/png;base64,/, ""), "base64"));
       return send(res, 200, { saved: name });
     } catch (err) { return send(res, 500, { error: err.message }); }

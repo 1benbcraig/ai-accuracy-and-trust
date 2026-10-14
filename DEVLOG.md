@@ -272,6 +272,11 @@ The first real runs of the contested, opinion and "no source" labels, on four qu
 - **Planted errors: still 10 of 10.**
 - **Cost grows with answer length.** A four-sentence answer cost about 5 cents to check; the ten-sentence coffee answer about 12.
 
+## October 14 — Design branches
+
+- **Freezing the design to explore.** Ben is starting rough design passes (basic function, not visual polish) and rethinking some earlier choices. The current version gets frozen, and several copies are made to explore different directions side by side and pick among them. These copies stay on his Mac, not on GitHub.
+- **Screenshots name their copy.** Each automatic screenshot's file name now includes the app folder's name, so shots from different copies can be told apart later.
+
 ---
 
 ## Open questions
