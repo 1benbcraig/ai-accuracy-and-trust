@@ -277,6 +277,13 @@ The first real runs of the contested, opinion and "no source" labels, on four qu
 - **Freezing the design to explore.** Ben is starting rough design passes (basic function, not visual polish) and rethinking some earlier choices. The current version gets frozen, and several copies are made to explore different directions side by side and pick among them. These copies stay on his Mac, not on GitHub.
 - **Screenshots name their copy.** Each automatic screenshot's file name now includes the app folder's name, so shots from different copies can be told apart later.
 
+> *A note from Claude: the entries from October 14 (second half) to October 21 were added on the evening of October 21. Ben asked for GitHub to be updated after every session, and I didn't do it, so I've backdated these entries from the session notes kept each day. The design copies themselves still stay on Ben's Mac, as decided on October 14.*
+
+- **Showing what Claude searched, not its "reasoning."** The page used to show a short "reasoning" summary from the Replier. Ben dropped it: Claude can't report its real reasoning, so the summary was a plausible story, not insight. Branch A now shows what the Replier actually searched, as links ("Claude searched:"), or "No sources checked — answered from memory" when it didn't search.
+- **Verifier stays independent.** The Replier searches the open web; Verifier still searches only the 1,200 trusted sites. Verifier doesn't reuse the Replier's links.
+- **Design moves to Figma.** Designing through Claude was too slow, so Ben designs the interface in Figma and Claude builds it to match, owning the working parts (logic, search, data, testing). 2S also stops imitating the Claude.ai layout: it's its own page, meant as a clickable prototype for employers and hiring managers.
+- **A finding on confidence.** Across 306 scored claims in branch A, the Replier never gave a claim 100. 23% were 95–99, 57% were 80–94, 20% below 80. So a rule like "highlight anything below 100" would highlight everything.
+
 ---
 
 ## Open questions
