@@ -284,6 +284,14 @@ The first real runs of the contested, opinion and "no source" labels, on four qu
 - **Design moves to Figma.** Designing through Claude was too slow, so Ben designs the interface in Figma and Claude builds it to match, owning the working parts (logic, search, data, testing). 2S also stops imitating the Claude.ai layout: it's its own page, meant as a clickable prototype for employers and hiring managers.
 - **A finding on confidence.** Across 306 scored claims in branch A, the Replier never gave a claim 100. 23% were 95–99, 57% were 80–94, 20% below 80. So a rule like "highlight anything below 100" would highlight everything.
 
+
+## October 15 — The Figma design, built
+
+- **Ben's design rules for the Verifier.** Within one claim, a quote appears only once, under one verdict. When Verifier files the same quote under two, the more serious verdict wins: contradicted, then unsettled, then supported. Quotes are shown in that order, so alarming ones come first.
+- **Nothing on the page shifts.** Anything that expands (the searched-links list, the full quote) opens on top of the page.
+- **Junk text removed from quotes.** Lines like "Getty Images," "Share on LinkedIn" and markdown headings are dropped from the source text before Verifier sees it. Sentences are never changed. Tested on sample lines only.
+- **Built to the Figma frame.** Branch A's page was rebuilt to Ben's "Second Source final" design: Claude's response on the left with "Claude searched" links on the right; per claim, the claim, a half-circle confidence gauge, and the citations with verdict icons. Hovering a citation shows the full quote; one click opens the source. The Claude sidebar is shown as quiet, non-working framing with one tooltip: "Claude sidebar — not active in this demo." Tested with made-up data in Claude's workspace.
+
 ---
 
 ## Open questions
