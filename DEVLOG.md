@@ -292,6 +292,17 @@ The first real runs of the contested, opinion and "no source" labels, on four qu
 - **Junk text removed from quotes.** Lines like "Getty Images," "Share on LinkedIn" and markdown headings are dropped from the source text before Verifier sees it. Sentences are never changed. Tested on sample lines only.
 - **Built to the Figma frame.** Branch A's page was rebuilt to Ben's "Second Source final" design: Claude's response on the left with "Claude searched" links on the right; per claim, the claim, a half-circle confidence gauge, and the citations with verdict icons. Hovering a citation shows the full quote; one click opens the source. The Claude sidebar is shown as quiet, non-working framing with one tooltip: "Claude sidebar — not active in this demo." Tested with made-up data in Claude's workspace.
 
+
+## October 19 — Real questions, and saying why something isn't checked
+
+- **New test questions from real people.** Ben found the old test set "kind of simple and stale." Claude drew 30 real first messages from WildChat, filtering out sexual content, violent or hateful requests, jailbreak attempts, self-harm, app traffic, greetings and non-English. Ben then disliked most of them, and the set moved to Chatbot Arena (people comparing two AIs side by side). The filters are written down in full, at Ben's request: "Let's be as transparent and honest as possible."
+- **Clearer messages when 2S doesn't check something.** New categories and wording, Ben's: code ("Second Source is currently unable to verify claims about code."), fiction ("This looks like fiction. Second Source checks facts, so there's nothing here to verify."), writing tasks, and reasoning, math and puzzles ("…generally unsourced, so they can't be verified here."). Code is out of scope for now, but named rather than lumped in.
+- **Checked by code, not AI.** Plain arithmetic is now calculated in code and compared with Claude's answer ("Checked by calculator, not AI"), and so are letter counts like "how many r's in strawberry" ("Counted by code, not AI"). Ben wanted it clear this isn't Claude checking itself.
+- **"No reliable source found" was becoming a major problem.** In the log, 37 of 103 claims had no source, and in every case the search had found pages; Verifier just found nothing in them. Ben rejected searching the open web ("Absolutely not") and reusing the Replier's links (not independent). Built: when Verifier finds nothing, a second search with different wording. The label also changed from "No source found" to "No reliable source found."
+- **Government sites stay a known gap.** A test showed adding ".gov" to the search crowds out everything else (9 of 10 results from census.gov). Ben: "leave gov sites as known gap."
+- **Quotes start at the evidence.** The two-line preview of a quote now starts at the sentence Verifier picked, with surrounding text only after it.
+- **A working spinner.** While Verifier runs: "Checking N claims against reliable sources…"
+
 ---
 
 ## Open questions
