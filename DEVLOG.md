@@ -303,6 +303,16 @@ The first real runs of the contested, opinion and "no source" labels, on four qu
 - **Quotes start at the evidence.** The two-line preview of a quote now starts at the sentence Verifier picked, with surrounding text only after it.
 - **A working spinner.** While Verifier runs: "Checking N claims against reliable sources…"
 
+
+## October 20 — Testing the design, and a side-by-side experiment
+
+- **How problems get handled.** Ben calls out problems as he sees them while running the test set; Claude logs them and fixes them in batches. Ben's priorities: first, gaps caused by how answers are split into claims; then, gaps from a search that's too narrow.
+- **No change to the Replier.** Ben: "we do not want to change the replier." Claims with two facts in one are a real cause of "no reliable source," but the fix, if any, is a separate claim splitter, not new instructions to the Replier.
+- **A side-by-side layout, tried and dropped.** Ben tried Claude's response on the left with the Verifier on the right, showing one claim at a time (hover, click to lock, then a carousel with dots and arrows). He liked parts of it but went back to the stacked layout: hover and the carousel fought each other, and content jumped with each claim's height.
+- **A summary line.** The Verifier heading gained a count, for example "3 claims: 2 supported, 1 no reliable source."
+- **Does Claude's confidence predict what the sources find?** Ben asked. Across 579 logged claims (mixed models and versions, so a rough signal): of claims Claude scored below 80, 19% came back contradicted, disputed or unsettled, against 3–6% for claims scored above 90. Written up as its own finding.
+- **Good examples kept.** A short list of questions where 2S did something worth showing, including the Cowork merger catch and a Snow White question with contradicting and unsettled sources.
+
 ---
 
 ## Open questions
