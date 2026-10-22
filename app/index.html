@@ -20,7 +20,6 @@
       --border-tertiary: rgba(31, 30, 29, 0.15);
       --claim-bg: #eef1f6;
       --supported: #31891c;
-      --unsettled: #656565;
       --contradicted: #b53333;
       --sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
@@ -296,11 +295,10 @@
     // ---------- Icons from the Figma master components ----------
     const ICON = {
       Supported: '<svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect width="22" height="22" rx="11" fill="#31891C"/><path d="M16.1887 7.10891C16.3703 6.96379 16.6349 6.96134 16.8205 7.11575C17.006 7.27051 17.0507 7.53111 16.9407 7.73592L16.884 7.81992L9.38391 16.8208C9.29398 16.9285 9.16279 16.9931 9.02257 16.9995C8.8824 17.0057 8.74582 16.9532 8.64659 16.854L5.14654 13.3536L5.08209 13.2755C4.9542 13.0815 4.97579 12.8173 5.14654 12.6465C5.3173 12.4758 5.58142 12.4542 5.77545 12.5821L5.85358 12.6465L8.96593 15.7592L16.1164 7.17923L16.1887 7.10891Z" fill="white" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-      Unsettled: '<svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect width="22" height="22" rx="11" fill="#656565"/><line x1="5.5" y1="11.5" x2="16.5" y2="11.5" stroke="white" stroke-width="3" stroke-linecap="round"/></svg>',
       Contradicted: '<svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect width="22" height="22" rx="11" fill="#B53333"/><path d="M15.2888 6.62202C15.4515 6.45934 15.7153 6.45931 15.878 6.62202C16.0407 6.78473 16.0407 7.04851 15.878 7.2112L11.5892 11.4999L15.878 15.7886C16.0406 15.9513 16.0407 16.2151 15.878 16.3778C15.7357 16.5202 15.5156 16.5382 15.3539 16.4315L15.2888 16.3778L11 12.0891L6.71116 16.3778C6.54845 16.5403 6.28463 16.5404 6.12196 16.3778C5.95929 16.2151 5.95941 15.9513 6.12196 15.7886L10.4108 11.4999L6.12196 7.2112C5.95941 7.04847 5.95929 6.78468 6.12196 6.62202C6.28462 6.4594 6.54844 6.45948 6.71116 6.62202L11 10.9107L15.2888 6.62202Z" fill="#141413" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>',
     };
     // Header words, from the Figma verdict row (Ben, 10/20). They replace the old hover tips.
-    const LABEL = { Supported: "Citation supports claim", Contradicted: "Citation contradicts claim", Unsettled: "Citation says claim is unsettled" };
+    const LABEL = { Supported: "Citation supports claim", Contradicted: "Citation contradicts claim" };
     function citeHead(v, label) {
       const h = el("div", "cite-head");
       const i = el("span", "vicon"); i.innerHTML = ICON[v];
@@ -493,12 +491,12 @@
     }
 
     // Dedupe rule (Ben, 10/15): within one claim, a quote shows once, in one category.
-    // Priority picks the lane: Contradicted beats Unsettled beats Supported. Shown in that order;
+    // Priority picks the lane: Contradicted beats Supported. No "unsettled" citations (Ben, 10/22). Shown in that order;
     // within a category, the Verifier's order (most direct first) is kept.
     function citationsFor(s) {
       const lanes = s.kind === "opinion"
         ? [["Supported", s.confirms || []]]
-        : [["Contradicted", s.contradicts || []], ["Unsettled", s.unsettled || []], ["Supported", s.confirms || []]];
+        : [["Contradicted", s.contradicts || []], ["Supported", s.confirms || []]];
       const seen = new Set(), out = [];
       for (const [verdict, list] of lanes) for (const p of list) {
         const key = (p.url || "") + "\n" + (p.quote || "");
@@ -546,12 +544,11 @@
       if (verdict === "Supported" || verdict === "Partly supported") return "supported";
       if (verdict === "Contradicted") return "contradicted";
       if (verdict === "Sources disagree") return "sources disagree";
-      if (verdict === "Sources say this is unsettled") return "unsettled";
       if (verdict === "Opinion, source found") return "opinion held by a source";
       if (FAILED.includes(verdict)) return "not checked";
       return "no reliable source"; // Not found, Opinion with no source
     }
-    const SUMMARY_ORDER = ["supported", "contradicted", "sources disagree", "unsettled", "opinion held by a source", "no reliable source", "not checked"];
+    const SUMMARY_ORDER = ["supported", "contradicted", "sources disagree", "opinion held by a source", "no reliable source", "not checked"];
     function showSummary(verdicts) {
       if (!verdicts.length) { vSummary.textContent = ""; vBox.querySelectorAll(".f-all").forEach((x) => x.remove()); vBox.hidden = true; return; }
       const n = {}; verdicts.forEach((v) => { const k = summaryLabel(v); n[k] = (n[k] || 0) + 1; });

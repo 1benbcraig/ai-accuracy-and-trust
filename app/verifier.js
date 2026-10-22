@@ -309,26 +309,25 @@ async function claudeVerify(question, items, src) {
 // Verdict and bucket per claim, set by 2S from Verifier's lists (Ben, 10/12):
 // a fact is contested (bucket 2) only if sources conflict about it (10/22);
 // an opinion is checked only for who holds it; nothing found is "Not found" (bucket 4, shown as "No source found").
-const MIN_UNSETTLED_SITES = 2; // Ben, 10/13
-function verdictFor(confirms, contradicts, unsettled = [], kind = "fact") {
+function verdictFor(confirms, contradicts, kind = "fact") {
   if (kind === "opinion") return confirms.length ? "Opinion, source found" : "Opinion, no source found";
   if (confirms.length && contradicts.length) return "Sources disagree";
-  // "Sources say this is unsettled" removed (Ben, 10/22): we check whether Claude's claim holds up, not whether the topic
-  // is settled. Unsettled now means only that sources conflict about the claim (confirms and contradicts both found).
+  // "Unsettled" removed entirely (Ben, 10/22): we check whether Claude's claim matches its sources, not whether the topic
+  // is settled. Each citation either supports or contradicts the claim.
   if (confirms.length) return "Supported";
   if (contradicts.length) return "Contradicted";
   return "Not found";
 }
 function bucketFor(verdict) {
   if (verdict.startsWith("Opinion")) return "opinion";
-  if (verdict === "Sources disagree" || verdict === "Sources say this is unsettled") return "contested";
+  if (verdict === "Sources disagree") return "contested";
   if (verdict === "Supported" || verdict === "Contradicted") return "settled";
   if (verdict === "Not found") return "no source";
   return null; // a failure message
 }
 
 function emptySection(n, x, verdict) {
-  return { n, claim: x.claim, sentence: x.sentence, verdict, kind: null, bucket: verdict ? bucketFor(verdict) : null, confirms: [], contradicts: [], unsettled: [], unknownIds: [], droppedOverLimit: [], droppedSameSite: [], sources: [], sourceCount: 0 };
+  return { n, claim: x.claim, sentence: x.sentence, verdict, kind: null, bucket: verdict ? bucketFor(verdict) : null, confirms: [], contradicts: [], unknownIds: [], droppedOverLimit: [], droppedSameSite: [], sources: [], sourceCount: 0 };
 }
 
 const CUT_OFF = "Verifier's reply was cut off before this claim";
@@ -369,11 +368,10 @@ function readReply(data, items, table) {
     s.confirms = pick(e.confirms, "confirms").map(view);
     // For an opinion, only "who holds it" counts; any other lists are ignored.
     s.contradicts = s.kind === "fact" ? pick(e.contradicts, "contradicts").map(view) : [];
-    s.unsettled = []; // no separate "unsettled" list any more (Ben, 10/22); anything the Verifier still sends there is ignored
-    const hosts = new Map(); for (const p of [...s.confirms, ...s.contradicts, ...s.unsettled]) if (!hosts.has(p.host)) hosts.set(p.host, p.url);
+    const hosts = new Map(); for (const p of [...s.confirms, ...s.contradicts]) if (!hosts.has(p.host)) hosts.set(p.host, p.url);
     s.sources = [...hosts.entries()].map(([host, url]) => ({ host, url }));
     s.sourceCount = s.sources.length; // per claim piece (Ben, 10/7)
-    s.verdict = verdictFor(s.confirms, s.contradicts, s.unsettled, s.kind);
+    s.verdict = verdictFor(s.confirms, s.contradicts, s.kind);
     s.bucket = bucketFor(s.verdict);
     return s;
   });
@@ -400,7 +398,7 @@ async function verify(question, segments) {
   let retry = null;
   // Off since 10/22 (Ben): it rescued 5 of 93 claims. Set to true to bring it back.
   const SECOND_SEARCH = false;
-  const missIdx = read.sections.map((sec, i) => (!sec.confirms.length && !sec.contradicts.length && !sec.unsettled.length && !FAIL_VERDICTS.includes(sec.verdict)) ? i : -1).filter((i) => i >= 0);
+  const missIdx = read.sections.map((sec, i) => (!sec.confirms.length && !sec.contradicts.length && !FAIL_VERDICTS.includes(sec.verdict)) ? i : -1).filter((i) => i >= 0);
   if (missIdx.length && SECOND_SEARCH) {
     const seen = new Set(searches.flatMap((x) => x.kept.map((r) => r.url)));
     const items2 = missIdx.map((i) => ({ ...items[i] }));
@@ -410,9 +408,9 @@ async function verify(question, segments) {
     const src2 = buildSources(queries2, s2);
     let read2 = null, usage2 = null;
     if (src2.table.size) { const data2 = await claudeVerify(question, items2, src2); usage2 = data2.usage; read2 = readReply(data2, items2, src2.table); }
-    if (read2) read2.sections.forEach((sec, k) => { const i = missIdx[k]; if (sec.confirms.length || sec.contradicts.length || sec.unsettled.length) { sec.n = i + 1; sec.secondSearch = true; read.sections[i] = sec; } });
+    if (read2) read2.sections.forEach((sec, k) => { const i = missIdx[k]; if (sec.confirms.length || sec.contradicts.length) { sec.n = i + 1; sec.secondSearch = true; read.sections[i] = sec; } });
     if (usage2) usage = { input_tokens: usage.input_tokens + usage2.input_tokens, output_tokens: usage.output_tokens + usage2.output_tokens };
-    retry = { claims: missIdx.length, foundNow: read2 ? read2.sections.filter((sec) => sec.confirms.length || sec.contradicts.length || sec.unsettled.length).length : 0,
+    retry = { claims: missIdx.length, foundNow: read2 ? read2.sections.filter((sec) => sec.confirms.length || sec.contradicts.length).length : 0,
       searches: s2.map((x) => ({ query: x.query, returned: x.returned.length, newKept: x.kept.map((r) => r.url), exaCost: x.cost })), verifierReply: read2 ? read2.raw : null };
     searches.push(...s2);
   }

@@ -234,7 +234,7 @@ http.createServer(async (req, res) => {
       const ref = (p) => ({ id: p.id, url: p.url });
       logResult({ time: new Date().toISOString(), kind: "verifier", model: MODEL, mode: out.mode, question,
         sections: out.sections.map((s) => ({ n: s.n, claim: s.claim, sentence: s.sentence, verdict: s.verdict, kind: s.kind, bucket: s.bucket,
-          confirms: s.confirms.map(ref), contradicts: s.contradicts.map(ref), unsettled: (s.unsettled || []).map(ref), unknownIds: s.unknownIds, droppedOverLimit: s.droppedOverLimit, droppedSameSite: s.droppedSameSite,
+          confirms: s.confirms.map(ref), contradicts: s.contradicts.map(ref), unknownIds: s.unknownIds, droppedOverLimit: s.droppedOverLimit, droppedSameSite: s.droppedSameSite,
           sourceCount: s.sourceCount, sources: s.sources.map((x) => x.url), ...(s.secondSearch ? { secondSearch: true } : {}) })),
         verifierReply: out.verifierReply, readable: out.readable,
         paragraphsFound: out.paragraphsFound, paragraphsSent: out.paragraphsSent, sourceSentencesSent: out.sourceSentencesSent,
