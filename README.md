@@ -14,7 +14,9 @@ The name comes from the newsroom rule of confirming a claim with a second, indep
 
 ## Status
 
-A rough version, being improved through use. Updated October 14, 2026.
+A rough version, being improved through use. Updated October 21, 2026.
+
+- **Design copies (since October 14):** design work happens in copies of the app on Ben's Mac. The code here is the October 14 version; the [devlog](DEVLOG.md) describes what has changed since.
 
 - **Working:** the first answer ("Replier"), with a confidence score for each claim and Anthropic's web search when it needs current facts; a checker ("Verifier") that searches about 1,200 trusted sites, keeps only pages on a list of about 24,000 reliable sources, and shows each piece of evidence in the source's own words. Verifier only points to source sentences; it never writes its own. Both use Claude Sonnet 5.5.
 - **Tested:** all 10 planted errors caught on the current setup. Across 32 claims from 8 real questions, 29 were backed by two or three different sites. Small and mostly easy questions, so a first signal, not proof.

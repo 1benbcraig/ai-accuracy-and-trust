@@ -313,6 +313,16 @@ The first real runs of the contested, opinion and "no source" labels, on four qu
 - **Does Claude's confidence predict what the sources find?** Ben asked. Across 579 logged claims (mixed models and versions, so a rough signal): of claims Claude scored below 80, 19% came back contradicted, disputed or unsettled, against 3–6% for claims scored above 90. Written up as its own finding.
 - **Good examples kept.** A short list of questions where 2S did something worth showing, including the Cowork merger catch and a Snow White question with contradicting and unsettled sources.
 
+
+## October 21 — What a claim demands, and a new design pass
+
+- **The story Ben wants the prototypes to tell.** (1) AI is better at some kinds of thinking or claims than others. (2) AI partly knows it: the confidence score. (3) How the claims hold up, per the Verifier. Then prototype 2: an extractive core with a generative layer controlled by a dial. The prototypes are proof of concept, not products, and not evidence.
+- **Abilities per claim.** For step 1, a separate AI call now rates each claim against 17 kinds of thinking and knowledge from ADeLe (a 2025 framework from Microsoft Research and university partners for describing what AI test questions demand). The page shows the top two per claim. Ben kept "Calibrating knowns & unknowns" on display even though it shows up often, for honesty. Tooltip: "Categories of thinking and knowledge needed for this claim." A rough illustration, not a measurement; about 0.7 cents per question.
+- **Documentation density.** The same call guesses how much has been published about each claim's subject (ADeLe calls it "atypicality"), shown as High, Medium or Low. Ben chose the name; it's our rough attempt at gauging how familiar Claude might be with a topic. Claude's training data is private, so this is a guess, not a count.
+- **Where confidence and sources disagree.** The summary box now lists claims where Claude was very confident (90 or above) but sources contradict it, or not very confident (below 80) but sources support it. Three show at first; "See more" opens the rest on top of the page. Ben's view: the box "doesn't have meaning yet." It's his top design priority.
+- **Built to Ben's latest Figma pass.** Claude's confidence is shown as a percentage under "CLAUDE'S CONFIDENCE," next to the citations so readers connect the two. Tooltips explain each label. "Claude searched" lists each site once. Links that leave the page show an "opens another site" icon; links in the summary box that jump down the page show a down arrow. The page now waits for every check and fills in at once, so nothing grows while you read.
+- **Not yet decided:** wording for the documentation-density tooltip; whether a cut-off quote can hide a counterpoint (the preview already starts at the evidence; text after it can still be cut).
+
 ---
 
 ## Open questions
