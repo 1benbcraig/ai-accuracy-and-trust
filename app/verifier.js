@@ -115,8 +115,18 @@ async function exaSearch(query, retried = false) {
   return data;
 }
 
+// Junk lines from page text (Ben, 10/15): headings ("## ..."), image credits, share and navigation links.
+// Whole lines are dropped; no sentence is changed. Fact lines like "- Capital: Canberra" are kept.
+const JUNK = /^(-\s*)?(share on \w+|share this|link to rss feed|rss feed|print|email|copy link|subscribe|sign up|advertisement|getty images|shutterstock|image source:.*|image credit:.*|photo:.*|credit:.*|hide caption|toggle caption|read more|related:?.*|skip to (main )?content)\.?$/i;
+function isJunkLine(s) {
+  if (/^#{1,6}\s/.test(s)) return true;                 // markdown heading
+  if (/^!\[.*\]\(.*\)$/.test(s)) return true;          // markdown image
+  if (/^©/.test(s) && s.length < 120) return true;       // copyright / photo credit line
+  return s.length < 60 && JUNK.test(s);
+}
+
 function paragraphs(text) {
-  const raw = String(text || "").split(/\n\s*\n|\n/).map((s) => s.replace(/\s+/g, " ").trim()).filter(Boolean);
+  const raw = String(text || "").split(/\n\s*\n|\n/).map((s) => s.replace(/\s+/g, " ").trim()).filter(Boolean).filter((s) => !isJunkLine(s));
   const out = []; let buf = "";
   for (const p of raw) {
     // Join very short lines (headings, captions) onto the next piece so they keep their context.
@@ -172,9 +182,11 @@ function sentencesOf(text) {
 }
 
 // ---------- step 1: search (one per distinct sentence, shared) ----------
-async function searchSentences(question, sentences) {
+async function searchSentences(question, sentences, plain = false) {
   const searches = await inBatches(sentences, MAX_PARALLEL_SEARCHES, async (sentence) => {
-    const query = `${sentence} (context: ${question})`;
+    // Second search (plain): the question, then the claim (Ben, 10/20). The claim alone searched badly for short
+    // pieces like "4.1 years in January 2026"; the question first keeps it on topic without repeating the first query.
+    const query = plain ? `${question} ${sentence}` : `${sentence} (context: ${question})`;
     const data = await exaSearch(query);
     const all = (data.results || []).map((r) => ({ url: r.url, title: r.title, published: r.publishedDate, text: r.text, list: onList(r.url) }));
     const perSite = new Map(); const kept = [];
@@ -235,8 +247,12 @@ function quoteFor(e, e2 = e) {
   for (let grew = true; grew;) {
     grew = false;
     if (hi + 1 < ss.length && text.length + 1 + ss[hi + 1].text.length <= QUOTE_CHARS) { hi++; text = text + " " + ss[hi].text; grew = true; }
-    if (lo > 0 && text.length + 1 + ss[lo - 1].text.length <= QUOTE_CHARS) { lo--; text = ss[lo].text + " " + text; grew = true; }
+    // The quote starts at the sentence the Verifier picked, so the two-line preview shows the evidence (Ben, 10/19).
+    // Neighboring text is added only after it, never before.
   }
+  // Exception (Ben, 10/19): if the picked sentence is very short or starts mid-reference (e.g. a book title in a
+  // reference list), also show the sentence before it, so the author's name isn't cut off.
+  if (lo > 0 && (ss[lo].text.length < 60 || !/^[A-Z0-9"“'‘(]/.test(ss[lo].text))) { lo--; text = ss[lo].text + " " + text; }
   return (lo > 0 ? "… " : "") + text + (hi < ss.length - 1 ? " …" : "");
 }
 
@@ -272,7 +288,7 @@ async function claudeVerify(question, items, src) {
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: { "x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json" },
-    body: JSON.stringify({ model: MODEL, max_tokens: 3000, system: SYSTEM, messages: [{ role: "user", content: text }] }),
+    body: JSON.stringify({ model: MODEL, max_tokens: 16000, system: SYSTEM, messages: [{ role: "user", content: text }] }),
   });
   const data = await res.json();
   if (!res.ok) throw new Error(`API error ${res.status}: ${data?.error?.message ?? JSON.stringify(data)}`);
@@ -305,16 +321,26 @@ function emptySection(n, x, verdict) {
   return { n, claim: x.claim, sentence: x.sentence, verdict, kind: null, bucket: verdict ? bucketFor(verdict) : null, confirms: [], contradicts: [], unsettled: [], unknownIds: [], droppedOverLimit: [], droppedSameSite: [], sources: [], sourceCount: 0 };
 }
 
+const CUT_OFF = "Verifier's reply was cut off before this claim";
+const FAIL_VERDICTS = ["Verifier's reply couldn't be read", "Verifier gave no answer for this claim", CUT_OFF];
 function readReply(data, items, table) {
   const raw = data.content.filter((b) => b.type === "text").map((b) => b.text).join("");
   let parsed = null;
   try { parsed = JSON.parse(raw.slice(raw.indexOf("{"), raw.lastIndexOf("}") + 1)); } catch {}
-  const entries = Array.isArray(parsed?.claims) ? parsed.claims : null;
+  let entries = Array.isArray(parsed?.claims) ? parsed.claims : null;
+  // Keep what arrived (Ben, 10/19): if the reply was cut off, read each claim that was finished
+  // instead of throwing the whole reply away. Claims it never reached say it was cut off.
+  const cutOff = data.stop_reason === "max_tokens" || (!entries && /"claims"\s*:/.test(raw));
+  if (!entries && cutOff) {
+    const found = [];
+    for (const m of raw.matchAll(/\{\s*"claim"\s*:[^{}]*\}/g)) { try { found.push(JSON.parse(m[0])); } catch {} }
+    if (found.length) entries = found;
+  }
   const sections = items.map((x, i) => {
     const s = emptySection(i + 1, x, null);
     if (!entries) return { ...s, verdict: "Verifier's reply couldn't be read" };
     const e = entries.find((y) => Number(y?.claim) === i + 1);
-    if (!e) return { ...s, verdict: "Verifier gave no answer for this claim" };
+    if (!e) return { ...s, verdict: cutOff ? CUT_OFF : "Verifier gave no answer for this claim" };
     // At most one pick per site in each list (Ben, 10/7), so three picks means three different sites.
     const pick = (ids, kind) => {
       const out = [];
@@ -341,7 +367,7 @@ function readReply(data, items, table) {
     s.bucket = bucketFor(s.verdict);
     return s;
   });
-  return { raw, readable: !!entries, sections };
+  return { raw, readable: !!entries, cutOff, sections };
 }
 
 // Sonnet 5.5 prices, read 10/8 on Anthropic's models page: $2 per million input tokens, $10 per million output.
@@ -358,15 +384,36 @@ async function verify(question, segments) {
   let read = { raw: null, readable: true, sections: items.map((x, i) => emptySection(i + 1, x, "Not found")) };
   let usage = { input_tokens: 0, output_tokens: 0 };
   if (src.table.size && items.length) { const data = await claudeVerify(question, items, src); usage = data.usage; read = readReply(data, items, src.table); }
+  // Second search (Ben, 10/19, option 2): for claims where nothing was found, search again with different wording
+  // (the question, then the claim; was the claim alone until 10/20) and check only the new pages. Found 10/19 in the log:
+  // in every "no source" case the first search had kept pages; the Verifier just found nothing in them.
+  let retry = null;
+  const missIdx = read.sections.map((sec, i) => (!sec.confirms.length && !sec.contradicts.length && !sec.unsettled.length && !FAIL_VERDICTS.includes(sec.verdict)) ? i : -1).filter((i) => i >= 0);
+  if (missIdx.length) {
+    const seen = new Set(searches.flatMap((x) => x.kept.map((r) => r.url)));
+    const items2 = missIdx.map((i) => ({ ...items[i] }));
+    const queries2 = items2.map((x) => x.claim);
+    const { searches: s2 } = await searchSentences(question, queries2, true);
+    s2.forEach((x) => { x.kept = x.kept.filter((r) => !seen.has(r.url)); });
+    const src2 = buildSources(queries2, s2);
+    let read2 = null, usage2 = null;
+    if (src2.table.size) { const data2 = await claudeVerify(question, items2, src2); usage2 = data2.usage; read2 = readReply(data2, items2, src2.table); }
+    if (read2) read2.sections.forEach((sec, k) => { const i = missIdx[k]; if (sec.confirms.length || sec.contradicts.length || sec.unsettled.length) { sec.n = i + 1; sec.secondSearch = true; read.sections[i] = sec; } });
+    if (usage2) usage = { input_tokens: usage.input_tokens + usage2.input_tokens, output_tokens: usage.output_tokens + usage2.output_tokens };
+    retry = { claims: missIdx.length, foundNow: read2 ? read2.sections.filter((sec) => sec.confirms.length || sec.contradicts.length || sec.unsettled.length).length : 0,
+      searches: s2.map((x) => ({ query: x.query, returned: x.returned.length, newKept: x.kept.map((r) => r.url), exaCost: x.cost })), verifierReply: read2 ? read2.raw : null };
+    searches.push(...s2);
+  }
   const exaCost = searches.reduce((t, s) => t + (s.cost || 0), 0);
   return {
+    secondSearch: retry,
     mode: "replier-pieces",
     sections: read.sections,
-    verifierReply: read.raw, readable: read.readable,
+    verifierReply: read.raw, readable: read.readable, cutOff: !!read.cutOff,
     paragraphsFound: src.totalParas, paragraphsSent: src.sentParas, sourceSentencesSent: src.table.size,
     searches: searches.map((s) => ({ sentence: s.sentence, query: s.query, returned: s.returned.length, returnedUrls: s.returned, kept: s.kept.map((r) => r.url), exaCost: s.cost })),
     cost: { exaDollars: exaCost, claudeUsage: usage, claudeDollars: claudeDollars(usage) },
   };
 }
 
-module.exports = { verify, claimsFromSegments, sentencesOf, buildSources, readReply, quoteFor, verdictFor, bucketFor, onList, paragraphs, parseCsv, trustedSites, MODEL };
+module.exports = { isJunkLine, verify, claimsFromSegments, sentencesOf, buildSources, readReply, quoteFor, verdictFor, bucketFor, onList, paragraphs, parseCsv, trustedSites, MODEL };

@@ -3,106 +3,281 @@
 <head>
   <meta charset="UTF-8" />
   <title>Second Source</title>
+  <!-- Built to match Figma "Second Source 'final'" (node 2020:17988), 10/15. Earlier page: index-before-figma.html. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet" />
   <style>
-    body { font-family: sans-serif; max-width: 1200px; margin: 24px auto; padding: 0 16px; }
-    .row { display: flex; gap: 16px; align-items: center; } /* gap doubled from 8px (Ben, 10/2) */
-    #question { flex: 1; }
-    /* Question box keeps the height it had at twice the default text size (39px); its text matches the Send button (Ben, 10/1). */
-    #question { font-size: 1.17em; box-sizing: border-box; height: 39px; }
-    /* Send and "Check answers" text match the "Default answer" heading size (Ben, 10/1). */
-    #send, #verify-label { font-size: 1.17em; }
-    #question { padding: 2px 4px; }
-    #send { padding: 2px 12px; box-sizing: border-box; height: 39px; } /* same height as the question box (Ben, 10/2) */
-    #verify-on { width: 18px; height: 18px; }
-    .cols { display: flex; gap: 32px; align-items: flex-start; }
-    .col { flex: 1; min-width: 0; }
-    .heads h3 { margin-bottom: 4px; } /* halved from 8px (Ben, 10/2) */
-    .head-right { display: flex; justify-content: space-between; align-items: baseline; }
-    .head-line { border: 0; border-top: 1px solid #ccc; margin: 0; }
-    .circles { display: flex; gap: 8px; }
-    .circle { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; color: #000; font-weight: bold; cursor: default; }
-    #answer { white-space: pre-wrap; }
-    .hl-red { background: #ffc2c2; }
-    .hl-yellow { background: #fff0a0; }
-    .hl-green { background: #c8f0c8; }
-    .claim { border-top: 1px solid #ccc; padding: 8px 0; }
-    .claim:first-child { border-top: 0; } /* the full-width line under the headings replaces it (Ben, 10/2) */
-    .claim-text { font-style: italic; }
-    .verdict { font-weight: bold; }
-    .uncited { text-decoration: underline dotted; }
-    .flag { font-size: 0.8em; font-weight: bold; color: #a00; margin-left: 4px; }
-    /* Build line pinned to the bottom of the window (Ben, 10/7). Page gets bottom padding so it never covers content. */
-    #build { position: fixed; left: 0; right: 0; bottom: 0; margin: 0; padding: 4px 16px; font-size: 0.8em; color: #666; background: #fff; border-top: 1px solid #ddd; }
-    body { padding-bottom: 40px; }
+    :root {
+      --bg: #f9f9f7;
+      --sidebar-bg: #faf9f5;
+      --text-primary: #141413;
+      --text-secondary: #3d3d3a;
+      --text-tertiary: #73726c;
+      --text-info: #3266ad;
+      --border-info: #4682d5;
+      --border-secondary: rgba(31, 30, 29, 0.3);
+      --border-tertiary: rgba(31, 30, 29, 0.15);
+      --claim-bg: #eef1f6;
+      --supported: #31891c;
+      --unsettled: #656565;
+      --contradicted: #b53333;
+      --sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: var(--bg); color: var(--text-primary); }
+    body { font-family: var(--sans); font-size: 15px; line-height: 1.6; letter-spacing: -0.01em; padding-bottom: 40px; }
+    a { color: var(--text-info); text-decoration-thickness: 6%; }
+
+    /* ---------- Sidebar: non-working framing, toned down (Ben, 10/15) ---------- */
+    #sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: 53px; padding: 0 8px 12px; background: var(--sidebar-bg);
+      border-right: 0.5px solid var(--border-secondary); display: flex; flex-direction: column; justify-content: space-between; z-index: 5; }
+    #sidebar .icons { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 36px; opacity: 0.4; } /* how quiet: Claude's pick (40%) */
+    #sidebar .icons .top { height: 68px; display: flex; align-items: center; justify-content: center; }
+    #sidebar .icons .nav { display: flex; flex-direction: column; align-items: center; }
+    #sidebar .icons .nav span { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; }
+    #sidebar .avatar { padding: 4px; opacity: 0.4; }
+    #sidebar svg { display: block; }
+    #sidebar-tip { position: fixed; left: 61px; display: none; z-index: 30; }
+    #sidebar-tip .bubble { position: relative; }
+    #sidebar-tip .tip-wrap { position: relative; }
+    #sidebar-tip .arrow { position: absolute; left: -13px; top: 11px; z-index: 1; }
+
+    /* ---------- Page ---------- */
+    #main { margin-left: 53px; padding: 24px 64px 12px; display: flex; flex-direction: column; align-items: center; gap: 36px; }
+    .content { width: 100%; max-width: 1100px; }
+
+    /* Query input */
+    #query { width: 765px; max-width: 100%; background: #fff; border: 1px solid var(--border-tertiary); border-radius: 15px;
+      padding: 12px 16px; display: flex; align-items: center; gap: 10px;
+      filter: drop-shadow(-2px -2px 2px rgba(0,0,0,0.04)) drop-shadow(2px 2px 2px rgba(0,0,0,0.04)); }
+    #question { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; font: inherit; color: var(--text-primary); padding: 0; }
+    #send { border: 0; background: none; padding: 0; cursor: pointer; display: flex; }
+    #send:disabled { cursor: default; opacity: 0.5; }
+    #status { margin: -24px 0 0; min-height: 0; color: var(--text-tertiary); font-size: 14px; }
+    #status:empty { display: none; }
+
+    /* Section headings */
+    .head { display: flex; align-items: center; justify-content: space-between; gap: 60px; border-bottom: 0.5px solid var(--border-secondary); }
+    .head h2 { margin: 0; font-family: var(--serif); font-weight: 600; font-size: 18px; line-height: 1.6; letter-spacing: -0.01em; }
+    #verify-head { font-family: var(--sans); } /* Verifier heading in Inter (Ben, 10/20); "Claude's response" stays serif */
+    #verify-label { position: relative; display: flex; align-items: center; height: 26px; font-weight: 500; color: var(--text-secondary); cursor: pointer; user-select: none; }
+    #verify-on { position: absolute; opacity: 0; width: 0; height: 0; }
+    #verify-box { position: absolute; left: -25px; top: 0; width: 20px; height: 20px; border-radius: 6px; border: 0.5px solid var(--border-info);
+      background: var(--border-info); display: flex; align-items: center; justify-content: center; }
+    #verify-on:not(:checked) + #verify-box { background: #fff; border-color: var(--border-secondary); }
+    #verify-on:not(:checked) + #verify-box svg { display: none; }
+    #verify-on:focus-visible + #verify-box { outline: 2px solid var(--border-info); outline-offset: 2px; }
+
+    /* Claude's response: answer left, "Claude searched:" right (Ben, 10/15) */
+    #response { display: flex; flex-direction: column; gap: 16px; }
+    .answer-row { display: grid; grid-template-columns: minmax(0, 520px) minmax(0, 520px); justify-content: space-between; column-gap: 60px; align-items: start; } /* Figma 10/21: top-aligned, right column 4px down */
+    #answer .v-working { font-family: var(--sans); white-space: normal; }
+    #answer { font-family: var(--serif); font-size: 15px; line-height: 1.6; white-space: pre-wrap; }
+    #searched { position: relative; overflow: hidden; padding-top: 4px; }
+    /* "CLAUDE SEARCHED:" header row with the caret at its right end (Figma 10/21) */
+    .s-head { display: flex; align-items: flex-start; max-width: 501px; }
+    .s-head .label { flex: 1; min-width: 0; font-size: 12px; font-weight: 500; line-height: 1.6; color: var(--text-secondary); white-space: nowrap; }
+    #searched .links, .search-overlay .links { display: block; max-width: 501px; }
+    .search-overlay .links { max-width: 504px; }
+    #searched .links { overflow: hidden; }
+    #searched .links a, .search-overlay a { white-space: nowrap; }
+    .links .more { color: var(--text-info); }
+    .caret { width: 20px; height: 20px; flex: none; display: inline-flex; align-items: center; justify-content: center; padding: 0; cursor: pointer;
+      border: 0; border-radius: 6px; background: none; color: var(--text-secondary); }
+    .caret svg { display: block; transition: transform 0.15s; }
+    .caret[aria-expanded="true"] svg { transform: rotate(180deg); }
+    #searched-wrap { position: relative; }
+    /* Accordions open as an overlay on top; nothing on the page shifts (Ben, 10/15) */
+    .search-overlay { display: none; position: absolute; left: -9px; top: -5px; width: 520px; max-width: calc(100% + 9px); z-index: 20; background: var(--bg);
+      border: 1px solid rgba(31,30,29,0.4); border-radius: 0; padding: 8px; filter: drop-shadow(2px 2px 1px rgba(0,0,0,0.15)); } /* Figma 10/21: page color, square corners, 8px padding; top -5px = 4px top padding of the column - 9px, so the text doesn't move when it opens */
+    .search-overlay.open { display: block; }
+    .search-overlay .s-head { max-width: none; }
+    .cap-row { display: flex; gap: 8px; margin-top: 8px; }
+    .cap-btn { font: inherit; padding: 4px 12px; border: 1px solid var(--border-secondary); border-radius: 8px; background: #fff; cursor: pointer; }
+    .no-search { font-weight: 400; color: var(--text-secondary); } /* regular weight (Ben, 10/19) */
+
+    /* Verifier */
+    #verify-col { display: flex; flex-direction: column; gap: 0; }
+    .vclaim { display: grid; grid-template-columns: minmax(0, 520px) minmax(0, 520px); justify-content: space-between; column-gap: 60px; align-items: start;
+      padding-bottom: 24px; border-bottom: 0.5px solid var(--border-secondary); }
+    /* Verifier working: spinner + line while the check runs (Ben, 10/19) */
+    .v-working { display: flex; align-items: center; gap: 10px; color: var(--text-secondary); }
+    .spinner { width: 20px; height: 20px; border-radius: 50%; border: 3px solid rgba(70,130,213,0.2); border-top-color: var(--border-info); animation: spin 0.8s linear infinite; flex: none; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .vclaim:last-child { border-bottom: none; } /* no line under the last claim (Ben, 10/19) */
+    .vclaim + .vclaim { margin-top: 24px; } /* 24px below each dividing line (Figma 10/21) */
+    .vleft { display: flex; flex-direction: column; gap: 16px; }
+    /* Claim: bold serif, no shaded box (Figma 10/21) */
+    .claim-box { padding: 8px 16px 8px 0; font-family: var(--serif); font-weight: 600; }
+    /* Under the claim: abilities + documentation density on the left (314px, 16px in), confidence centred on the right (Figma 10/21) */
+    .cinfo { display: flex; align-items: flex-start; }
+    .cinfo-l { width: 314px; flex: none; padding-left: 0; display: flex; flex-direction: column; gap: 20px; }
+    .cinfo-r { flex: 1; min-width: 0; display: flex; justify-content: center; }
+    .info-block { display: flex; flex-direction: column; gap: 8px; }
+    /* Label tooltips (Ben, 10/21): same bubble as the sidebar tooltip, centred above the label, arrow pointing down at it */
+    .tip-host { position: relative; align-self: flex-start; cursor: default; }
+    .tip { display: none; position: absolute; left: 50%; bottom: calc(100% + 10px); transform: translateX(-50%); z-index: 12;
+      filter: drop-shadow(2px 2px 1px rgba(0,0,0,0.15)); }
+    .tip .bubble { filter: none; font-weight: 400; color: #000; letter-spacing: -0.01em; }
+    .tip .down { position: absolute; left: 50%; top: calc(100% - 1px); transform: translateX(-50%); display: block; }
+    .tip-group:hover .tip { display: block; } /* label and its content both trigger the tooltip (Ben, 10/21) */
+    .cinfo-l .info-block { align-self: flex-start; }
+    /* "Leaves this site" icon after outside links (Ben, 10/21) */
+    .ext { display: inline-block; vertical-align: -1px; margin-left: 3px; color: var(--text-info); }
+    .host { white-space: nowrap; }
+    /* "See more" in the summary box opens the full list on top; nothing below moves (Ben, 10/21) */
+    #v-box { position: relative; }
+    .f-toggle { color: var(--text-info); text-decoration: underline; text-decoration-thickness: from-font; cursor: pointer; background: none; border: 0; padding: 0; font: inherit; display: block; align-self: flex-end; }
+    #v-findings > .f-toggle { margin: 16px 0 0 auto; } /* right side, like the caret on "Claude searched"; 16px gap like the bullets (Ben, 10/21) */
+    .jump { display: inline-block; vertical-align: -1px; margin-left: 3px; } /* down arrow: this link jumps down the page (Ben, 10/21) */
+    .f-all { display: none; position: absolute; left: -0.5px; right: -0.5px; top: -0.5px; z-index: 15; background: var(--claim-bg); border: 0.5px solid rgba(31,30,29,0.4);
+      padding: 16px 16px 24px; flex-direction: column; gap: 16px; filter: drop-shadow(2px 2px 1px rgba(0,0,0,0.15)); }
+    .f-all.open { display: flex; }
+    .lbl { font-size: 12px; font-weight: 500; line-height: 1.6; color: var(--text-secondary); white-space: nowrap; }
+    .ab-list { margin: 0; padding-left: 21px; font-size: 14px; font-weight: 500; line-height: 1.6; color: var(--text-tertiary); }
+    .ab-list li + li { margin-top: 4px; }
+    .dd-val { padding-left: 16px; font-size: 14px; font-weight: 500; line-height: 1.6; color: var(--text-tertiary); }
+    .conf { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .conf .gwrap { padding: 0 24px 4px; }
+    .gauge { position: relative; width: 88px; height: 46px; }
+    .gauge svg { position: absolute; left: 0; top: 0; overflow: visible; }
+    .gauge .num { position: absolute; left: 0; right: 0; top: 19px; text-align: center; font-weight: 500; font-size: 20px; line-height: 21px; color: var(--text-tertiary); letter-spacing: -0.01em; }
+    .gauge .base { position: absolute; left: 1px; top: 46px; width: 86px; height: 0; border-top: 1px solid var(--border-tertiary); }
+    /* Verifier heading: title + (?) icon, no line under it (Figma 10/21) */
+    .head.vhead { display: flex; align-items: center; justify-content: flex-start; gap: 8px; border-bottom: 0; margin-bottom: 4px; }
+    #explain-btn { width: 20px; height: 20px; border: 0; background: none; padding: 0; cursor: pointer; display: flex; color: var(--text-primary); }
+    #explain-btn svg { display: block; }
+    /* Summary box (Figma 10/21): count line, then the confidence/source mismatches as bullets */
+    #v-box[hidden] { display: none; }
+    #v-box { background: var(--claim-bg); border: 0.5px solid rgba(31,30,29,0.4); padding: 16px 16px 24px; display: flex; flex-direction: column; gap: 16px; margin-bottom: 36px; }
+    #v-summary { font-weight: 600; }
+    #v-box ul { margin: 0; padding-left: 22.5px; }
+    #v-box li + li { margin-top: 16px; }
+    #v-box b, .f-all .f-count { font-weight: 600; }
+    #v-box a { color: var(--text-info); text-decoration-thickness: from-font; }
+    #v-findings p { margin: 0; }
+    .vclaim.flash { background: var(--claim-bg); transition: background 0.3s; }
+    #verify-col { position: relative; }
+    #explain { position: absolute; top: 33px; left: 0; z-index: 20; filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.15)); /* opens on top; nothing on the page shifts (Ben, 10/15 rule) */ border: 1px solid var(--border-secondary); border-radius: 16px; background: #fff; padding: 16px 20px; max-width: 760px; font-size: 14px; line-height: 1.5; }
+    #explain h3 { font-size: 14px; margin: 12px 0 4px; } #explain h3:first-of-type { margin-top: 0; } #explain p { margin: 0 0 6px; }
+    #explain .close { position: absolute; right: 12px; top: 8px; border: 0; background: none; font-size: 18px; cursor: pointer; color: var(--text-secondary); }
+    .cites { display: flex; flex-direction: column; gap: 16px; align-items: flex-end; min-width: 0; }
+    .no-source { font-size: 15px; color: var(--text-tertiary); padding-top: 8px; width: 100%; max-width: 520px; padding-left: 30px; } /* lines up with the verdict words ("Citation supports claim") */
+    .bucket-note, .v-working { max-width: 520px; } /* Verifier messages outside the claim/citation rows stay within the left column, like Claude's response (Ben, 10/20) */
+    .bucket-note { color: var(--text-secondary); }
+
+    /* One citation, Figma "Second Source_3" (node 2054:19574, Ben 10/20): a header row with the verdict icon and its
+       words, then the quote (two lines at rest) and the site link. Hover shows the full quote in an overlay on top (Ben, 10/15). */
+    .cite { position: relative; width: 100%; max-width: 520px; }
+    /* Figma 10/21: no left inset; icon, quote and site all start at the column edge; 4px between rows */
+    .cite-row { display: flex; flex-direction: column; align-items: stretch; gap: 4px; padding: 8px 16px 8px 0; border-radius: 16px; }
+    .cite-head { display: flex; gap: 8px; align-items: flex-start; padding: 0; }
+    .cite-head .vicon { flex: none; width: 22px; height: 22px; }
+    .cite-head .vicon svg { display: block; }
+    .cite-head .vlabel { font-weight: 500; white-space: nowrap; }
+    .cite-row .rcol { display: flex; flex-direction: column; gap: 4px; padding: 0; min-width: 0; }
+    .cite-row .quote { margin: 0; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+    .cite-row .src { display: flex; justify-content: flex-end; gap: 4px; font-size: 14px; white-space: nowrap; align-items: baseline; }
+    .cite-row .src .host { color: var(--text-info); text-decoration: underline; text-decoration-thickness: 6%; }
+    .cite-full { display: none; position: absolute; left: -18px; top: -2px; right: 0; z-index: 10; background: #fff; padding: 8px 14px 8px 16px;
+      border: 2px solid var(--border-info); color: inherit; text-decoration: none; cursor: pointer;
+      box-shadow: 2px 2px 2px rgba(0,0,0,0.15); } /* shadow on the card's edge only, not the text (Ben, 10/21). Figma 10/21: card sticks out 18px to the left so its text lines up with the resting text; top -2px keeps the text from moving */ /* shadow only on the hover card, not the resting rows (Ben, 10/19). top -4px: the hover card has 4px more top padding than the resting row, so the text no longer drops on hover (Ben, 10/20) */
+    .cite-full .rcol { gap: 4px; }
+    .cite-full .quote { display: block; -webkit-line-clamp: unset; overflow: visible; }
+    .cite-full .src .lead { font-size: 15px; font-weight: 500; color: var(--text-primary); }
+    .cite:hover .cite-full { display: flex; }
+    .cite:hover { z-index: 11; }
+    /* Sidebar tooltip bubble */
+    .bubble { background: #fff; border: 1px solid rgba(31,30,29,0.4); border-radius: 16px; padding: 8px 16px; font-size: 14px; color: #000;
+      white-space: nowrap; filter: drop-shadow(2px 2px 1px rgba(0,0,0,0.15)); }
+    .tip-wrap { filter: drop-shadow(2px 2px 1px rgba(0,0,0,0.15)); }
+    .tip-wrap .bubble { filter: none; }
+
+    /* Build line pinned to the bottom of the window (Ben, 10/7). */
+    #build { position: fixed; left: 53px; right: 0; bottom: 0; margin: 0; padding: 4px 16px; font-size: 12px; color: #666; background: var(--bg); border-top: 1px solid #ddd; z-index: 4; }
     #build.stale { color: #a00; font-weight: bold; }
-    .sources { font-size: 0.9em; margin: 4px 0 0 0; padding-left: 20px; }
-    .piece { margin: 8px 0 12px 0; }
-    .piece-text { font-weight: bold; margin: 6px 0 2px; }
-    .no-source { font-weight: bold; color: #a00; }
-    .bucket-label { font-weight: bold; margin: 2px 0; }
-    .value-field { display: block; width: 100%; box-sizing: border-box; margin: 6px 0; padding: 4px; font-size: 1em; }
-    .note { font-size: 0.9em; color: #666; }
-    .list-label { font-weight: bold; margin: 6px 0 2px; }
-    .para { margin: 4px 0 8px 12px; padding-left: 8px; border-left: 3px solid #ccc; }
-    .para-src { font-size: 0.9em; margin-top: 2px; }
   </style>
 </head>
 <body>
-  <div class="row">
-    <input id="question" type="text" />
-    <button id="send">Submit</button>
-  </div>
-  <p id="status"></p>
-  <!-- Headings sit in their own row so one line can run under both, full width (Ben, 10/2). -->
-  <div class="cols heads">
-    <h3 class="col">Default answer</h3>
-    <!-- "Check answers" sits on the headings row, right aligned (Ben, 10/2). -->
-    <div class="col head-right">
-      <h3 id="verify-head">Verifier</h3>
-      <label id="verify-label"><input id="verify-on" type="checkbox" checked /> Check answers</label>
+  <!-- Claude's sidebar from the UI kit: framing only, not working (Ben, 10/15) -->
+  <nav id="sidebar" aria-label="Claude sidebar (not active in this demo)">
+    <div class="icons">
+      <div class="top"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M16.5 4C17.3284 4 18 4.67157 18 5.5V14.5C18 15.3284 17.3284 16 16.5 16H3.5C2.67157 16 2 15.3284 2 14.5V5.5C2 4.67157 2.67157 4 3.5 4H16.5ZM7 15H16.5C16.7761 15 17 14.7761 17 14.5V5.5C17 5.22386 16.7761 5 16.5 5H7V15ZM3.5 5C3.22386 5 3 5.22386 3 5.5V14.5C3 14.7761 3.22386 15 3.5 15H6V5H3.5Z" fill="#383835"/></svg></div>
+      <div class="nav">
+        <span><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2.5C14.1421 2.5 17.5 5.85786 17.5 10C17.5 14.1421 14.1421 17.5 10 17.5H3C2.79779 17.5 2.61549 17.3782 2.53809 17.1914C2.4607 17.0046 2.50349 16.7895 2.64648 16.6465L4.35547 14.9365C3.20124 13.6175 2.5 11.8906 2.5 10C2.5 5.85786 5.85786 2.5 10 2.5ZM10 3.5C6.41015 3.5 3.5 6.41015 3.5 10C3.5 11.7952 4.22659 13.4199 5.40332 14.5967L5.46582 14.6729C5.52017 14.7544 5.5498 14.8508 5.5498 14.9502C5.5498 15.0828 5.49709 15.2099 5.40332 15.3037L4.20703 16.5H10C13.5899 16.5 16.5 13.5899 16.5 10C16.5 6.41015 13.5899 3.5 10 3.5ZM10 7C10.2761 7 10.5 7.22386 10.5 7.5V9.5H12.5C12.7761 9.5 13 9.72386 13 10C13 10.2761 12.7761 10.5 12.5 10.5H10.5V12.5C10.5 12.7761 10.2761 13 10 13C9.72386 13 9.5 12.7761 9.5 12.5V10.5H7.5C7.22386 10.5 7 10.2761 7 10C7 9.72386 7.22386 9.5 7.5 9.5H9.5V7.5C9.5 7.22386 9.72386 7 10 7Z" fill="#141413"/></svg></span>
+        <span><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M8.99962 2C12.3133 2 14.9996 4.68629 14.9996 8C14.9996 11.3137 12.3133 14 8.99962 14H2.49962C2.30105 13.9998 2.12113 13.8821 2.04161 13.7002C1.96224 13.5181 1.99835 13.3058 2.1334 13.1602L3.93516 11.2178C3.34317 10.2878 2.99962 9.18343 2.99962 8C2.99962 4.68643 5.68609 2.00022 8.99962 2ZM8.99962 3C6.23838 3.00022 3.99961 5.23871 3.99961 8C3.99961 9.11212 4.36265 10.1386 4.97618 10.9688C5.11884 11.1621 5.1035 11.4293 4.94004 11.6055L3.64512 13H8.99962C11.761 13 13.9996 10.7614 13.9996 8C13.9996 5.23858 11.761 3 8.99962 3Z" fill="#141413"/><path d="M16.5447 9.72766C16.4184 9.53278 16.168 9.44661 15.9432 9.5343C15.7184 9.62227 15.5934 9.85515 15.6326 10.0841L15.7371 10.3956C15.9075 10.8987 16.0008 11.4381 16.0008 12.0001C16.0008 13.1124 15.6378 14.1387 15.0242 14.9689C14.8813 15.1622 14.8958 15.4303 15.0594 15.6066L16.3533 17.0001H11.0008C9.54537 17.0001 8.23546 16.3783 7.32109 15.3849L7.07109 15.1105C6.89014 14.9646 6.62553 14.9607 6.43926 15.1144C6.25286 15.2683 6.20686 15.5291 6.31621 15.7345L6.58476 16.0626C7.68066 17.2531 9.25395 18.0001 11.0008 18.0001H17.5008C17.6993 17.9999 17.8793 17.8823 17.9588 17.7003C18.0382 17.5182 18.002 17.306 17.867 17.1603L16.0633 15.2179C16.6556 14.2877 17.0008 13.1839 17.0008 12.0001C17.0008 11.3272 16.8893 10.6794 16.6844 10.0743L16.5447 9.72766Z" fill="#141413"/></svg></span>
+        <span><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M15.8196 7C16.6883 7.00025 17.3623 7.73158 17.3177 8.57617L17.2991 8.74707L16.1331 15.7471C16.0124 16.4699 15.3863 16.9996 14.6536 17H5.34696C4.61405 16.9998 3.98818 16.47 3.86746 15.7471L2.70145 8.74707C2.54906 7.83277 3.25403 7 4.18094 7H15.8196ZM4.18094 8C3.87201 8 3.63707 8.27731 3.68778 8.58203L4.85379 15.582C4.89398 15.8229 5.10275 15.9998 5.34696 16H14.6536C14.8976 15.9996 15.1066 15.8228 15.1468 15.582L16.3128 8.58203L16.3186 8.46973C16.3035 8.21259 16.0898 8.00023 15.8196 8H4.18094Z" fill="#141413"/><path d="M16 5.5C16 5.224 15.7759 5.00024 15.5 5H4.5C4.22386 5 4 5.22386 4 5.5C4 5.77614 4.22386 6 4.5 6H15.5C15.7759 5.99976 16 5.776 16 5.5Z" fill="#141413"/><path d="M14.5 3.5C14.5 3.224 14.2759 3.00024 14 3H6C5.72386 3 5.5 3.22386 5.5 3.5C5.5 3.77614 5.72386 4 6 4H14C14.2759 3.99976 14.5 3.776 14.5 3.5Z" fill="#141413"/></svg></span>
+        <span><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M6.35352 3.14642L9.35352 6.14644C9.43935 6.25105 9.5 6.36004 9.5 6.50093C9.4998 6.63321 9.44704 6.75989 9.35352 6.85347L6.35352 9.85349C6.14584 10.0609 5.85611 10.0243 5.64648 9.85349L2.64648 6.85347C2.55296 6.75989 2.5002 6.63321 2.5 6.50093C2.5 6.36842 2.55285 6.24018 2.64648 6.14644L5.64648 3.14642C5.8552 2.97423 6.14635 2.93937 6.35352 3.14642ZM6 8.79196L3.70703 6.49995L6 4.20697L8.29297 6.49995L6 8.79196Z" fill="#141413"/><path d="M16.9337 3.75098C17.0233 3.90639 17.0218 4.09834 16.9308 4.25293L15.6065 6.5L16.9308 8.74707C17.0219 8.90164 17.0233 9.09359 16.9337 9.24902C16.8441 9.4044 16.6768 9.5 16.4966 9.5H11.503C11.3218 9.5 11.1541 9.40285 11.0648 9.24609C10.9759 9.08953 10.9787 8.8974 11.0717 8.74316L12.4255 6.5L11.0717 4.25684C10.9788 4.10257 10.9758 3.91044 11.0648 3.75391C11.1541 3.59724 11.3218 3.5 11.503 3.5H16.4966C16.6767 3.51317 16.8403 3.58916 16.9337 3.75098ZM13.4432 6.24316C13.5302 6.41076 13.5317 6.58644 13.4432 6.75684L12.3911 8.5H15.6193L14.5897 6.75293C14.4978 6.59689 14.4978 6.40309 14.5897 6.24707L15.6193 4.5H12.3911L13.4432 6.24316Z" fill="#141413"/><path fill-rule="evenodd" clip-rule="evenodd" d="M7.25293 10.9669C7.40708 10.8794 7.59647 10.8803 7.75 10.9689C7.90356 11.0575 7.99869 11.2212 8 11.3985L8.01074 12.839L9.30762 13.6056C9.42811 13.6995 9.49994 13.8449 9.5 14.0001C9.5 14.1775 9.40587 14.342 9.25293 14.4318L8.01074 15.1603L7.99512 16.6671C7.97406 16.8186 7.88446 16.9537 7.75 17.0314C7.59642 17.12 7.40713 17.1209 7.25293 17.0333L6 16.3204L4.74707 17.0333C4.59287 17.1209 4.40358 17.12 4.25 17.0314C4.09643 16.9427 4.00124 16.779 4 16.6017L3.99023 15.1603L2.74707 14.4318C2.59413 14.342 2.5 14.1775 2.5 14.0001C2.50006 13.8449 2.57188 13.6995 2.69238 13.6056L3.99023 12.839L4 11.3985C4.00131 11.2212 4.09644 11.0575 4.25 10.9689C4.40353 10.8803 4.59292 10.8794 4.74707 10.9669L6 11.6788L7.25293 10.9669ZM4.99512 12.257L5.75293 12.6886C5.90608 12.7756 6.09392 12.7756 6.24707 12.6886L7.00586 12.257L7.01172 13.131C7.01308 13.3069 7.10706 13.4696 7.25879 13.5587L8.01172 14.0001L7.25879 14.4415C7.10706 14.5306 7.01315 14.6934 7.01172 14.8693L7.00586 15.7423L6.24707 15.3117C6.09397 15.2247 5.90603 15.2247 5.75293 15.3117L4.99512 15.7423L4.98828 14.8693C4.98703 14.7153 4.91459 14.5717 4.79492 14.4786L3.98926 14.0001L4.74121 13.5587C4.87421 13.4806 4.96267 13.3459 4.9834 13.1954L4.99512 12.257Z" fill="#141413"/><path fill-rule="evenodd" clip-rule="evenodd" d="M14 11C15.6568 11 16.9999 12.3432 17 14C17 15.6569 15.6569 17 14 17C12.3431 17 11 15.6569 11 14C11.0001 12.3432 12.3432 11 14 11ZM12 14C12.0001 12.8955 12.8955 12 14 12C15.1045 12 15.9999 12.8955 16 14C16 15.1046 15.1046 16 14 16C12.8954 16 12 15.1046 12 14Z" fill="#141413"/></svg></span>
+        <span><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M11.6318 4.01772C11.898 4.09047 12.055 4.3657 11.9824 4.63198L8.98242 15.632C8.90966 15.8983 8.63449 16.0552 8.36816 15.9826C8.10193 15.9098 7.94495 15.6346 8.01758 15.3683L11.0176 4.36831C11.0904 4.10215 11.3656 3.94513 11.6318 4.01772ZM13.124 6.17105C13.3059 5.96341 13.6213 5.94245 13.8291 6.12417L17.8291 9.62418L17.9014 9.7023C17.9647 9.7877 18 9.89197 18 10.0002C18 10.1443 17.9375 10.2812 17.8291 10.3761L13.8291 13.8761L13.7471 13.9347C13.5449 14.05 13.2833 14.0112 13.124 13.8293C12.9649 13.6473 12.9606 13.3825 13.1016 13.1974L13.1709 13.1242L16.7412 10.0002L13.1709 6.87612C12.9632 6.69426 12.9422 6.37881 13.124 6.17105ZM6.25293 6.06558C6.45509 5.9504 6.71675 5.98923 6.87598 6.17105C7.03513 6.35294 7.03933 6.61775 6.89844 6.80288L6.8291 6.87612L3.25879 10.0002L6.8291 13.1242C7.03682 13.306 7.05771 13.6215 6.87598 13.8293C6.69413 14.037 6.37869 14.058 6.1709 13.8761L2.1709 10.3761L2.09863 10.298C2.03528 10.2126 2 10.1084 2 10.0002C2.00005 9.85606 2.06247 9.71908 2.1709 9.62418L6.1709 6.12417L6.25293 6.06558Z" fill="#141413"/></svg></span>
+      </div>
     </div>
-  </div>
-  <hr class="head-line" />
-  <div class="cols">
-    <div class="col">
-      <p><strong>Reasoning:</strong> <span id="summary"></span></p>
-      <p class="circles">
-        <span id="c-red" class="circle" style="background: red"></span>
-        <span id="c-yellow" class="circle" style="background: gold"></span>
-        <span id="c-green" class="circle" style="background: green"></span>
-      </p>
-      <p><strong>Answer:</strong></p>
-      <div id="answer"></div>
-    </div>
-    <div class="col" id="verify-col">
+    <div class="avatar"><svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="14" fill="#C46686"/><path d="M17.478 6.56615C17.8153 6.63666 18.1535 6.71855 18.4907 6.78588C18.6563 6.81897 18.822 6.8517 18.9877 6.89037C19.0013 6.89353 19.0216 6.88851 19.0356 6.89428C19.0788 6.91205 19.1523 6.99093 19.1918 7.02221C19.4177 7.20007 19.6404 7.39545 19.8618 7.57787C20.0357 7.72114 20.2378 7.85992 20.3862 8.02807C20.4163 8.06214 20.4554 8.07027 20.4819 8.09057C20.5108 8.11276 20.5437 8.1598 20.5737 8.18627C20.6516 8.25487 20.7419 8.30834 20.8208 8.37768C20.8392 8.39398 20.8894 8.4373 20.9008 8.45385C20.9064 8.46216 20.9033 8.47369 20.9145 8.48607C20.9386 8.51276 20.9847 8.53389 21.0034 8.57006C21.0526 9.21877 21.1424 9.85716 21.228 10.5027C21.267 10.7967 21.3183 11.0905 21.3344 11.3865C21.3362 11.4188 21.352 11.4645 21.3481 11.4978C21.3459 11.5049 21.3191 11.5595 21.3149 11.5662C21.3021 11.5861 21.2776 11.5981 21.2661 11.613C21.2384 11.6496 21.2092 11.7253 21.1752 11.7644C21.0117 12.0472 20.7769 12.2778 20.6235 12.5632C20.4562 12.7912 20.2862 13.0158 20.1362 13.2576C20.1313 13.2653 20.13 13.2836 20.1254 13.2878C20.1217 13.2901 20.1094 13.2901 20.102 13.2947C20.0446 13.3304 20.045 13.3125 19.9917 13.3298C19.9576 13.3409 19.9379 13.3713 19.9028 13.3855C19.885 13.3925 19.8331 13.3989 19.8198 13.405C19.808 13.4107 19.7962 13.4322 19.7817 13.4382C19.7691 13.4431 19.7566 13.4395 19.7465 13.4431C19.6757 13.4682 19.6002 13.5154 19.5336 13.5496C19.4767 13.5789 19.3865 13.6329 19.3286 13.6472C19.3218 13.6486 19.3122 13.6436 19.3022 13.6462C19.2845 13.6509 19.274 13.6703 19.2573 13.6775C19.2315 13.6885 19.1954 13.686 19.1772 13.6931C19.1641 13.6983 19.1166 13.7301 19.0942 13.74C19.0201 13.7726 18.9433 13.805 18.8696 13.8347C18.8419 13.8458 18.8159 13.8677 18.7973 13.8767C18.7755 13.8871 18.7438 13.8814 18.7221 13.8904L18.7192 13.8913C18.8168 13.9472 18.9136 14.0042 19.0131 14.0583C19.0224 14.0634 19.0393 14.0841 19.0415 14.0857C19.0496 14.0903 19.0675 14.0851 19.0766 14.0896C19.0812 14.092 19.0956 14.1136 19.1069 14.1189C19.116 14.1227 19.1288 14.1181 19.145 14.1296C19.1501 14.1334 19.1714 14.1599 19.1733 14.1609C19.1837 14.166 19.2128 14.1693 19.2309 14.1794C19.2489 14.1895 19.2668 14.2117 19.2778 14.2185C19.3533 14.2633 19.4301 14.3029 19.5043 14.3503C19.5119 14.3551 19.5335 14.3613 19.5366 14.363C19.5378 14.3644 19.5338 14.3715 19.5336 14.3728C19.535 14.374 19.5559 14.3713 19.5649 14.3757C19.5767 14.3819 19.5727 14.3913 19.5805 14.3962C19.6538 14.4416 19.7391 14.484 19.8178 14.5251C19.8496 14.5418 19.8793 14.5691 19.9116 14.5867C19.9434 14.604 19.9799 14.6273 20.0112 14.6462C20.0584 14.6749 20.1062 14.7141 20.1508 14.74C20.1918 14.7638 20.2149 14.7459 20.2456 14.7976C20.264 14.8288 20.2781 14.8572 20.2973 14.8884C20.5311 15.2669 20.7983 15.6045 21.0131 15.988C21.0672 16.1134 21.1385 16.2314 21.2016 16.3503C21.2288 16.4016 21.2544 16.4558 21.2915 16.4997L21.2934 16.5144C21.2774 16.5397 21.2954 16.5779 21.2983 16.6052C21.3176 16.7945 21.3299 16.9829 21.3549 17.1736C21.3883 17.4272 21.4053 17.6865 21.4448 17.9402C21.4512 17.9816 21.4365 17.999 21.4252 18.031C21.3148 18.3431 21.1934 18.6552 21.0864 18.9675C21.0338 19.121 20.9817 19.2745 20.9233 19.4275C20.9185 19.44 20.9201 19.4597 20.9125 19.4724C20.889 19.5114 20.8 19.5722 20.7631 19.6062C20.5532 19.8008 20.325 19.9906 20.1108 20.1804C19.9425 20.3296 19.7758 20.5064 19.5844 20.6287C19.5455 20.6535 19.5323 20.6897 19.5083 20.7126C19.4819 20.7377 19.4297 20.7642 19.3989 20.7898C19.3187 20.8563 19.2524 20.9354 19.1713 21.0027C19.1523 21.0184 19.103 21.0609 19.0844 21.0701C19.0751 21.0745 19.0635 21.0706 19.0493 21.0798C19.0189 21.0997 18.9922 21.1412 18.9526 21.155C18.2713 21.1306 17.5964 21.1456 16.9145 21.156C16.6039 21.1608 16.292 21.178 15.9819 21.1609C15.9481 21.159 15.8989 21.1682 15.8647 21.1609C15.8608 21.1601 15.8027 21.1265 15.7963 21.1218C15.7768 21.1074 15.7669 21.0825 15.7524 21.0701C15.7171 21.0398 15.6418 21.004 15.6049 20.9675C15.3283 20.7814 15.114 20.534 14.8334 20.3572C14.6143 20.1735 14.3989 19.9879 14.1635 19.8191C14.1559 19.8136 14.1371 19.8102 14.1333 19.8054C14.1311 19.8019 14.1334 19.7896 14.1293 19.782C14.0983 19.7234 14.1162 19.7262 14.104 19.6736C14.0961 19.6401 14.0671 19.6185 14.0561 19.5837C14.0506 19.5663 14.0494 19.5146 14.0444 19.5017C14.0414 19.4946 14.0334 19.4863 14.0258 19.4783C14.0231 19.4847 14.0207 19.4915 14.018 19.4978C14.0044 19.5298 13.9806 19.5609 13.9663 19.5935C13.9519 19.6257 13.9316 19.6631 13.9155 19.6951C13.8912 19.7432 13.8561 19.7933 13.8344 19.8386C13.8146 19.8802 13.8359 19.9001 13.7856 19.9353C13.7553 19.9564 13.727 19.9729 13.6967 19.9949C13.3305 20.2609 13.0109 20.5528 12.6372 20.8015C12.5129 20.8675 12.3982 20.9492 12.2817 21.0232C12.2317 21.0549 12.1785 21.0855 12.1372 21.1257L12.1225 21.1296C12.0942 21.1174 12.0559 21.1394 12.0278 21.1453C11.8332 21.1859 11.6392 21.2202 11.4438 21.2663C11.1839 21.3278 10.916 21.3748 10.6567 21.4421C10.6145 21.4531 10.5943 21.4413 10.56 21.4343C10.2221 21.3666 9.883 21.288 9.54536 21.2234C9.37924 21.1916 9.21261 21.1602 9.04634 21.1228C9.03289 21.1198 9.01346 21.1243 8.99946 21.1189C8.95601 21.1014 8.88108 21.0228 8.84126 20.9919C8.61409 20.8161 8.39017 20.6226 8.16743 20.4421C7.99226 20.3003 7.78797 20.1628 7.63813 19.9958C7.60785 19.9623 7.56904 19.9542 7.54243 19.9343C7.51321 19.9123 7.479 19.8658 7.44868 19.8396C7.36997 19.7715 7.28017 19.718 7.20063 19.6492C7.18204 19.633 7.13209 19.5904 7.12056 19.574C7.11497 19.5657 7.11716 19.555 7.10591 19.5427C7.08167 19.5162 7.03512 19.4957 7.01606 19.4597C6.96109 18.8114 6.86515 18.1739 6.77388 17.529C6.73225 17.2352 6.67837 16.9412 6.65962 16.6453C6.65755 16.6131 6.64144 16.5681 6.64497 16.5349C6.64533 16.5312 6.67377 16.4728 6.67817 16.4656C6.69092 16.4454 6.71574 16.4329 6.727 16.4177C6.75433 16.3807 6.7822 16.3046 6.81587 16.2654C6.97687 15.9815 7.20989 15.75 7.36079 15.4636C7.52607 15.2343 7.69334 15.0073 7.84126 14.7644C7.84597 14.7567 7.84762 14.7397 7.852 14.7351C7.85492 14.7324 7.86774 14.7321 7.87544 14.7273C7.93274 14.6909 7.93249 14.7089 7.98579 14.6912C8.0197 14.6798 8.03889 14.65 8.07368 14.6355C8.09115 14.6282 8.1448 14.6212 8.15767 14.615C8.16939 14.6092 8.18031 14.5869 8.19478 14.5808C8.20732 14.5758 8.21993 14.5796 8.22993 14.5759C8.3006 14.5502 8.37555 14.5022 8.44185 14.4675C8.49852 14.4378 8.58813 14.3836 8.64595 14.3689C8.65267 14.3672 8.66223 14.3716 8.67231 14.3689C8.68999 14.3641 8.70059 14.345 8.71724 14.3376C8.74276 14.3265 8.77812 14.3281 8.79634 14.321C8.80914 14.3159 8.85798 14.2842 8.88032 14.2742C8.95402 14.241 9.03061 14.2078 9.10395 14.1775C9.13145 14.1661 9.15779 14.1445 9.17622 14.1355C9.19804 14.125 9.22888 14.1292 9.25044 14.1199C9.26826 14.1121 9.27467 14.0985 9.28755 14.0915C9.29928 14.0856 9.32504 14.0825 9.33931 14.0759C9.3443 14.0736 9.34905 14.0705 9.35395 14.0681C9.09729 13.9724 8.84304 13.8768 8.59321 13.7585C8.47295 13.6863 8.343 13.63 8.21919 13.5681C8.16594 13.5415 8.11198 13.5111 8.05513 13.4958L8.04438 13.4851C8.0417 13.4557 8.0036 13.4344 7.98481 13.4138C7.85389 13.2704 7.72869 13.1246 7.59224 12.9831C7.41086 12.7952 7.23962 12.5936 7.05317 12.4089C7.02266 12.3787 7.02436 12.3562 7.01411 12.324C6.91406 12.0086 6.82302 11.6874 6.72017 11.3738C6.66959 11.2195 6.61821 11.065 6.5727 10.9079C6.56881 10.8953 6.55583 10.8812 6.55415 10.8669C6.54931 10.8222 6.58591 10.7217 6.59517 10.6736C6.64772 10.3989 6.71792 10.1186 6.77681 9.84545C6.82304 9.63084 6.8507 9.39471 6.93208 9.1892C6.94859 9.14761 6.9373 9.11077 6.94282 9.07885C6.94904 9.04381 6.97629 8.99278 6.98579 8.95482C7.0105 8.85639 7.01544 8.7555 7.04048 8.656C7.04639 8.63269 7.06117 8.57009 7.07075 8.55248C7.07561 8.5437 7.0873 8.54054 7.09321 8.52514C7.10589 8.49206 7.10241 8.44308 7.12642 8.4099C7.69604 8.0524 8.23662 7.66622 8.7856 7.28002C9.03552 7.10413 9.27953 6.91828 9.54243 6.76049C9.57112 6.74328 9.6048 6.70801 9.63716 6.69506C9.64103 6.69356 9.70699 6.68905 9.71626 6.6892C9.74094 6.69017 9.76428 6.70562 9.78364 6.70775C9.83072 6.71288 9.91397 6.69944 9.96626 6.70873C10.3048 6.70705 10.6302 6.79046 10.9663 6.77904C11.2564 6.80717 11.545 6.83839 11.8393 6.84545C11.8488 6.84553 11.8655 6.83785 11.8715 6.83959C11.8754 6.84085 11.8811 6.85205 11.8891 6.85619C11.9501 6.88665 11.9341 6.89435 11.976 6.93041C12.0028 6.95347 12.0396 6.95593 12.0698 6.97826C12.085 6.9898 12.1165 7.03006 12.1284 7.03783C12.1393 7.04491 12.1647 7.04417 12.1772 7.05346C12.1877 7.06151 12.1906 7.07318 12.1987 7.07982C12.2562 7.1266 12.3361 7.16701 12.3999 7.2058C12.4544 7.23889 12.5479 7.2866 12.5893 7.32787C12.5942 7.33265 12.5936 7.34414 12.601 7.35131C12.6139 7.36375 12.637 7.36253 12.6518 7.37279C12.6745 7.38881 12.6901 7.41961 12.7055 7.43139C12.7164 7.43963 12.7685 7.46538 12.7885 7.47924C12.8544 7.52501 12.9217 7.57301 12.9848 7.61986C13.0085 7.6374 13.0409 7.64881 13.0581 7.6599C13.0784 7.67306 13.0888 7.70196 13.1079 7.71557C13.1236 7.72675 13.1393 7.72471 13.1518 7.73217C13.1629 7.7389 13.1779 7.75934 13.1909 7.7683C13.2517 7.80951 13.3166 7.83962 13.3745 7.88647C13.384 7.89415 13.3838 7.9074 13.3959 7.91674C13.4136 7.93015 13.4385 7.92513 13.4467 7.93041C13.4716 7.94639 13.5165 7.98889 13.5405 8.01049C13.6303 8.0648 13.7334 8.12631 13.8129 8.18529C13.8594 8.21976 13.8812 8.22975 13.9282 8.25756C13.9422 8.26586 13.9514 8.28073 13.9682 8.28979C13.9788 8.29537 13.9947 8.29299 13.9995 8.29857C14.0018 8.30169 14.0176 8.32531 14.018 8.32689C14.0265 8.3663 14.0318 8.36194 14.0454 8.39525C14.0483 8.38981 14.0526 8.38516 14.0551 8.37963C14.0697 8.34759 14.0905 8.31082 14.1069 8.27904C14.1316 8.23104 14.1668 8.18069 14.1889 8.13549C14.2091 8.09413 14.1883 8.07447 14.2387 8.03979C14.2692 8.0189 14.2971 8.00192 14.3276 7.98022C14.6963 7.71704 15.019 7.42814 15.395 7.18236C15.5196 7.11743 15.6345 7.03653 15.7514 6.96361C15.8018 6.9322 15.8562 6.90204 15.8979 6.86205L15.9125 6.85814C15.9408 6.87057 15.9792 6.84912 16.0073 6.8435C16.2022 6.80446 16.3965 6.77188 16.5922 6.72729C16.8528 6.66788 17.1214 6.62262 17.3813 6.55736C17.4236 6.54679 17.4435 6.55896 17.478 6.56615ZM14.0961 12.6267C14.0866 12.6401 14.0658 12.6453 14.0649 12.6648L14.0532 12.6755L14.0463 12.6824C14.0369 12.6819 14.0315 12.6868 14.0317 12.696L14.017 12.7097C13.9981 12.7182 13.9756 12.7359 13.9604 12.7497C13.7926 12.9031 13.6127 13.0521 13.4389 13.198C13.2969 13.3172 13.1566 13.4338 13.0073 13.5437L13.0092 13.5486L13.0034 13.5466C12.7719 13.7174 12.5451 13.892 12.3139 14.0613C12.3495 14.0865 12.3869 14.1132 12.4155 14.1365C12.522 14.2233 12.6158 14.3194 12.7211 14.4031C12.726 14.4069 12.7423 14.4115 12.7436 14.4128C12.7464 14.4162 12.7427 14.4216 12.7426 14.4236C12.7441 14.4275 12.7486 14.42 12.7524 14.4216C12.7915 14.4469 12.8162 14.4789 12.8481 14.5056C13.0172 14.6468 13.19 14.7802 13.3598 14.9236C13.503 15.0445 13.6582 15.1672 13.7875 15.2996C13.7931 15.3052 13.8152 15.3115 13.8217 15.3171C13.8794 15.3669 13.9406 15.4121 14.0004 15.4587C14.0172 15.4415 14.0338 15.4255 14.0493 15.4119C14.1523 15.3211 14.2631 15.2431 14.3627 15.1531C14.3674 15.1489 14.3739 15.1336 14.3754 15.1326C14.3794 15.1302 14.3854 15.1356 14.3872 15.1355C14.3915 15.1346 14.3837 15.1291 14.3862 15.1257C14.4171 15.0916 14.4533 15.0728 14.4848 15.0456C14.6519 14.902 14.8106 14.7532 14.9799 14.6091C15.1227 14.4877 15.2693 14.3558 15.4223 14.2488C15.4287 14.244 15.4372 14.2243 15.4438 14.2185C15.5394 14.139 15.6287 14.0534 15.7182 13.9695C15.6737 13.9291 15.6036 13.887 15.5581 13.8494C15.4523 13.7617 15.359 13.6644 15.2543 13.5798C15.2495 13.5759 15.2331 13.5714 15.2319 13.5701C15.2285 13.5665 15.2334 13.5599 15.2329 13.5583C15.2313 13.5547 15.2259 13.5637 15.2221 13.5613C15.1832 13.5357 15.16 13.5032 15.1284 13.4763C14.9604 13.3336 14.7882 13.1992 14.6196 13.0544C14.4774 12.9324 14.324 12.8079 14.1958 12.6746C14.1903 12.6689 14.1681 12.6627 14.1616 12.657C14.1419 12.6397 14.121 12.6239 14.101 12.6072C14.0998 12.613 14.1006 12.6202 14.0961 12.6267Z" fill="#CBCADB"/></svg></div>
+  </nav>
+  <div id="sidebar-tip"><div class="tip-wrap"><svg class="arrow" width="15" height="18" viewBox="0 0 15 18"><path d="M15 0.5 L0.5 9 L15 17.5" fill="#fff" stroke="rgba(31,30,29,0.4)"/></svg><div class="bubble">Claude sidebar — not active in this demo.</div></div></div>
+
+  <main id="main">
+    <form id="query">
+      <input id="question" type="text" aria-label="Your question" />
+      <button id="send" type="submit" aria-label="Submit"><svg width="14" height="12" viewBox="0 0 14 12" fill="none"><path d="M11 1.24898e-06C11.3873 1.24898e-06 11.7516 -0.000838312 12.0556 0.0410169C12.3683 0.0840557 12.689 0.179926 12.9472 0.428712C13.2022 0.674381 13.3313 1.00666 13.4033 1.38086C13.4751 1.75444 13.5 2.22727 13.5 2.8125V6C13.5 6.48461 13.5009 6.9009 13.456 7.22461C13.4097 7.55777 13.3025 7.89858 13 8.14063C12.7211 8.36368 12.3569 8.43412 11.9892 8.4668C11.6102 8.50046 11.115 8.5 10.5 8.5H1.70699L4.03512 10.8281C4.23038 11.0234 4.23038 11.3399 4.03512 11.5352C3.83986 11.7304 3.52335 11.7304 3.32809 11.5352L0.146446 8.35352C-0.0488156 8.15825 -0.0488151 7.84175 0.146446 7.64649L3.32809 4.46485C3.52335 4.26958 3.83986 4.26958 4.03512 4.46485C4.23038 4.66011 4.23038 4.97661 4.03512 5.17188L1.70699 7.5H10.5C11.1348 7.5 11.5772 7.49951 11.9013 7.4707C12.2366 7.44088 12.3413 7.38631 12.375 7.35938C12.3849 7.35143 12.4339 7.31687 12.4658 7.08789C12.4989 6.84916 12.5 6.5152 12.5 6V2.8125C12.5 2.24177 12.475 1.84711 12.4218 1.57031C12.3688 1.29444 12.2978 1.19276 12.2529 1.14942C12.2111 1.10914 12.1312 1.06048 11.9189 1.03125C11.698 1.00089 11.4124 1 11 1H6.99996V1.24898e-06H11Z" fill="#73726C"/></svg></button>
+    </form>
+    <p id="status"></p>
+
+    <section id="response" class="content">
+      <div class="head">
+        <h2>Claude’s response</h2>
+        <label id="verify-label"><input id="verify-on" type="checkbox" checked /><span id="verify-box"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M11.3516 3.93022L5.1016 10.1802C5.04717 10.2348 4.98248 10.2782 4.91126 10.3078C4.84004 10.3373 4.76368 10.3526 4.68656 10.3526C4.60945 10.3526 4.53309 10.3373 4.46186 10.3078C4.39064 10.2782 4.32596 10.2348 4.27152 10.1802L1.53715 7.44584C1.48265 7.39134 1.43941 7.32663 1.40991 7.25542C1.38042 7.18421 1.36523 7.10788 1.36523 7.0308C1.36523 6.95372 1.38042 6.8774 1.40991 6.80618C1.43941 6.73497 1.48265 6.67027 1.53715 6.61576C1.59165 6.56126 1.65636 6.51802 1.72757 6.48853C1.79878 6.45903 1.87511 6.44385 1.95219 6.44385C2.02927 6.44385 2.10559 6.45903 2.17681 6.48853C2.24802 6.51802 2.31272 6.56126 2.36723 6.61576L4.68705 8.93559L10.5225 3.10111C10.6326 2.99104 10.7819 2.9292 10.9375 2.9292C11.0932 2.9292 11.2425 2.99104 11.3526 3.10111C11.4627 3.21119 11.5245 3.36048 11.5245 3.51615C11.5245 3.67182 11.4627 3.82112 11.3526 3.93119L11.3516 3.93022Z" fill="white"/></svg></span>Verify claims</label>
+      </div>
+      <div class="answer-row">
+        <div id="answer"></div>
+        <div id="searched-wrap"><div id="searched"></div><div class="search-overlay" id="search-overlay"></div></div>
+      </div>
+    </section>
+
+    <section id="verify-col" class="content">
+      <div class="head vhead"><h2 id="verify-head">Verifier</h2><button type="button" id="explain-btn" aria-label="What am I looking at?"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9.25" fill="#D6E4F6" stroke="currentColor" stroke-width="1.5"/><path d="M7.6 7.7a2.45 2.45 0 0 1 4.75.8c0 1.65-2.35 2.1-2.35 3.6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="10" cy="14.6" r="0.95" fill="currentColor"/></svg></button></div>
+      <div id="explain" hidden></div>
+      <div id="v-box" hidden><div id="v-summary"></div><div id="v-findings"></div></div>
       <div id="verified"></div>
-    </div>
-  </div>
+    </section>
+  </main>
   <p id="build"></p>
+
   <script src="/html2canvas.min.js"></script>
   <script>
     const q = document.getElementById("question");
     const send = document.getElementById("send");
     const verifyOn = document.getElementById("verify-on");
     const status = document.getElementById("status");
-    const summary = document.getElementById("summary");
     const answer = document.getElementById("answer");
     const verified = document.getElementById("verified");
     const verifyCol = document.getElementById("verify-col");
-    const COLORS = ["red", "yellow", "green"];
-    const circle = (c) => document.getElementById("c-" + c);
+    const searched = document.getElementById("searched");
+    const searchOverlay = document.getElementById("search-overlay");
+    // Markdown bold (**text**) from the Replier: show as bold; drop any unpaired ** (Ben, 10/20). Display only.
+    function appendBold(parent, text) {
+      String(text).split(/\*\*(.+?)\*\*/s).forEach((part, i) => {
+        part = part.replace(/\*\*/g, "");
+        if (!part) return;
+        if (i % 2) { const b = document.createElement("strong"); b.textContent = part; parent.append(b); }
+        else parent.append(document.createTextNode(part));
+      });
+    }
+    const stripBold = (t) => String(t).replace(/\*\*/g, "");
     const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+    const hostOf = (u) => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch { return u; } };
 
-    // Placeholder thresholds (Ben, 9/22): green above 95, yellow 80-95, red below 80.
+    // Sidebar: one hover tooltip over the whole bar (Ben, 10/15).
+    const sidebar = document.getElementById("sidebar"), sideTip = document.getElementById("sidebar-tip");
+    sidebar.addEventListener("mousemove", (e) => { sideTip.style.display = "block"; sideTip.style.top = (e.clientY - 20) + "px"; });
+    sidebar.addEventListener("mouseleave", () => { sideTip.style.display = "none"; });
+
+    // Stoplight thresholds kept for later (Ben, 10/14: stoplights hidden, wiring kept).
     function colorFor(c) { if (c > 95) return "green"; if (c >= 80) return "yellow"; return "red"; }
 
-    for (const color of COLORS) {
-      circle(color).addEventListener("mouseenter", () => answer.querySelectorAll(`[data-color="${color}"]`).forEach((s) => s.classList.add("hl-" + color)));
-      circle(color).addEventListener("mouseleave", () => answer.querySelectorAll(`[data-color="${color}"]`).forEach((s) => s.classList.remove("hl-" + color)));
-    }
-    const verifyHead = document.getElementById("verify-head");
-    // Hiding Verifier hides its heading too; the heading keeps its space so the line still runs full width.
-    verifyOn.addEventListener("change", () => { verifyCol.style.display = verifyOn.checked ? "" : "none"; verifyHead.style.visibility = verifyOn.checked ? "" : "hidden"; });
+    // Hiding the Verifier hides the whole section.
+    verifyOn.addEventListener("change", () => { verifyCol.style.display = verifyOn.checked ? "" : "none"; });
 
     async function post(url, body) {
       const res = await fetch(url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
@@ -111,55 +286,382 @@
       return data;
     }
 
-    // One box per sentence (Ben, 10/7). Inside it, each claim the Replier scored gets its own line, then its own
-    // quoted evidence and links, or "No source found". Count is per claim (Ben, 10/7).
-    const FAILED = ["Verifier's reply couldn't be read", "Verifier gave no answer for this claim"];
-    // Bucket zero (Ben, 10/13): say why nothing is checked, never go blank.
-    const ZERO_REASONS = {
-      creative: "This looks like a creative request. Creative requests are out of scope, so nothing here was checked.",
-      draft: "This looks like a request to draft or edit text. Drafts are out of scope, so nothing here was checked.",
-      chat: "This looks like small talk, so there is nothing here to check.",
-      other: "This doesn't look like a question of fact, so nothing here was checked.",
+    // ---------- Icons from the Figma master components ----------
+    const ICON = {
+      Supported: '<svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect width="22" height="22" rx="11" fill="#31891C"/><path d="M16.1887 7.10891C16.3703 6.96379 16.6349 6.96134 16.8205 7.11575C17.006 7.27051 17.0507 7.53111 16.9407 7.73592L16.884 7.81992L9.38391 16.8208C9.29398 16.9285 9.16279 16.9931 9.02257 16.9995C8.8824 17.0057 8.74582 16.9532 8.64659 16.854L5.14654 13.3536L5.08209 13.2755C4.9542 13.0815 4.97579 12.8173 5.14654 12.6465C5.3173 12.4758 5.58142 12.4542 5.77545 12.5821L5.85358 12.6465L8.96593 15.7592L16.1164 7.17923L16.1887 7.10891Z" fill="white" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+      Unsettled: '<svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect width="22" height="22" rx="11" fill="#656565"/><line x1="5.5" y1="11.5" x2="16.5" y2="11.5" stroke="white" stroke-width="3" stroke-linecap="round"/></svg>',
+      Contradicted: '<svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect width="22" height="22" rx="11" fill="#B53333"/><path d="M15.2888 6.62202C15.4515 6.45934 15.7153 6.45931 15.878 6.62202C16.0407 6.78473 16.0407 7.04851 15.878 7.2112L11.5892 11.4999L15.878 15.7886C16.0406 15.9513 16.0407 16.2151 15.878 16.3778C15.7357 16.5202 15.5156 16.5382 15.3539 16.4315L15.2888 16.3778L11 12.0891L6.71116 16.3778C6.54845 16.5403 6.28463 16.5404 6.12196 16.3778C5.95929 16.2151 5.95941 15.9513 6.12196 15.7886L10.4108 11.4999L6.12196 7.2112C5.95941 7.04847 5.95929 6.78468 6.12196 6.62202C6.28462 6.4594 6.54844 6.45948 6.71116 6.62202L11 10.9107L15.2888 6.62202Z" fill="#141413" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>',
     };
-    function showNotCheckable(reason) {
-      verified.textContent = "";
-      verified.append(el("p", "bucket-label", ZERO_REASONS[reason] || ZERO_REASONS.other));
+    // Header words, from the Figma verdict row (Ben, 10/20). They replace the old hover tips.
+    const LABEL = { Supported: "Citation supports claim", Contradicted: "Citation contradicts claim", Unsettled: "Citation says claim is unsettled" };
+    function citeHead(v, label) {
+      const h = el("div", "cite-head");
+      const i = el("span", "vicon"); i.innerHTML = ICON[v];
+      h.append(i, el("span", "vlabel", label || LABEL[v])); return h;
     }
 
-    function showVerifier(out) {
-      verified.textContent = "";
-      const boxes = [];
-      for (const s of out.sections) {
-        let b = boxes.find((x) => x.sentence === s.sentence);
-        if (!b) { b = { sentence: s.sentence, claims: [] }; boxes.push(b); }
-        b.claims.push(s);
-      }
-      for (const b of boxes) {
-        const box = el("div", "claim");
-        box.append(el("p", "claim-text", b.sentence));
-        for (const s of b.claims) {
-          const piece = el("div", "piece");
-          piece.append(el("p", "piece-text", "\u201c" + s.claim + "\u201d"));
-          // Contested claims and opinions get a plain label (Ben, 10/12). How labels look is a UI question for later.
-          if (s.bucket === "contested") piece.append(el("p", "bucket-label", "Contested: " + s.verdict.toLowerCase()));
-          if (s.bucket === "opinion") piece.append(el("p", "bucket-label", "Opinion"));
-          const lists = (s.kind === "opinion" ? [["Held by", s.confirms || []]]
-            : [["Supports", s.confirms || []], ["Contradicts", s.contradicts || []], ["Says this is unsettled", s.unsettled || []]]).filter(([, l]) => l.length);
-          for (const [label, list] of lists) {
-            piece.append(el("p", "list-label", label + ":"));
-            for (const p of list) {
-              const q = el("div", "para", "\u201c" + p.quote + "\u201d");
-              const src = el("div", "para-src");
-              const a = el("a", "", p.host); a.href = p.url; a.target = "_blank"; a.rel = "noopener"; a.title = p.title || "";
-              src.append(a); q.append(src); piece.append(q);
-            }
-          }
-          if (!lists.length) piece.append(el("p", "no-source", FAILED.includes(s.verdict) ? s.verdict : "No source found"));
-          else piece.append(el("p", "", `Reliable sources cited: ${s.sourceCount}`));
-          box.append(piece);
+    // Confidence gauge: half circle, full = 100. Blue arc length follows the score.
+    function gauge(score) {
+      const g = el("div", "gauge");
+      const R = 39.09, arc = "M83.09 42.09A39.09 39.09 0 0 0 4.91 42.09";
+      const L = Math.PI * R, filled = Math.max(0, Math.min(100, score)) / 100 * L;
+      g.innerHTML = '<svg width="88" height="46" viewBox="0 0 88 46" fill="none">' +
+        '<path d="' + arc + '" stroke="#1F1E1D" stroke-opacity="0.1" stroke-width="5" stroke-linecap="butt"/>' +
+        // the arc is drawn right to left, so the blue is shifted to end at the left end: it fills left to right
+        '<path d="' + arc + '" stroke="#4682D5" stroke-width="5" stroke-linecap="butt" stroke-dasharray="0 ' + (L - filled) + " " + filled + " " + L + '"/></svg>';
+      g.append(el("span", "num", score + "%"), el("span", "base"));
+      return g;
+    }
+
+    // A label with a hover tooltip (Ben, 10/21)
+    function tipLabel(text, tip) {
+      const l = el("div", "lbl tip-host", text);
+      const t = el("div", "tip"); t.append(el("div", "bubble", tip));
+      t.insertAdjacentHTML("beforeend", '<svg class="down" width="18" height="10" viewBox="0 0 18 10"><path d="M0.5 0.5 L9 9 L17.5 0.5" fill="#fff" stroke="rgba(31,30,29,0.4)"/><rect x="1" y="0" width="16" height="1" fill="#fff"/></svg>');
+      l.append(t); return l;
+    }
+    // Confidence block: "CONFIDENCE SCORE" over the gauge, no % sign (Ben, 10/21)
+    function confBlock(score) {
+      const c = el("div", "conf tip-group"); const w = el("div", "gwrap"); w.append(gauge(score));
+      c.append(tipLabel("CLAUDE’S CONFIDENCE", "Claude’s confidence in the accuracy of this claim"), w); return c;
+    }
+    // Under each claim: left = abilities + documentation density (filled in when the ability scores arrive), right = confidence (Figma 10/21)
+    function claimInfo(seg) {
+      const info = el("div", "cinfo"); const l = el("div", "cinfo-l"), r = el("div", "cinfo-r");
+      if (seg) r.append(confBlock(seg.confidence));
+      info.append(l, r); return info;
+    }
+
+    // ---------- "Claude searched:" (Ben, 10/15) ----------
+    // Right column matches the answer's height; links that don't fit are cut, with a caret that opens an overlay on top.
+    let searchUrls = [];
+    const EXT = '<svg class="ext" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M7 1.5h3.5V5M10.5 1.5 5.5 6.5M9 7v2.5a1 1 0 0 1-1 1H2.5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1H5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    function linkList(container) {
+      // One link per site (Ben, 10/21): the first page found on each site.
+      const seen = new Set(), list = searchUrls.filter((u) => { const h = hostOf(u); if (seen.has(h)) return false; seen.add(h); return true; });
+      list.forEach((u, i) => {
+        const a = el("a", "", hostOf(u)); a.href = u; a.target = "_blank"; a.rel = "noopener"; // no browser title label (Ben, 10/19)
+        a.insertAdjacentHTML("beforeend", EXT);
+        container.append(a);
+        if (i < list.length - 1) container.append(document.createTextNode(", "));
+      });
+    }
+    function caretButton() {
+      const c = el("button", "caret"); c.type = "button"; c.setAttribute("aria-label", "Show all searched sources"); c.setAttribute("aria-expanded", "false");
+      c.innerHTML = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M6 8l4 4 4-4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      return c;
+    }
+    function searchedHead(caret) { const h = el("div", "s-head"); h.append(el("span", "label", "CLAUDE SEARCHED:"), caret); return h; }
+    function setOverlay(open) {
+      searchOverlay.classList.toggle("open", open);
+      document.querySelectorAll("#searched-wrap .caret").forEach((c) => c.setAttribute("aria-expanded", String(open)));
+    }
+    function showSearched() {
+      searched.textContent = ""; searchOverlay.textContent = ""; setOverlay(false);
+      searched.style.height = "";
+      if (!searchUrls.length) { searched.append(el("span", "no-search", "No sources checked — answered from memory")); return; }
+      const caret = caretButton(); caret.addEventListener("click", () => setOverlay(true));
+      searched.append(searchedHead(caret), el("div", "links"));
+      const close = caretButton(); close.setAttribute("aria-expanded", "true"); close.addEventListener("click", () => setOverlay(false));
+      const all = el("div", "links"); linkList(all);
+      searchOverlay.append(searchedHead(close), all);
+      fitSearched();
+    }
+    function fitSearched() {
+      // Whole lines only, never less than one line. Links that don't fit are dropped and the list ends with ", ..." (Figma 10/21).
+      const links = searched.querySelector(".links"), caret = searched.querySelector(".caret"), head = searched.querySelector(".s-head");
+      if (!links) return;
+      links.textContent = ""; links.style.height = ""; linkList(links);
+      const lh = parseFloat(getComputedStyle(links).lineHeight) || 24;
+      const room = Math.max(lh, Math.floor((answer.offsetHeight - 4 - head.offsetHeight) / lh) * lh);
+      const overflow = links.scrollHeight > room + 1;
+      caret.style.display = overflow ? "" : "none";
+      if (overflow) {
+        const more = el("span", "more", "...");
+        links.append(document.createTextNode(", "), more);
+        // drop one link (and its comma) at a time until the list plus ", ..." fits
+        while (links.scrollHeight > room + 1 && links.querySelectorAll("a").length > 1) {
+          const a = [...links.querySelectorAll("a")].pop();
+          const comma = a.nextSibling; if (comma && comma.nodeType === 3) comma.remove();
+          a.remove();
         }
-        verified.append(box);
       }
+      links.style.height = room + "px";
+    }
+    window.addEventListener("resize", fitSearched);
+    document.addEventListener("click", (e) => { if (searchOverlay.classList.contains("open") && !e.target.closest("#searched-wrap")) setOverlay(false); });
+
+    // ---------- Verifier ----------
+    const FAILED = ["Verifier's reply couldn't be read", "Verifier gave no answer for this claim", "Verifier's reply was cut off before this claim"];
+    // Bucket zero (Ben, 10/13): say why nothing is checked, never go blank.
+    const ZERO_REASONS = {
+      creative: "This looks like fiction. Second Source checks facts, so there's nothing here to verify.", // Ben, 10/19
+      draft: "This looks like a request to write or edit something. Second Source checks answers to questions of fact, not writing tasks.", // Ben, 10/19
+      chat: "This looks like small talk, so there is nothing here to check.",
+      code: "Second Source is currently unable to verify claims about code.",
+      reasoning: "Second Source checks claims by finding reliable sources that support or contradict them. Reasoning, math and puzzle questions are generally unsourced, so they can't be verified here.", // Ben's wording, 10/19; "or contradict" added 10/20
+      other: "This doesn't look like a question of fact, so nothing here was checked.",
+    };
+    // Plain arithmetic (Ben, 10/19): when the question is only numbers and operators, 2S does the sum in code
+    // and compares it with the numbers in Claude's answer. Exact for whole numbers; no AI involved.
+    function arithmetic(question) {
+      let q = question.toLowerCase().replace(/^\s*(what is|what's|whats|calculate|compute|solve)\s*/, "").replace(/[?=\s]+$/, "").trim();
+      q = q.replace(/(\d),(?=\d{3}\b)/g, "$1").replace(/[×x]/g, "*").replace(/÷/g, "/");
+      if (!/^[\d\s+\-*/^().]+$/.test(q) || !/\d/.test(q) || !/[+\-*/^]/.test(q)) return null;
+      const toks = q.match(/\d+(\.\d+)?|[+\-*/^()]/g); if (!toks || toks.join("") !== q.replace(/\s+/g, "")) return null;
+      const exact = !toks.some((t) => t.includes(".") || t === "/");
+      let i = 0;
+      const num = (t) => exact ? BigInt(t) : Number(t);
+      function prim() { const t = toks[i++]; if (t === "(") { const v = add(); if (toks[i++] !== ")") throw 0; return v; } if (t === "-") return -prim(); if (t === undefined || !/\d/.test(t)) throw 0; return num(t); }
+      function pow() { let v = prim(); if (toks[i] === "^") { i++; const e = pow(); v = exact ? v ** e : Math.pow(v, e); } return v; }
+      function mul() { let v = pow(); while (toks[i] === "*" || toks[i] === "/") { const o = toks[i++], r = pow(); v = o === "*" ? v * r : v / r; } return v; }
+      function add() { let v = mul(); while (toks[i] === "+" || toks[i] === "-") { const o = toks[i++], r = mul(); v = o === "+" ? v + r : v - r; } return v; }
+      try { const v = add(); if (i !== toks.length) return null; return { value: v, exact }; } catch { return null; }
+    }
+    // Code checks (calculator, letter counter) use the same claim row as source checks (Ben, 10/19):
+    // Claude's sentence in the claim box with its confidence, the code's result where a quote goes,
+    // and "Second Source calculator/counter" where the site name goes. No link: there's no page to visit.
+    function sentenceWith(answerText, test) {
+      const sents = answerText.match(/[^.!?\n]+[.!?]*/g) || [answerText];
+      return (sents.find(test) || sents[sents.length - 1] || "").trim();
+    }
+    function codeCheckRow(claimText, verdict, line, label) {
+      const rowEl = el("div", "vclaim");
+      const left = el("div", "vleft");
+      left.append(el("div", "claim-box", "“" + stripBold(claimText).trim() + "”"));
+      const seg = lastSegments.find((x) => typeof x.confidence === "number" && claimText.includes(String(x.text).trim()));
+      if (seg) left.append(claimInfo(seg));
+      const right = el("div", "cites");
+      if (verdict) {
+        const wrap = el("div", "cite"); const row = el("div", "cite-row");
+        // Header words for code checks are Claude's placeholder (10/20), pending Ben's wording.
+        const r = el("div", "rcol"); r.append(el("p", "quote", line));
+        const src = el("div", "src"); src.append(el("span", "", label)); r.append(src);
+        row.append(citeHead(verdict, verdict === "Supported" ? "Result supports claim" : "Result contradicts claim"), r); wrap.append(row); right.append(wrap);
+      } else right.append(el("div", "no-source", line));
+      rowEl.append(left, right);
+      verified.textContent = ""; verified.append(rowEl);
+      showSummary(verdict ? [verdict] : []);
+    }
+    function showArithmetic(calc, answerText) {
+      const fmt = (v) => typeof v === "bigint" ? v.toLocaleString("en-US") : Number(v.toPrecision(12)).toLocaleString("en-US", { maximumFractionDigits: 10 });
+      const numsIn = (t) => (t.match(/-?\d[\d,]*(\.\d+)?/g) || []).map((n) => n.replace(/,/g, ""));
+      const target = typeof calc.value === "bigint" ? calc.value.toString() : null;
+      const same = (n) => target !== null ? n === target : Math.abs(Number(n) - calc.value) <= Math.abs(calc.value) * 1e-9;
+      const nums = numsIn(answerText), hit = nums.some(same);
+      // Wording (Ben, 10/19): make clear this is not Claude checking its own work.
+      const line = "Checked by calculator, not AI: " + fmt(calc.value);
+      const claim = sentenceWith(answerText, (t) => hit ? numsIn(t).some(same) : numsIn(t).length > 0);
+      if (!nums.length) return codeCheckRow(claim, null, line + ". Claude's answer has no number to compare.", "");
+      codeCheckRow(claim, hit ? "Supported" : "Contradicted", line, "Second Source calculator");
+    }
+    // Letter counts (Ben, 10/19), e.g. "how many r in strawberry": counted by plain code, not AI.
+    const NUMWORDS = ["zero","one","two","three","four","five","six","seven","eight","nine","ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen","eighteen","nineteen","twenty"];
+    function letterCount(question) {
+      const m = question.match(/how many\s+["'“‘]?([a-z])["'”’]?(?:'s|s)?(?:\s+letters?)?(?:\s+(?:are|is)(?:\s+there)?|\s+appears?)?\s+in\s+(?:the\s+(?:word|sentence|phrase|name|string)\s+)?["'“‘]?([^"'”’?.!]+?)["'”’]?\s*(?:[?.!][\s\S]*)?$/i); // text after the question (e.g. "Work it out step by step.") is allowed (10/20)
+      if (!m) return null;
+      const letter = m[1].toLowerCase(), target = m[2].trim();
+      if (!target) return null;
+      return { letter, target, count: [...target.toLowerCase()].filter((c) => c === letter).length };
+    }
+    function showLetterCount(lc, answerText) {
+      const saysIn = (t) => { const set = new Set((t.match(/\b\d+\b/g) || []).map(Number)); t.toLowerCase().replace(/\b[a-z]+\b/g, (w) => { const i = NUMWORDS.indexOf(w); if (i >= 0) set.add(i); return w; }); return set; };
+      const hit = saysIn(answerText).has(lc.count);
+      const claim = sentenceWith(answerText, (t) => hit ? saysIn(t).has(lc.count) : saysIn(t).size > 0);
+      codeCheckRow(claim, hit ? "Supported" : "Contradicted", "Counted by code, not AI: " + lc.count + ' "' + lc.letter + '" in "' + lc.target + '"', "Second Source counter");
+    }
+    function showNotCheckable(reason) {
+      verified.textContent = "";
+      verified.append(el("p", "bucket-note", ZERO_REASONS[reason] || ZERO_REASONS.other));
+    }
+
+    // Dedupe rule (Ben, 10/15): within one claim, a quote shows once, in one category.
+    // Priority picks the lane: Contradicted beats Unsettled beats Supported. Shown in that order;
+    // within a category, the Verifier's order (most direct first) is kept.
+    function citationsFor(s) {
+      const lanes = s.kind === "opinion"
+        ? [["Supported", s.confirms || []]]
+        : [["Contradicted", s.contradicts || []], ["Unsettled", s.unsettled || []], ["Supported", s.confirms || []]];
+      const seen = new Set(), out = [];
+      for (const [verdict, list] of lanes) for (const p of list) {
+        const key = (p.url || "") + "\n" + (p.quote || "");
+        if (seen.has(key)) continue;
+        seen.add(key); out.push({ verdict, p });
+      }
+      return out;
+    }
+
+    function citation(verdict, p) {
+      const wrap = el("div", "cite");
+      const quote = "“" + p.quote + "”";
+      // Resting card: quote cut to two lines, site name under it.
+      const row = el("div", "cite-row");
+      const r = el("div", "rcol"); r.append(el("p", "quote", quote));
+      const src = el("div", "src"); const hs = el("span", "host", p.host); hs.insertAdjacentHTML("beforeend", EXT); src.append(hs); r.append(src);
+      row.append(citeHead(verdict), r);
+      // Hover: full quote in an overlay on top; the whole box opens the source in a new tab (Ben, 10/15).
+      const full = el("a", "cite-row cite-full"); full.href = p.url; full.target = "_blank"; full.rel = "noopener"; // no browser title label (Ben, 10/19)
+      const r2 = el("div", "rcol"); r2.append(el("p", "quote", quote));
+      const src2 = el("div", "src"); const hs2 = el("span", "host", p.host); hs2.insertAdjacentHTML("beforeend", EXT); src2.append(el("span", "lead", "Click to visit source:"), hs2); r2.append(src2);
+      full.append(citeHead(verdict), r2);
+      wrap.append(row, full);
+      return wrap;
+    }
+
+    // Room for the hover card (Ben, 10/21): if a hovered quote card would run past the end of the page,
+    // add space at the bottom so it can be scrolled into view. The space stays until the next question, so the page doesn't jump.
+    const mainEl = document.getElementById("main");
+    let extraRoom = 0;
+    verified.addEventListener("mouseover", (e) => {
+      const cite = e.target.closest(".cite"); if (!cite) return;
+      const card = cite.querySelector(".cite-full"); if (!card) return;
+      requestAnimationFrame(() => {
+        const bottom = card.getBoundingClientRect().bottom + window.scrollY;
+        const buildH = (document.getElementById("build")?.offsetHeight || 0) + 24;
+        const need = Math.ceil(bottom + buildH - document.documentElement.scrollHeight);
+        if (need > 0) { extraRoom += need; mainEl.style.paddingBottom = (12 + extraRoom) + "px"; }
+      });
+    });
+    let lastSegments = [];
+    // Summary line (Ben, 10/20): counts of claims by verdict, e.g. "13 claims: 9 supported, 2 contradicted, 2 no reliable source".
+    const vSummary = document.getElementById("v-summary"), vBox = document.getElementById("v-box");
+    function summaryLabel(verdict) {
+      if (verdict === "Supported" || verdict === "Partly supported") return "supported";
+      if (verdict === "Contradicted") return "contradicted";
+      if (verdict === "Sources disagree") return "sources disagree";
+      if (verdict === "Sources say this is unsettled") return "unsettled";
+      if (verdict === "Opinion, source found") return "opinion held by a source";
+      if (FAILED.includes(verdict)) return "not checked";
+      return "no reliable source"; // Not found, Opinion with no source
+    }
+    const SUMMARY_ORDER = ["supported", "contradicted", "sources disagree", "unsettled", "opinion held by a source", "no reliable source", "not checked"];
+    function showSummary(verdicts) {
+      if (!verdicts.length) { vSummary.textContent = ""; vBox.querySelectorAll(".f-all").forEach((x) => x.remove()); vBox.hidden = true; return; }
+      const n = {}; verdicts.forEach((v) => { const k = summaryLabel(v); n[k] = (n[k] || 0) + 1; });
+      const text = verdicts.length + (verdicts.length === 1 ? " claim: " : " claims: ") + SUMMARY_ORDER.filter((k) => n[k]).map((k) => n[k] + " " + k).join(", ");
+      vSummary.textContent = text; findingsEl.textContent = ""; vBox.querySelectorAll(".f-all").forEach((x) => x.remove()); vBox.hidden = false; // full width now, so no cut-off and no hover bubble (Figma 10/21)
+    }
+    // Ability scores under each claim, plain data for now (Ben, 10/21: see real data before designing).
+    // Only abilities above 0 are shown, highest first.
+    // Abilities and rarity under each claim (Ben, 10/21). The scorer still rates all 17; the full scores stay in the log.
+    // Shown: the top two abilities by score, names only (a third only if it ties the second), and Atypicality as a word.
+    // Atypicality is ADeLe's "how uncommon" factor, not an ability, so it gets its own line: used as a rough stand-in for familiarity.
+    // One explanation panel for abilities, rarity and confidence (Ben, 10/21). Claude's draft wording; plain styling for Ben to redesign.
+    const EXPLAIN_HTML = `<button type="button" class="close" aria-label="Close">×</button>
+      <h3>Abilities</h3>
+      <p>A separate AI call rates how much each claim demands of 17 kinds of thinking and knowledge, such as logical reasoning or natural sciences knowledge. The categories come from <a href="https://arxiv.org/abs/2503.06378" target="_blank" rel="noopener">ADeLe</a>, a 2025 framework from Microsoft Research and university partners for describing what AI test questions demand. We show the two that matter most for each claim. It's a rough illustration, not a measurement.</p>
+      <h3>Documentation density</h3>
+      <p>Our rough attempt at gauging how familiar Claude might be with a claim's subject or specific detail. The same separate AI call guesses how much has been published about it on the web, in books and in textbooks (ADeLe calls this "atypicality"). Little published usually means Claude saw little of it in training, but Claude's training data is private, so this is a guess, not a count. Often the whole subject is thinly documented; sometimes only the detail is. High density doesn't mean the claim is true, and it's separate from whether our search found a source.</p>
+      <h3>Confidence</h3>
+      <p>Claude's own estimate, from 0 to 100, that the claim is accurate. It's self-reported. Nobody, including Claude, can say exactly what drives it.</p>
+      <h3>How they relate</h3>
+      <p>We haven't measured whether the abilities or documentation density line up with the confidence score or with what the sources say. With enough questions, that's what you'd check.</p>`;
+    const explain = document.getElementById("explain"), explainBtn = document.getElementById("explain-btn");
+    explain.innerHTML = EXPLAIN_HTML;
+    explainBtn.addEventListener("click", () => { explain.hidden = !explain.hidden; });
+    explain.querySelector(".close").addEventListener("click", () => { explain.hidden = true; });
+    function rarityWord(at) { return at >= 4 ? "Low" : at >= 2 ? "Medium" : "High"; } // documentation density from ADeLe atypicality: 0-1 high, 2-3 medium, 4-5 low (Claude's cut-offs; label Ben, 10/21)
+    function showAbilities(out) {
+      // Figma 10/21: "ABILITIES USED" as a bulleted list, then "DOCUMENTATION DENSITY" and High / Medium / Low. Names show "&" for "and", as in the Figma.
+      verified.querySelectorAll(".vclaim[data-n]").forEach((row) => {
+        const box = row.querySelector(".cinfo-l"); if (!box) return;
+        box.textContent = "";
+        const ab = el("div", "info-block tip-group"); ab.append(tipLabel("ABILITIES USED", "Categories of thinking and knowledge needed for this claim"));
+        const ul = el("ul", "ab-list");
+        let dd = null;
+        if (!out || out.error) ul.append(el("li", "", "Couldn't be scored"));
+        else {
+          const c = (out.claims || []).find((x) => x.n === Number(row.dataset.n));
+          const scores = c?.scores || {};
+          const ranked = Object.entries(scores).filter(([k]) => k !== "AT").sort((a, b) => b[1] - a[1]);
+          const top = ranked.slice(0, 2).concat(ranked.slice(2).filter(([, v]) => ranked[1] && v === ranked[1][1]).slice(0, 1));
+          if (!top.length) ul.append(el("li", "", "None rated"));
+          for (const [k] of top) ul.append(el("li", "", String(out.names?.[k] || k).replace(/ and /g, " & ")));
+          dd = el("div", "info-block tip-group"); dd.append(tipLabel("DOCUMENTATION DENSITY", "Assumed level of familiarity Claude has with this topic"), el("div", "dd-val", rarityWord(scores.AT || 0)));
+        }
+        ab.append(ul); box.append(ab); if (dd) box.append(dd);
+      });
+    }
+    // "Worth a second look" (Ben, 10/21): points out where Claude's confidence doesn't match what the sources found.
+    // Observations, not conclusions. Only two kinds count: high confidence (90+) with sources contradicting, and low
+    // confidence (below 80) with sources supporting. "No reliable source found" never counts: it means unchecked, not wrong.
+    // Cut-offs are Claude's (80 matches the old red range) and are stated on the page. Plain styling for Ben to redesign.
+    const HIGH = 90, LOW = 80, MAX_FINDINGS = 3;
+    const findingsEl = document.getElementById("v-findings");
+    const short = (t, n = 90) => { t = stripBold(String(t)).trim(); return t.length > n ? t.slice(0, n - 1).trimEnd() + "…" : t; };
+    const plural = (n, one, many) => n + " " + (n === 1 ? one : many);
+    function showFindings(sections, scored) {
+      const items = [];
+      for (const s of sections) {
+        const seg = scored[s.n - 1]; if (!seg || s.kind === "opinion") continue;
+        const conf = seg.confidence;
+        const lanes = citationsFor(s);
+        const nC = lanes.filter((x) => x.verdict === "Contradicted").length, nS = lanes.filter((x) => x.verdict === "Supported").length;
+        if (conf >= HIGH && s.verdict === "Contradicted")
+          items.push({ n: s.n, parts: ["Claude was ", [`${conf}% confident`], " in “", { link: stripBold(String(s.claim)).trim() }, "”, and ", [plural(nC, "source contradicts", "sources contradict") + " it"], "."] });
+        else if (conf < LOW && s.verdict === "Supported")
+          items.push({ n: s.n, parts: ["Claude was only ", [`${conf}% confident`], " in “", { link: stripBold(String(s.claim)).trim() }, "”, but ", [plural(nS, "source supports", "sources support") + " it"], "."] });
+      }
+      // Figma 10/21: no heading, no footnote, no "…and N more" line (overflow to be decided later; still capped at 3).
+      findingsEl.textContent = "";
+      if (!items.length) { findingsEl.append(el("p", "f-none", "No mismatches between Claude's confidence and what the sources found.")); return; }
+      const makeList = (list) => { const u = el("ul"); for (const it of list) u.append(findingLi(it)); return u; };
+      findingsEl.append(makeList(items.slice(0, MAX_FINDINGS)));
+      if (items.length > MAX_FINDINGS) {
+        const all = el("div", "f-all"); all.append(vSummary.cloneNode(true), makeList(items));
+        const less = el("button", "f-toggle", "See less"); less.type = "button"; less.addEventListener("click", (e) => { e.stopPropagation(); all.classList.remove("open"); }); all.append(less);
+        const more = el("button", "f-toggle", "See more"); more.type = "button"; more.addEventListener("click", (e) => { e.stopPropagation(); all.classList.add("open"); fitFindings(); });
+        all.firstChild.removeAttribute("id"); all.firstChild.className = "f-count";
+        findingsEl.append(more); vBox.append(all);
+      }
+      fitFindings();
+    }
+    function findingLi(it) {
+        const li = el("li");
+        for (const part of it.parts) {
+          if (typeof part === "string") li.append(document.createTextNode(part));
+          else if (Array.isArray(part)) li.append(el("b", "", part[0]));
+          else {
+            const a = el("a"); a.href = "#"; a.dataset.full = part.link; a.append(el("span", "t", part.link)); a.insertAdjacentHTML("beforeend", '<svg class="jump" width="10" height="12" viewBox="0 0 10 12" fill="none" aria-hidden="true"><path d="M5 1.5v8.5M1.5 6.5 5 10l3.5-3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>');
+            a.addEventListener("click", (e) => { e.preventDefault(); const row = verified.querySelector('.vclaim[data-n="' + it.n + '"]'); if (row) { row.scrollIntoView({ behavior: "smooth", block: "start" }); row.classList.add("flash"); setTimeout(() => row.classList.remove("flash"), 1500); } });
+            li.append(a);
+          }
+        }
+      return li;
+    }
+    // Each bullet stays on one line (Ben, 10/21): the quoted claim is cut with "…" until the line fits. Redone when the window resizes.
+    function fitFindings() {
+      vBox.querySelectorAll("li").forEach((li) => {
+        const a = li.querySelector("a[data-full]"); if (!a) return;
+        const full = a.dataset.full, lh = parseFloat(getComputedStyle(li).lineHeight) || 24;
+        const fits = () => li.offsetHeight <= lh * 1.5;
+        const t = a.querySelector(".t"); t.textContent = full; if (fits()) return;
+        let lo = 10, hi = full.length - 1;
+        while (lo < hi) { const mid = Math.ceil((lo + hi) / 2); t.textContent = full.slice(0, mid).trimEnd() + "…"; if (fits()) lo = mid; else hi = mid - 1; }
+        t.textContent = full.slice(0, lo).trimEnd() + "…";
+      });
+    }
+    window.addEventListener("resize", fitFindings);
+    document.addEventListener("click", (e) => { const o = vBox.querySelector(".f-all.open"); if (o && (!o.contains(e.target) || e.target.closest("a[data-full]"))) o.classList.remove("open"); });
+    function showVerifier(out) {
+      showSummary(out.sections.map((s) => s.verdict));
+      verified.textContent = "";
+      // Confidence for each claim comes from the Replier's score for that piece (sections are in the same order).
+      const scored = lastSegments.filter((s) => typeof s.confidence === "number" && String(s.text).trim());
+      for (const s of out.sections) {
+        const rowEl = el("div", "vclaim"); rowEl.dataset.n = s.n;
+        const left = el("div", "vleft");
+        left.append(el("div", "claim-box", "“" + stripBold(s.claim).trim() + "”"));
+        const seg = scored[s.n - 1];
+        left.append(claimInfo(seg));
+        const right = el("div", "cites");
+        const cites = citationsFor(s);
+        for (const { verdict, p } of cites) right.append(citation(verdict, p));
+        if (!cites.length) right.append(el("div", "no-source", FAILED.includes(s.verdict) ? s.verdict : "No reliable source found")); // label (Ben, 10/19)
+        rowEl.append(left, right);
+        verified.append(rowEl);
+      }
+      showFindings(out.sections, scored);
     }
 
     // Build line (Ben, 10/7): shows which version is running; warns when the app needs a restart.
@@ -175,42 +677,92 @@
     }
     showBuild();
 
-    // Enter in the question box works the same as clicking Submit (Ben, 10/7).
-    q.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.isComposing) { e.preventDefault(); send.click(); } });
+    // Enter in the question box submits (Ben, 10/7). The question stays in the box until the user clears it (Ben, 10/14).
+    const CLAIM_CAP = 20; // Ben, 10/19
+    function askToCheck(n) {
+      return new Promise((resolve) => {
+        const cents = Math.round(n * 0.9);
+        const box = el("div", "bucket-note");
+        box.append(el("p", "", `This answer has ${n} claims. Checking them all would cost about ${cents} cents, possibly more. Check anyway?`));
+        const yes = el("button", "cap-btn", "Check anyway"), no = el("button", "cap-btn", "Skip");
+        yes.type = "button"; no.type = "button";
+        yes.onclick = () => resolve(true); no.onclick = () => resolve(false);
+        const row = el("div", "cap-row"); row.append(yes, no); box.append(row);
+        verified.append(box);
+      });
+    }
 
-    send.addEventListener("click", async () => {
+    // Return in the box submits, like the arrow button: the box is a form, so the browser handles it (Ben, 10/19).
+    document.getElementById("query").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (send.disabled) return;
+      if (!q.value.trim()) return;
       // The user can't move forward until both answers are in (blocking).
       q.disabled = true; send.disabled = true; verifyOn.disabled = true;
-      COLORS.forEach((c) => (circle(c).textContent = ""));
-      summary.textContent = ""; answer.textContent = ""; verified.textContent = "";
-      status.textContent = "Thinking...";
+      answer.textContent = ""; verified.textContent = ""; extraRoom = 0; mainEl.style.paddingBottom = ""; vBox.querySelectorAll(".f-all").forEach((x) => x.remove()); vSummary.textContent = ""; findingsEl.textContent = ""; vBox.hidden = true; searchUrls = []; searched.textContent = ""; searchOverlay.textContent = ""; setOverlay(false);
+      { const w = el("div", "v-working"); w.append(el("span", "spinner"), el("span", "", "Thinking...")); answer.append(w); } // spinner + line, same as the Verifier (Ben, 10/21)
       try {
         const data = await post("/ask", { question: q.value });
-        summary.textContent = data.summary;
-        for (const seg of data.segments) {
-          const span = el("span", "", seg.text);
-          const c = seg.confidence;
-          if (typeof c === "number") {
-            const color = colorFor(c);
-            span.dataset.color = color;
-            span.addEventListener("mouseenter", () => { circle(color).textContent = c; span.classList.add("hl-" + color); });
-            span.addEventListener("mouseleave", () => { circle(color).textContent = ""; span.classList.remove("hl-" + color); });
+        answer.textContent = ""; // remove the spinner
+        lastSegments = data.segments || [];
+        // Space between list items (Ben, 10/20): a single line break in Claude's answer is shown as a blank line, so bullets
+        // don't run together. Display only: the text sent to the Verifier and the log are unchanged.
+        const fullText = lastSegments.map((x) => String(x.text)).join("");
+        let pos = 0;
+        const spaced = lastSegments.map((x) => {
+          const t = String(x.text), start = pos; pos += t.length;
+          let out = "";
+          for (let i = 0; i < t.length; i++) {
+            const c = t[i], g = start + i;
+            out += (c === "\n" && fullText[g - 1] !== "\n" && fullText[g + 1] !== "\n") ? "\n\n" : c;
           }
+          return out;
+        });
+        for (const [segIdx, seg] of lastSegments.entries()) {
+          const span = el("span", "");
+          appendBold(span, spaced[segIdx]); // shows **bold** as bold instead of asterisks (Ben, 10/20); text sent to the Verifier is unchanged
+          if (typeof seg.confidence === "number") span.dataset.color = colorFor(seg.confidence);
           answer.appendChild(span);
         }
-        const claims = data.segments.filter((s) => typeof s.confidence === "number").map((s) => s.text.trim());
+        searchUrls = Array.from(new Set(data.resultUrls || []));
+        showSearched();
+        const claims = lastSegments.filter((s) => typeof s.confidence === "number").map((s) => s.text.trim());
         // The gate (Ben, 10/13): only checkable questions go to the Verifier. The Replier's answer always shows.
-        // Bucket 3 checks the Replier's claims like any other answer (Ben, 10/13); the values form was dropped.
-        if (verifyOn.checked && data.gate === "none") showNotCheckable(data.gateReason);
+        const calc = arithmetic(q.value);
+        const lc = calc ? null : letterCount(q.value);
+        if (verifyOn.checked && calc) showArithmetic(calc, answer.textContent);
+        else if (verifyOn.checked && lc) showLetterCount(lc, answer.textContent);
+        else if (verifyOn.checked && data.gate === "none") showNotCheckable(data.gateReason);
+        // Never go blank (Ben, 10/13): if Claude marked no claims to check, say so.
+        else if (verifyOn.checked && !claims.length) { verified.textContent = ""; verified.append(el("p", "bucket-note", "Claude didn't mark its answer as checkable fact, so nothing was verified.")); }
         else if (verifyOn.checked && claims.length) {
-          status.textContent = `Checking ${claims.length} claim${claims.length > 1 ? "s" : ""} against reliable sources...`;
-          showVerifier(await post("/verify", { question: q.value, segments: data.segments })); // Verifier gets each piece with its sentence (Ben, 10/7)
+          status.textContent = ""; // the Verifier section shows its own working line now
+          verified.textContent = "";
+          // Cap long answers (Ben, 10/19): past 20 claims, ask before checking and show the rough cost.
+          // Rough cost from the 49-claim run on 10/19: about 0.9 cents per claim, more if some need a second search.
+          if (claims.length > CLAIM_CAP && !(await askToCheck(claims.length))) {
+            verified.textContent = "";
+            verified.append(el("p", "bucket-note", `Not checked. This answer has ${claims.length} claims.`));
+            throw { skip: true };
+          }
+          verified.textContent = "";
+          const working = el("div", "v-working"); working.append(el("span", "spinner"), el("span", "", `Checking ${claims.length} claim${claims.length > 1 ? "s" : ""} against reliable sources...`));
+          verified.append(working);
+          // Ability scores (Ben, 10/21): a separate call that rates each claim's demands, run alongside the Verifier.
+          const scoredTexts = data.segments.filter((x) => typeof x.confidence === "number" && String(x.text).trim()).map((x) => String(x.text).trim());
+          const abilitiesP = post("/abilities", { question: q.value, claims: scoredTexts }).catch((e) => ({ error: e.message }));
+          // Wait for both, then show everything at once, so claims don't grow while you read (Ben, 10/21)
+          const [vOut, abOut] = await Promise.all([post("/verify", { question: q.value, segments: data.segments }), abilitiesP]);
+          showVerifier(vOut);
+          showAbilities(abOut);
         }
         status.textContent = "";
       } catch (err) {
-        status.textContent = "ERROR: " + err.message;
+        if (!err?.skip) status.textContent = "ERROR: " + err.message;
+        verified.querySelectorAll(".v-working").forEach((w) => w.remove()); answer.querySelectorAll(".v-working").forEach((w) => w.remove()); // no spinner left running after an error
       }
       q.disabled = false; send.disabled = false; verifyOn.disabled = false;
+      q.focus(); // cursor back in the box for the next question
       await showBuild();
       saveScreenshot();
     });
@@ -218,7 +770,7 @@
     // Automatic screenshots (Ben, 10/7): after each answer, the page draws itself and the app saves it to Documentarian.
     async function saveScreenshot() {
       try {
-        const canvas = await html2canvas(document.body, { backgroundColor: "#ffffff", scale: window.devicePixelRatio || 1 });
+        const canvas = await html2canvas(document.body, { backgroundColor: "#f9f9f7", scale: window.devicePixelRatio || 1 });
         await post("/screenshot", { image: canvas.toDataURL("image/png"), question: q.value });
       } catch (err) {
         status.textContent = "Screenshot not saved: " + err.message;
