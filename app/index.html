@@ -146,8 +146,7 @@
     .gauge .base { position: absolute; left: 1px; top: 46px; width: 86px; height: 0; border-top: 1px solid var(--border-tertiary); }
     /* Verifier heading: title + (?) icon, no line under it (Figma 10/21) */
     .head.vhead { display: flex; align-items: center; justify-content: flex-start; gap: 8px; border-bottom: 0; margin-bottom: 4px; }
-    #explain-btn { width: 20px; height: 20px; border: 0; background: none; padding: 0; cursor: pointer; display: flex; color: var(--text-primary); }
-    #explain-btn svg { display: block; }
+    #explain-btn { border: 0; background: none; padding: 0; cursor: pointer; font: inherit; font-size: 15px; color: var(--text-info); text-decoration: underline; text-decoration-thickness: from-font; margin-left: 8px; } /* text link, not an icon (Ben, 10/22) */
     /* Summary box (Figma 10/21): count line, then the confidence/source mismatches as bullets */
     #v-box[hidden] { display: none; }
     #v-box { background: var(--claim-bg); border: 0.5px solid rgba(31,30,29,0.4); padding: 16px 16px 24px; display: flex; flex-direction: column; gap: 16px; margin-bottom: 36px; }
@@ -159,9 +158,33 @@
     #v-findings p { margin: 0; }
     .vclaim.flash { background: var(--claim-bg); transition: background 0.3s; }
     #verify-col { position: relative; }
-    #explain { position: absolute; top: 33px; left: 0; z-index: 20; filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.15)); /* opens on top; nothing on the page shifts (Ben, 10/15 rule) */ border: 1px solid var(--border-secondary); border-radius: 16px; background: #fff; padding: 16px 20px; max-width: 760px; font-size: 14px; line-height: 1.5; }
-    #explain h3 { font-size: 14px; margin: 12px 0 4px; } #explain h3:first-of-type { margin-top: 0; } #explain p { margin: 0 0 6px; }
-    #explain .close { position: absolute; right: 12px; top: 8px; border: 0; background: none; font-size: 18px; cursor: pointer; color: var(--text-secondary); }
+    /* "What am I looking at?" takes over the full page; BACK closes it (Ben, 10/22). Layout follows Ben's Figma draft of 10/22 (screenshot), roughly. */
+    #explain[hidden] { display: none; }
+    #explain { position: fixed; inset: 0; z-index: 60; background: var(--bg); overflow-y: auto; }
+    .ex-page { max-width: 1100px; margin: 0 auto; padding: 32px 24px 80px 120px; position: relative; }
+    .ex-back { position: absolute; left: 24px; top: 38px; border: 0; background: none; padding: 0; cursor: pointer; font: inherit; font-size: 13px; font-weight: 600; letter-spacing: 0.02em; color: var(--text-primary); }
+    .ex-page h1 { font-family: var(--serif); font-weight: 600; font-size: 26px; margin: 0 0 40px; }
+    .ex-page h3 { margin: 0; font-size: 15px; font-weight: 700; }
+    .ex-page p { margin: 0; }
+    .callout { border: 1px solid var(--border-secondary); background: #fff; padding: 10px 14px 12px; max-width: 340px; font-size: 15px; line-height: 1.45; position: relative; }
+    .ex-top, .ex-bottom { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 40px; }
+    .ex-top .callout::after { content: ""; position: absolute; left: 24px; top: 100%; height: 40px; border-left: 1px solid #e26aa6; }
+    .ex-bottom .callout::before { content: ""; position: absolute; left: 24px; bottom: 100%; height: 40px; border-left: 1px solid #e26aa6; }
+    .ex-bottom-l { display: flex; flex-direction: column; gap: 40px; }
+    .ex-example { margin: 40px 0; padding: 24px; border: 1px solid var(--border-secondary); }
+    .ex-example .vclaim { border-bottom: 0; padding-bottom: 0; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 40px; }
+    .ex-q { margin-top: 48px !important; font-size: 16px; }
+    .ex-q + .ex-q { margin-top: 8px !important; }
+    .ex-box { border: 1px solid var(--text-primary); padding: 16px 24px; margin-top: 24px; }
+    .ex-box ul, .ex-ver ul { margin: 0; padding-left: 20px; }
+    .ex-box li + li, .ex-ver li + li { margin-top: 8px; }
+    .ph { color: var(--text-tertiary); } /* visible placeholder (Ben, 10/22) */
+    .ex-ver { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 40px; row-gap: 16px; margin-top: 48px; }
+    .ex-ver h3 { margin-bottom: 8px; }
+    .ex-ver .ex-note { grid-column: 1 / -1; }
+    /* New summary box lines (Ben, 10/22): one line each for abilities, likely familiarity, confidence */
+    .s-line { margin: 0; }
+    .s-line + .s-line { margin-top: 8px; }
     .cites { display: flex; flex-direction: column; gap: 16px; align-items: flex-end; min-width: 0; }
     .no-source { font-size: 15px; color: var(--text-tertiary); padding-top: 8px; width: 100%; max-width: 520px; padding-left: 30px; } /* lines up with the verdict words ("Citation supports claim") */
     /* Short "why" next to "No reliable source found" (Ben, 10/22): one line, the reasons on hover. Tooltip anchored left so it stays inside the column. */
@@ -242,7 +265,7 @@
     </section>
 
     <section id="verify-col" class="content">
-      <div class="head vhead"><h2 id="verify-head">Verifier</h2><button type="button" id="explain-btn" aria-label="What am I looking at?"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9.25" fill="#D6E4F6" stroke="currentColor" stroke-width="1.5"/><path d="M7.6 7.7a2.45 2.45 0 0 1 4.75.8c0 1.65-2.35 2.1-2.35 3.6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="10" cy="14.6" r="0.95" fill="currentColor"/></svg></button></div>
+      <div class="head vhead"><h2 id="verify-head">Verifier</h2><button type="button" id="explain-btn">What am I looking at?</button></div>
       <div id="explain" hidden></div>
       <div id="v-box" hidden><div id="v-summary"></div><div id="v-findings"></div></div>
       <div id="verified"></div>
@@ -329,12 +352,8 @@
       w.append(t); d.append(w); return d;
     }
     // A label with a hover tooltip (Ben, 10/21)
-    function tipLabel(text, tip) {
-      const l = el("div", "lbl tip-host", text);
-      const t = el("div", "tip"); t.append(el("div", "bubble", tip));
-      t.insertAdjacentHTML("beforeend", '<svg class="down" width="18" height="10" viewBox="0 0 18 10"><path d="M0.5 0.5 L9 9 L17.5 0.5" fill="#fff" stroke="rgba(31,30,29,0.4)"/><rect x="1" y="0" width="16" height="1" fill="#fff"/></svg>');
-      l.append(t); return l;
-    }
+    // Labels without tooltips (Ben, 10/22): "What am I looking at?" explains them now.
+    function tipLabel(text) { return el("div", "lbl", text); }
     // Confidence block: "CONFIDENCE SCORE" over the gauge, no % sign (Ben, 10/21)
     function confBlock(score) {
       const c = el("div", "conf tip-group"); const w = el("div", "gwrap"); w.append(gauge(score));
@@ -561,20 +580,77 @@
     // Shown: the top two abilities by score, names only (a third only if it ties the second), and Atypicality as a word.
     // Atypicality is ADeLe's "how uncommon" factor, not an ability, so it gets its own line: used as a rough stand-in for familiarity.
     // One explanation panel for abilities, rarity and confidence (Ben, 10/21). Claude's draft wording; plain styling for Ben to redesign.
-    const EXPLAIN_HTML = `<button type="button" class="close" aria-label="Close">×</button>
-      <h3>Abilities</h3>
-      <p>A separate AI call rates how much each claim demands of 17 kinds of thinking and knowledge, such as logical reasoning or natural sciences knowledge. The categories come from <a href="https://arxiv.org/abs/2503.06378" target="_blank" rel="noopener">ADeLe</a>, a 2025 framework from Microsoft Research and university partners for describing what AI test questions demand. We show the two that matter most for each claim. It's a rough illustration, not a measurement.</p>
-      <h3>Documentation density</h3>
-      <p>Our rough attempt at gauging how familiar Claude might be with a claim's subject or specific detail. The same separate AI call guesses how much has been published about it on the web, in books and in textbooks (ADeLe calls this "atypicality"). Little published usually means Claude saw little of it in training, but Claude's training data is private, so this is a guess, not a count. Often the whole subject is thinly documented; sometimes only the detail is. High density doesn't mean the claim is true, and it's separate from whether our search found a source.</p>
-      <h3>Confidence</h3>
-      <p>Claude's own estimate, from 0 to 100, that the claim is accurate. It's self-reported. Nobody, including Claude, can say exactly what drives it.</p>
-      <h3>How they relate</h3>
-      <p>We haven't measured whether the abilities or documentation density line up with the confidence score or with what the sources say. With enough questions, that's what you'd check.</p>`;
+    // "What am I looking at?" page (Ben's wording and layout, 10/22).
+    const EXPLAIN_HTML = `<div class="ex-page">
+      <button type="button" class="ex-back">← BACK</button>
+      <h1>Anatomy of a checked claim</h1>
+      <div class="ex-top">
+        <div class="callout"><h3>Claim</h3><p>Claude splits its responses into checkable claims.</p></div>
+        <div class="callout"><h3>Citation</h3><p>The Verifier quotes relevant sources &amp; marks whether or not they support the claim.</p></div>
+      </div>
+      <div class="ex-example" id="ex-example"></div>
+      <div class="ex-bottom">
+        <div class="ex-bottom-l">
+          <div class="callout"><h3>Abilities</h3><p>Types of thinking and knowledge presumably used by Claude when making this claim.</p></div>
+          <div class="callout"><h3>Likely Familiarity</h3><p>Estimated amount written on this topic. Our proxy for how often it appeared in Claude’s training.</p></div>
+        </div>
+        <div><div class="callout"><h3>Claude’s Confidence</h3><p>Claude’s self-reported confidence score in the accuracy of this claim.</p></div></div>
+      </div>
+      <p class="ex-q">When Claude gets it wrong, why?</p>
+      <p class="ex-q">How does Claude’s accuracy, judged by the Verifier, correlate to abilities used, likely familiarity, and Claude’s confidence in its own claims?</p>
+      <div class="ex-box"><ul>
+        <li>AI accuracy varies by ability <span class="ph">[link to research here]</span>.</li>
+        <li>Familiarity of a topic SHOULD increase accuracy <span class="ph">[link to research here]</span>.</li>
+        <li>Do higher confidence scores actually correlate with more accurate claims (and vice versa)?</li>
+      </ul></div>
+      <div class="ex-ver">
+        <div><h3>About the Verifier</h3><ul>
+          <li>Searches a list of 1,200 reputable sites, the most our search tool (Exa) allows per search</li>
+          <li>The source list combines Wikipedia’s “generally reliable” sources with top-rated news sites from a 2023 peer-reviewed study</li>
+          <li>We added some government and data sources, like the Census Bureau and the Bureau of Labor Statistics</li>
+        </ul></div>
+        <div><h3>Known limitations</h3><ul>
+          <li>Searches a limited set of sites (not the whole web, as Claude can)</li>
+          <li>Reads only part of each page (to save cost)</li>
+          <li>Counts only sentences that state the claim directly (literal by design)</li>
+        </ul></div>
+        <p class="ex-note">The Verifier is run by a separate instance of Claude, which can hallucinate. To keep it as accurate as we can, we restrict it to quoting sources, never writing its own prose. These restrictions, along with the limitations listed here, also keep it from seeing wider context or reading between the lines, which could turn up more evidence.</p>
+      </div>
+    </div>`;
     const explain = document.getElementById("explain"), explainBtn = document.getElementById("explain-btn");
     explain.innerHTML = EXPLAIN_HTML;
-    explainBtn.addEventListener("click", () => { explain.hidden = !explain.hidden; });
-    explain.querySelector(".close").addEventListener("click", () => { explain.hidden = true; });
+    // The example claim is drawn with the page's own parts (a real logged result from the Nile question; Ben's Figma example).
+    let exBuilt = false;
+    function buildExample() {
+      if (exBuilt) return; exBuilt = true;
+      const row = el("div", "vclaim"); const left = el("div", "vleft");
+      left.append(el("div", "claim-box", "“The Amazon is usually given as about 6,400 km (4,000 miles).”"));
+      const info = el("div", "cinfo"), l = el("div", "cinfo-l"), r = el("div", "cinfo-r");
+      const ab = el("div", "info-block"); ab.append(tipLabel("ABILITIES USED")); const ul = el("ul", "ab-list");
+      ul.append(el("li", "", "Natural sciences knowledge"), el("li", "", "Everyday knowledge")); ab.append(ul);
+      const dd = el("div", "info-block"); dd.append(tipLabel("LIKELY FAMILIARITY"), el("div", "dd-val", "High"));
+      l.append(ab, dd); r.append(confBlock(85)); info.append(l, r); left.append(info);
+      const right = el("div", "cites");
+      right.append(citation("Supported", { host: "voanews.com", url: "https://www.voanews.com/a/new-quest-aims-to-settle-debate-over-which-river-is-longest-amazon-or-nile-/7154329.html",
+        quote: "… The Encyclopedia Britannica gives the length of the Nile as 6,650 kilometers (4,132 miles), to 6,400 kilometers (3,977 miles) for the Amazon." }));
+      right.append(citation("Supported", { host: "kids.britannica.com", url: "https://kids.britannica.com/kids/article/Amazon-River/346079",
+        quote: "… It carries more water than any other river. It is about 4,000 miles (6,400 kilometers) long. Only the Nile River in Africa is longer." }));
+      row.append(left, right); document.getElementById("ex-example").append(row);
+    }
+    function openExplain() { buildExample(); explain.hidden = false; explain.scrollTop = 0; document.body.style.overflow = "hidden"; }
+    function closeExplain() { explain.hidden = true; document.body.style.overflow = ""; }
+    explainBtn.addEventListener("click", openExplain);
+    explain.querySelector(".ex-back").addEventListener("click", closeExplain);
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !explain.hidden) closeExplain(); });
     function rarityWord(at) { return at >= 4 ? "Low" : at >= 2 ? "Medium" : "High"; } // documentation density from ADeLe atypicality: 0-1 high, 2-3 medium, 4-5 low (Claude's cut-offs; label Ben, 10/21)
+    let lastV = null;
+    function topAbilities(out, n) {
+      const c = (out?.claims || []).find((x) => x.n === n); const scores = c?.scores;
+      if (!scores) return null;
+      const ranked = Object.entries(scores).filter(([k]) => k !== "AT").sort((a, b) => b[1] - a[1]);
+      const top = ranked.slice(0, 2).concat(ranked.slice(2).filter(([, v]) => ranked[1] && v === ranked[1][1]).slice(0, 1));
+      return { names: top.map(([k]) => String(out.names?.[k] || k).replace(/ and /g, " & ")), fam: rarityWord(scores.AT || 0) };
+    }
     function showAbilities(out) {
       // Figma 10/21: "ABILITIES USED" as a bulleted list, then "DOCUMENTATION DENSITY" and High / Medium / Low. Names show "&" for "and", as in the Figma.
       verified.querySelectorAll(".vclaim[data-n]").forEach((row) => {
@@ -591,10 +667,11 @@
           const top = ranked.slice(0, 2).concat(ranked.slice(2).filter(([, v]) => ranked[1] && v === ranked[1][1]).slice(0, 1));
           if (!top.length) ul.append(el("li", "", "None rated"));
           for (const [k] of top) ul.append(el("li", "", String(out.names?.[k] || k).replace(/ and /g, " & ")));
-          dd = el("div", "info-block tip-group"); dd.append(tipLabel("DOCUMENTATION DENSITY", "Assumed level of familiarity Claude has with this topic"), el("div", "dd-val", rarityWord(scores.AT || 0)));
+          dd = el("div", "info-block tip-group"); dd.append(tipLabel("LIKELY FAMILIARITY"), el("div", "dd-val", rarityWord(scores.AT || 0)));
         }
         ab.append(ul); box.append(ab); if (dd) box.append(dd);
       });
+      if (lastV) showFindings(lastV.sections, lastV.scored, out);
     }
     // "Worth a second look" (Ben, 10/21): points out where Claude's confidence doesn't match what the sources found.
     // Observations, not conclusions. Only two kinds count: high confidence (90+) with sources contradicting, and low
@@ -604,31 +681,39 @@
     const findingsEl = document.getElementById("v-findings");
     const short = (t, n = 90) => { t = stripBold(String(t)).trim(); return t.length > n ? t.slice(0, n - 1).trimEnd() + "…" : t; };
     const plural = (n, one, many) => n + " " + (n === 1 ? one : many);
-    function showFindings(sections, scored) {
-      const items = [];
+    // Summary box (Ben, 10/22): plain counts, no quotes. Compares claims the sources supported with claims they contradicted,
+    // by abilities, likely familiarity and Claude's confidence. "Sources disagree" claims get only a confidence figure;
+    // "no reliable source" and opinions are left out. With nothing contradicted, the lines describe the supported claims.
+    function showFindings(sections, scored, ab) {
+      const rows = [];
       for (const s of sections) {
-        const seg = scored[s.n - 1]; if (!seg || s.kind === "opinion" || s.calc) continue; // calculator results aren't sources, so they don't count here
-        const conf = seg.confidence;
-        const lanes = citationsFor(s);
-        const nC = lanes.filter((x) => x.verdict === "Contradicted").length, nS = lanes.filter((x) => x.verdict === "Supported").length;
-        if (conf >= HIGH && s.verdict === "Contradicted")
-          items.push({ n: s.n, parts: ["Claude was ", [`${conf}% confident`], " in “", { link: stripBold(String(s.claim)).trim() }, "”, and ", [plural(nC, "source contradicts", "sources contradict") + " it"], "."] });
-        else if (conf < LOW && s.verdict === "Supported")
-          items.push({ n: s.n, parts: ["Claude was only ", [`${conf}% confident`], " in “", { link: stripBold(String(s.claim)).trim() }, "”, but ", [plural(nS, "source supports", "sources support") + " it"], "."] });
+        const seg = scored[s.n - 1]; if (!seg || s.kind === "opinion" || FAILED.includes(s.verdict)) continue;
+        const kind = (s.verdict === "Supported" || s.verdict === "Partly supported") ? "sup" : s.verdict === "Contradicted" ? "con" : s.verdict === "Sources disagree" ? "dis" : null;
+        if (kind) rows.push({ kind, conf: seg.confidence, ab: topAbilities(ab, s.n) });
       }
-      // Figma 10/21: no heading, no footnote, no "…and N more" line (overflow to be decided later; still capped at 3).
+      const sup = rows.filter((r) => r.kind === "sup"), con = rows.filter((r) => r.kind === "con"), dis = rows.filter((r) => r.kind === "dis");
+      const avg = (list) => Math.round(list.reduce((a, r) => a + r.conf, 0) / list.length) + "%";
+      const word = (n, one, many) => n + " " + (n === 1 ? one : many);
+      const famCounts = (list) => { const c = {}; list.forEach((r) => { if (r.ab) c[r.ab.fam] = (c[r.ab.fam] || 0) + 1; });
+        return ["High", "Medium", "Low"].filter((k) => c[k]).map((k) => c[k] + " " + k.toLowerCase()).join(", ") || "not scored"; };
+      const commonAbility = (list) => { const c = new Map(); list.forEach((r) => (r.ab?.names || []).forEach((nm) => c.set(nm, (c.get(nm) || 0) + 1)));
+        let best = null; for (const [nm, k] of c) if (!best || k > best[1]) best = [nm, k]; return best; };
+      const line = (label, text) => { const p = el("p", "s-line"); p.append(el("b", "", label + ": "), document.createTextNode(text)); return p; };
+      const withPh = (p) => { p.append(document.createTextNode(" "), el("span", "ph", "[ability rating to come]")); return p; };
       findingsEl.textContent = "";
-      if (!items.length) { findingsEl.append(el("p", "f-none", "No mismatches between Claude's confidence and what the sources found.")); return; }
-      const makeList = (list) => { const u = el("ul"); for (const it of list) u.append(findingLi(it)); return u; };
-      findingsEl.append(makeList(items.slice(0, MAX_FINDINGS)));
-      if (items.length > MAX_FINDINGS) {
-        const all = el("div", "f-all"); all.append(vSummary.cloneNode(true), makeList(items));
-        const less = el("button", "f-toggle", "See less"); less.type = "button"; less.addEventListener("click", (e) => { e.stopPropagation(); all.classList.remove("open"); }); all.append(less);
-        const more = el("button", "f-toggle", "See more"); more.type = "button"; more.addEventListener("click", (e) => { e.stopPropagation(); all.classList.add("open"); fitFindings(); });
-        all.firstChild.removeAttribute("id"); all.firstChild.className = "f-count";
-        findingsEl.append(more); vBox.append(all);
-      }
-      fitFindings();
+      const base = con.length ? con : sup;
+      if (!base.length) { findingsEl.append(el("p", "s-line", dis.length ? "Sources disagreed on every checked claim, so there's nothing to compare." : "No supported or contradicted claims, so nothing to compare.")); 
+        if (dis.length) findingsEl.append(line("Confidence", "average " + avg(dis) + " where sources disagree")); return; }
+      const best = commonAbility(base); const N = base.length, what = con.length ? "contradicted" : "supported";
+      if (!best) findingsEl.append(line("Abilities", "not scored"));
+      else findingsEl.append(withPh(line("Abilities", (best[1] === N ? (N === 1 ? "The " + what + " claim" : N === 2 ? "Both " + what + " claims" : "All " + N + " " + what + " claims") : best[1] + " of " + N + " " + what + " claims") + " used " + best[0])));
+      if (con.length) findingsEl.append(line("Likely familiarity", (con.length === 1 ? "contradicted claim " : "contradicted claims ") + famCounts(con) + (sup.length ? "; supported " + famCounts(sup) : "")));
+      else findingsEl.append(line("Likely familiarity", famCounts(sup)));
+      let conf;
+      if (con.length) conf = [sup.length ? "average " + avg(sup) + " on supported claims" : null, avg(con) + " on contradicted"].filter(Boolean).join(", ");
+      else conf = "average " + avg(sup) + ", lowest " + Math.min(...sup.map((r) => r.conf)) + "%";
+      if (dis.length) conf += ", " + avg(dis) + " where sources disagree";
+      findingsEl.append(line("Confidence", conf));
     }
     function findingLi(it) {
         const li = el("li");
@@ -720,7 +805,7 @@
         rowEl.append(left, right);
         verified.append(rowEl);
       }
-      showFindings(out.sections, scored);
+      lastV = { sections: out.sections, scored }; // the summary lines are written once the ability scores arrive (showAbilities)
     }
 
     // Build line (Ben, 10/7): shows which version is running; warns when the app needs a restart.

@@ -337,6 +337,9 @@ The first real runs of the contested, opinion and "no source" labels, on four qu
 - **"Unsettled" is gone.** Ben: we're testing whether Claude's statement matches its sources, not whether a topic is settled. Each citation now either supports or contradicts the claim. A source saying "it's disputed" supports a claim that says it's disputed, and contradicts a claim stated as settled: "the citation is not supporting the claim." The old unsettled check had been marking Claude's own correct hedges (like "the ranking is disputed") as unsettled. Ben: "this is what I wanted for a long time, and I think we just got confused along the way." Not yet run live. Still open: whether to keep "Sources disagree" for a claim with citations on both sides.
 - **Design direction (Ben).** An "anatomy of a claim" overlay replaces the per-label tooltips; "Documentation density" is renamed "Likely familiarity"; the summary box moves from quotes to plain counts comparing claims that held up with ones that didn't, by confidence, likely familiarity and abilities.
 
+- **A new summary box.** No more quoted claims. Under the count line, three plain lines compare the claims sources supported with the ones they contradicted: the most common ability among the contradicted claims (a rating for that ability will come from the abilities map, a later deliverable), their likely familiarity, and Claude's average confidence on each side, plus on claims where sources disagree. When nothing is contradicted, the lines describe the supported claims instead. Ben: honesty matters more than a dramatic result, even though easy questions mostly come back supported.
+- **"What am I looking at?"** now opens a full page: an annotated example claim, the questions the prototype asks, and a short "About the Verifier" with its known limitations. The per-label tooltips are gone. "Documentation density" is now "Likely familiarity."
+
 ---
 
 ## Open questions
