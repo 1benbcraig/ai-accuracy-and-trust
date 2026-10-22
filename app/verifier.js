@@ -276,14 +276,14 @@ Each claim comes with the sentence it was taken from. Check only the claim, exac
 
 First, mark each claim's kind: "fact" if it states something that can be true or false, or "opinion" if it states a view, preference or judgment (including vague ones such as "some players feel" or "critics argue").
 
-For a fact: under "confirms", list the source sentences that directly confirm it. Under "contradicts", list the source sentences that directly contradict it. Under "unsettled", list the source sentences that say the matter itself is disputed, debated or unsettled, even if those sources agree with each other. List only source sentences that say the fact itself is disputed or unknown, for example that experts or measurements disagree. Do not list sentences that only give an opinion or a reaction about the fact.
+For a fact: under "confirms", list the source sentences that directly confirm it. Under "contradicts", list the source sentences that directly contradict it. You are checking whether the claim is accurate as written, not whether the topic is settled. A source sentence that says the matter is disputed or unknown confirms a claim that says it is disputed or unknown, and contradicts a claim that states it as settled.
 
-For an opinion: do not judge whether the opinion is right. Under "confirms", list only source sentences in which a person or outlet actually states or holds that view. Leave "contradicts" and "unsettled" empty.
+For an opinion: do not judge whether the opinion is right. Under "confirms", list only source sentences in which a person or outlet actually states or holds that view. Leave "contradicts" empty.
 
 Pick only source sentences about the claim itself, not the general topic. List at most three in each list, most direct first, and prefer source sentences from different sites. If none apply, leave the list empty.
 
 Reply with only this JSON and nothing else:
-{"claims": [{"claim": 1, "kind": "fact", "confirms": ["S12"], "contradicts": [], "unsettled": []}]}
+{"claims": [{"claim": 1, "kind": "fact", "confirms": ["S12"], "contradicts": []}]}
 
 In each entry, "claim" is the claim's number, not its text. Keep claims in the order given. Never write anything outside the JSON.`;
 
@@ -307,15 +307,14 @@ async function claudeVerify(question, items, src) {
 }
 
 // Verdict and bucket per claim, set by 2S from Verifier's lists (Ben, 10/12):
-// a fact is contested (bucket 2) if sources contradict each other, or if sources say the matter is unsettled;
+// a fact is contested (bucket 2) only if sources conflict about it (10/22);
 // an opinion is checked only for who holds it; nothing found is "Not found" (bucket 4, shown as "No source found").
 const MIN_UNSETTLED_SITES = 2; // Ben, 10/13
 function verdictFor(confirms, contradicts, unsettled = [], kind = "fact") {
   if (kind === "opinion") return confirms.length ? "Opinion, source found" : "Opinion, no source found";
   if (confirms.length && contradicts.length) return "Sources disagree";
-  // "Unsettled" only counts when at least two different sites say so (Ben, 10/13), so one opinion piece can't make a
-  // fact look disputed. Each list already holds at most one pick per site, so its length is the number of sites.
-  if (unsettled.length >= MIN_UNSETTLED_SITES) return "Sources say this is unsettled";
+  // "Sources say this is unsettled" removed (Ben, 10/22): we check whether Claude's claim holds up, not whether the topic
+  // is settled. Unsettled now means only that sources conflict about the claim (confirms and contradicts both found).
   if (confirms.length) return "Supported";
   if (contradicts.length) return "Contradicted";
   return "Not found";
@@ -370,7 +369,7 @@ function readReply(data, items, table) {
     s.confirms = pick(e.confirms, "confirms").map(view);
     // For an opinion, only "who holds it" counts; any other lists are ignored.
     s.contradicts = s.kind === "fact" ? pick(e.contradicts, "contradicts").map(view) : [];
-    s.unsettled = s.kind === "fact" ? pick(e.unsettled, "unsettled").map(view) : [];
+    s.unsettled = []; // no separate "unsettled" list any more (Ben, 10/22); anything the Verifier still sends there is ignored
     const hosts = new Map(); for (const p of [...s.confirms, ...s.contradicts, ...s.unsettled]) if (!hosts.has(p.host)) hosts.set(p.host, p.url);
     s.sources = [...hosts.entries()].map(([host, url]) => ({ host, url }));
     s.sourceCount = s.sources.length; // per claim piece (Ben, 10/7)

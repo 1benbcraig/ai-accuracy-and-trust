@@ -334,6 +334,9 @@ The first real runs of the contested, opinion and "no source" labels, on four qu
 - **A short "why" next to "No reliable source found."** One line, "Not found doesn't mean wrong," with the reasons on hover: few sites searched, literal by design, reads only part of each page, can't read tables or images, paywalls and new info, bundled claims. Ben's point: people scan, so explanations come in small bites.
 - **What's left is mostly not a reading problem.** Of the remaining no-source claims, about half are facts whose original source is outside the searched sites; the rest are the answer's own advice, arithmetic or caveats. Claude's read, from 22 claims.
 
+- **"Unsettled" now means only that sources conflict.** Ben: "We're testing the accuracy of Claude's statements," not whether a topic is settled. The old second route (two sites calling the matter disputed) was marking Claude's own correct hedges, like "the ranking is disputed," as unsettled. Removed. A source saying a matter is disputed now supports a claim that says so, and contradicts one that states it as settled (Claude's wording of the rule). Not yet run live.
+- **Design direction (Ben).** An "anatomy of a claim" overlay replaces the per-label tooltips; "Documentation density" is renamed "Likely familiarity"; the summary box moves from quotes to plain counts comparing claims that held up with ones that didn't, by confidence, likely familiarity and abilities.
+
 ---
 
 ## Open questions
