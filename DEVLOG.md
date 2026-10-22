@@ -323,6 +323,17 @@ The first real runs of the contested, opinion and "no source" labels, on four qu
 - **Built to Ben's latest Figma pass.** Claude's confidence is shown as a percentage under "CLAUDE'S CONFIDENCE," next to the citations so readers connect the two. Tooltips explain each label. "Claude searched" lists each site once. Links that leave the page show an "opens another site" icon; links in the summary box that jump down the page show a down arrow. The page now waits for every check and fills in at once, so nothing grows while you read.
 - **Not yet decided:** wording for the documentation-density tooltip; whether a cut-off quote can hide a counterpoint (the preview already starts at the evidence; text after it can still be cut).
 
+## October 22 — Why so many claims come back "no reliable source"
+
+- **Claude led this one, at Ben's request.** About 1 in 5 claims came back with no reliable source. Claude tested fixes one at a time by re-checking six recent questions (61 claims) before and after each change.
+- **The Verifier reads more of each page.** It now keeps 16 passages per sentence instead of 8, and the first 12,000 characters of each page instead of 6,000. Small gain (25 no-source claims down to 22), about the same cost. Kept.
+- **Government and data sites added to the search.** 32 primary sources that kept being the real origin of a claim (for example bls.gov, ftc.gov, census.gov, Our World in Data) replaced the lowest-scoring news sites in the 1,200-site search set. All were already on the reliable list. Where expected, they worked: an FTC question went from several no-source claims to none.
+- **The second search was dropped.** It rescued 5 of 93 claims. Dropping it cut the cost of the check by about 20%.
+- **Tried and undone: labeling some claims "Claude's own reasoning."** Ben: "No source found" is a limit of the Verifier (a small set of sites, cost, strict rules), and it isn't fair to pin that on Claude.
+- **Math is now checked by plain code.** When a claim holds all its own numbers ("30% of $80,000 is $24,000"), the page checks the arithmetic itself and shows "Checked by calculator, not AI." Ben: no AI on the checking side if we can help it.
+- **A short "why" next to "No reliable source found."** One line, "Not found doesn't mean wrong," with the reasons on hover: few sites searched, literal by design, reads only part of each page, can't read tables or images, paywalls and new info, bundled claims. Ben's point: people scan, so explanations come in small bites.
+- **What's left is mostly not a reading problem.** Of the remaining no-source claims, about half are facts whose original source is outside the searched sites; the rest are the answer's own advice, arithmetic or caveats. Claude's read, from 22 claims.
+
 ---
 
 ## Open questions

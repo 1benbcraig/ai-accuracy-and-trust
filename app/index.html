@@ -165,6 +165,13 @@
     #explain .close { position: absolute; right: 12px; top: 8px; border: 0; background: none; font-size: 18px; cursor: pointer; color: var(--text-secondary); }
     .cites { display: flex; flex-direction: column; gap: 16px; align-items: flex-end; min-width: 0; }
     .no-source { font-size: 15px; color: var(--text-tertiary); padding-top: 8px; width: 100%; max-width: 520px; padding-left: 30px; } /* lines up with the verdict words ("Citation supports claim") */
+    /* Short "why" next to "No reliable source found" (Ben, 10/22): one line, the reasons on hover. Tooltip anchored left so it stays inside the column. */
+    .ns-why { display: inline-block; margin-left: 8px; font-size: 14px; color: var(--text-tertiary); text-decoration: underline dotted; text-underline-offset: 3px; }
+    .ns-why .tip { left: 0; transform: none; text-align: left; }
+    .ns-why .tip .down { left: 24px; transform: none; }
+    .ns-why .bubble { white-space: normal; width: max-content; max-width: 320px; line-height: 1.45; }
+    .ns-why .bubble ul { margin: 4px 0 0; padding-left: 18px; }
+    .ns-why:hover .tip { display: block; }
     .bucket-note, .v-working { max-width: 520px; } /* Verifier messages outside the claim/citation rows stay within the left column, like Claude's response (Ben, 10/20) */
     .bucket-note { color: var(--text-secondary); }
 
@@ -313,6 +320,16 @@
       return g;
     }
 
+    // "No reliable source found" plus a short reason line; the causes show on hover (Ben, 10/22: scannable, bite-sized)
+    const NS_REASONS = ["Few sites searched", "Literal by design", "Reads only part of each page", "Can’t read tables or images", "Paywalls and new info", "Bundled claims"];
+    function noSource() {
+      const d = el("div", "no-source", "No reliable source found");
+      const w = el("span", "ns-why tip-host", "Not found doesn’t mean wrong");
+      const t = el("div", "tip"); const b = el("div", "bubble", "Our search is limited:");
+      const ul = document.createElement("ul"); for (const r of NS_REASONS) ul.append(el("li", "", r)); b.append(ul); t.append(b);
+      t.insertAdjacentHTML("beforeend", '<svg class="down" width="18" height="10" viewBox="0 0 18 10"><path d="M0.5 0.5 L9 9 L17.5 0.5" fill="#fff" stroke="rgba(31,30,29,0.4)"/><rect x="1" y="0" width="16" height="1" fill="#fff"/></svg>');
+      w.append(t); d.append(w); return d;
+    }
     // A label with a hover tooltip (Ben, 10/21)
     function tipLabel(text, tip) {
       const l = el("div", "lbl tip-host", text);
@@ -593,7 +610,7 @@
     function showFindings(sections, scored) {
       const items = [];
       for (const s of sections) {
-        const seg = scored[s.n - 1]; if (!seg || s.kind === "opinion") continue;
+        const seg = scored[s.n - 1]; if (!seg || s.kind === "opinion" || s.calc) continue; // calculator results aren't sources, so they don't count here
         const conf = seg.confidence;
         const lanes = citationsFor(s);
         const nC = lanes.filter((x) => x.verdict === "Contradicted").length, nS = lanes.filter((x) => x.verdict === "Supported").length;
@@ -643,7 +660,51 @@
     }
     window.addEventListener("resize", fitFindings);
     document.addEventListener("click", (e) => { const o = vBox.querySelector(".f-all.open"); if (o && (!o.contains(e.target) || e.target.closest("a[data-full]"))) o.classList.remove("open"); });
+    // Math inside a claim (Ben, 10/22): plain code only, no AI, no cost. Caught only when all the numbers are in the claim itself,
+    // e.g. "30% of $80,000 is $24,000" or "12 × 4 = 48". Math spread over sentences ("That is about $24,000…") isn't caught.
+    const NUM = String.raw`\$?\d[\d,]*(?:\.\d+)?(?:\s*(?:million|billion|thousand))?`;
+    const APPROX = String.raw`(?:(?:about|roughly|approximately|around|nearly|almost)\s+|~\s*)?`;
+    const IS = String.raw`\s*(?:=|is|equals|comes to|works out to|gives)\s*`;
+    function numOf(t) {
+      const m = String(t).match(/[\d,]*\.?\d+/); if (!m) return NaN;
+      let v = Number(m[0].replace(/,/g, ""));
+      if (/million/i.test(t)) v *= 1e6; else if (/billion/i.test(t)) v *= 1e9; else if (/thousand/i.test(t)) v *= 1e3;
+      return v;
+    }
+    const fmtN = (v) => Number(v.toPrecision(12)).toLocaleString("en-US", { maximumFractionDigits: 4 });
+    function mathCheck(text) {
+      const t = stripBold(String(text)).replace(/−/g, "-");
+      const pats = [
+        [new RegExp(`(${NUM})\\s*(?:%|percent)\\s+of\\s+(${NUM})${IS}(${APPROX})(${NUM})`, "i"), (m) => [numOf(m[1]) / 100 * numOf(m[2]), `${fmtN(numOf(m[1]))}% of ${fmtN(numOf(m[2]))}`, m[3], m[4]]],
+        [new RegExp(`(${NUM})\\s*([×*÷/+]|\\s[x-]\\s)\\s*(${NUM})${IS}(${APPROX})(${NUM})`, "i"), (m) => { const a = numOf(m[1]), b = numOf(m[3]), o = m[2].trim();
+          const v = o === "+" ? a + b : o === "-" ? a - b : (o === "/" || o === "÷") ? a / b : a * b; return [v, `${fmtN(a)} ${o === "*" || o === "x" ? "×" : o} ${fmtN(b)}`, m[4], m[5]]; }],
+        [new RegExp(`(${NUM})\\s+(times|plus|minus|divided by)\\s+(${NUM})${IS}(${APPROX})(${NUM})`, "i"), (m) => { const a = numOf(m[1]), b = numOf(m[3]), o = m[2].toLowerCase();
+          const v = o === "plus" ? a + b : o === "minus" ? a - b : o === "divided by" ? a / b : a * b; return [v, `${fmtN(a)} ${o} ${fmtN(b)}`, m[4], m[5]]; }],
+      ];
+      for (const [re, f] of pats) {
+        const m = t.match(re); if (!m) continue;
+        const [value, expr, approx, statedText] = f(m); const stated = numOf(statedText);
+        if (!isFinite(value) || !isFinite(stated)) continue;
+        const decimals = ((statedText.match(/\.(\d+)/) || [])[1] || "").length;
+        const ok = approx ? Math.abs(value - stated) <= Math.abs(value) * 0.05 : Math.abs(value - stated) <= 0.5 * Math.pow(10, -decimals) + Math.abs(value) * 0.005;
+        return { ok, line: `Checked by calculator, not AI: ${expr} = ${fmtN(value)}${ok ? "" : `, not ${fmtN(stated)}`}` };
+      }
+      return null;
+    }
+    function calcCite(verdict, line) {
+      const wrap = el("div", "cite"); const row = el("div", "cite-row");
+      const r = el("div", "rcol"); r.append(el("p", "quote", line));
+      const src = el("div", "src"); src.append(el("span", "", "Second Source calculator")); r.append(src);
+      row.append(citeHead(verdict, verdict === "Supported" ? "Result supports claim" : "Result contradicts claim"), r); wrap.append(row); return wrap;
+    }
     function showVerifier(out) {
+      // Math found in a claim: a wrong sum makes the claim Contradicted; a right sum counts as support when no source was found.
+      for (const s of out.sections) {
+        const c = FAILED.includes(s.verdict) ? null : mathCheck(s.claim); s.calc = c;
+        if (!c) continue;
+        if (!c.ok) s.verdict = "Contradicted";
+        else if (s.verdict === "Not found") s.verdict = "Supported";
+      }
       showSummary(out.sections.map((s) => s.verdict));
       verified.textContent = "";
       // Confidence for each claim comes from the Replier's score for that piece (sections are in the same order).
@@ -656,8 +717,9 @@
         left.append(claimInfo(seg));
         const right = el("div", "cites");
         const cites = citationsFor(s);
+        if (s.calc) right.append(calcCite(s.calc.ok ? "Supported" : "Contradicted", s.calc.line));
         for (const { verdict, p } of cites) right.append(citation(verdict, p));
-        if (!cites.length) right.append(el("div", "no-source", FAILED.includes(s.verdict) ? s.verdict : "No reliable source found")); // label (Ben, 10/19)
+        if (!cites.length && !s.calc) right.append(FAILED.includes(s.verdict) ? el("div", "no-source", s.verdict) : noSource()); // label (Ben, 10/19); short "why" (Ben, 10/22)
         rowEl.append(left, right);
         verified.append(rowEl);
       }

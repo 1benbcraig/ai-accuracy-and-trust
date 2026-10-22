@@ -14,9 +14,9 @@ The name comes from the newsroom rule of confirming a claim with a second, indep
 
 ## Status
 
-A rough version, being improved through use. Updated October 21, 2026.
+A rough version, being improved through use. Updated October 22, 2026.
 
-- **Current design (October 21):** the code in `app/` is the redesigned version Ben has been working in since October 14. Per claim, it shows Claude's confidence, the kinds of thinking and knowledge the claim calls for and how well documented its subject is (both rated by a separate AI call), and the sources that support or contradict it. A summary box lists claims where Claude's confidence and the sources point different ways. Questions about code, fiction, writing tasks and puzzles get a message saying why they aren't checked; plain arithmetic and letter counts are checked by code, not AI.
+- **Current design (October 21):** the code in `app/` is the redesigned version Ben has been working in since October 14. Per claim, it shows Claude's confidence, the kinds of thinking and knowledge the claim calls for and how well documented its subject is (both rated by a separate AI call), and the sources that support or contradict it. A summary box lists claims where Claude's confidence and the sources point different ways. Questions about code, fiction, writing tasks and puzzles get a message saying why they aren't checked; plain arithmetic, letter counts and the math inside a claim are checked by code, not AI. Claims with no reliable source carry a short note on why the search can miss them.
 - **Coming:** a hosted version that recruiters and hiring managers can try.
 
 - **Working:** the first answer ("Replier"), with a confidence score for each claim and Anthropic's web search when it needs current facts; a checker ("Verifier") that searches about 1,200 trusted sites, keeps only pages on a list of about 24,000 reliable sources, and shows each piece of evidence in the source's own words. Verifier only points to source sentences; it never writes its own. Both use Claude Sonnet 5.5.

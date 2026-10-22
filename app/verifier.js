@@ -75,12 +75,16 @@ function hostOf(url) { try { return new URL(url).hostname.replace(/^www\./, "");
 const RESULTS_PER_SEARCH = 10;   // pages Exa returns per search (tried 20 on 10/7; Ben chose 10 for cost)
 const PAGES_PER_CLAIM = 5;       // most pages kept per sentence after filtering
 const PAGES_PER_SITE = 2;        // most pages from any one site (Ben, 10/7: so one site can't fill every slot). 2 is Claude's pick.
-const CHARS_PER_PAGE = 6000;     // page text limit, to hold down Claude cost
+let CHARS_PER_PAGE = 12000;      // page text limit, to hold down Claude cost. Was 6000; raised 10/22 (Claude, leading the 'no source' fix, Ben OK'd) so evidence further down a page can be read
 
 // Trusted-sites search (Ben, 10/7: option 3 from exa-filter-test.js). Exa allows at most 1,200 sites per search.
 // The set: Wikipedia's "generally reliable" sites, then the highest-scoring news sites (Lin et al.) up to 1,200.
 // Not in the set: .gov sites and journal sites (Claude's note; the source-list check below still applies to every result).
 let TRUSTED = null;
+// Claude's pick (10/22), only ones on Ben's reliable-source list are used.
+const PRIMARY_SITES = ["bls.gov", "census.gov", "bea.gov", "ftc.gov", "fda.gov", "sec.gov", "federalreserve.gov", "epa.gov", "ed.gov", "eia.gov",
+  "usgs.gov", "dol.gov", "hhs.gov", "usda.gov", "energy.gov", "nist.gov", "irs.gov", "ssa.gov", "cms.gov", "treasury.gov", "justice.gov",
+  "state.gov", "nps.gov", "fbi.gov", "nhtsa.gov", "faa.gov", "fcc.gov", "cbo.gov", "gao.gov", "uscourts.gov", "supremecourt.gov", "ourworldindata.org"];
 function trustedSites() {
   if (TRUSTED) return TRUSTED;
   const rows = parseCsv(fs.readFileSync(path.join(DIR, "combined-sources.csv"), "utf8"));
@@ -89,7 +93,12 @@ function trustedSites() {
     .filter((r) => r.status === "meets Ben's rules" && !r.entry.includes("/"));
   const wiki = all.filter((r) => r.from_lists.includes("Wikipedia")).map((r) => r.entry);
   const lin = all.filter((r) => r.lin_score && !wiki.includes(r.entry)).sort((a, b) => b.lin_score - a.lin_score).map((r) => r.entry);
-  TRUSTED = [...wiki, ...lin].slice(0, 1200);
+  // Primary sources (Ben, 10/22, reverses 10/19 "leave gov sites as known gap"): federal statistics and agency sites that
+  // already meet Ben's rules, so claims whose original source is government data can be found. They replace the
+  // lowest-scoring news sites at the end of the list. Named one by one (not ".gov", which crowded out everything on 10/19).
+  const primary = PRIMARY_SITES.filter((d) => all.some((r) => r.entry === d) && !wiki.includes(d));
+  const linRest = lin.filter((d) => !primary.includes(d));
+  TRUSTED = [...wiki, ...primary, ...linRest].slice(0, 1200);
   return TRUSTED;
 }
 
@@ -204,7 +213,9 @@ async function searchSentences(question, sentences, plain = false) {
 // ---------- step 2: plain-code pre-sort (Ben, 10/7) ----------
 // For each sentence, rank its pages' paragraphs by how many words they share with the sentence, and keep the best few.
 // No AI here. Numbers count as words. Very common words are ignored.
-const PARAGRAPHS_PER_SENTENCE = 8; // Claude's pick
+let PARAGRAPHS_PER_SENTENCE = 16; // Claude's pick. Was 8; raised 10/22 (step 1 of the 'no source' fix): the word-match pre-sort was dropping ~90% of paragraphs
+// For the before/after test only (nosource-test.js): change the two reading limits.
+function setReadLimits({ paras, chars }) { if (paras) PARAGRAPHS_PER_SENTENCE = paras; if (chars) CHARS_PER_PAGE = chars; }
 const COMMON = new Set("the and for that with from this have has was were are its into than then also which who whom what when where while about after before over under more most such been being their there they them these those other some only very not but can could would should will may might one two out per all any each".split(" "));
 function words(t) { return new Set(String(t).toLowerCase().match(/[a-z0-9]+/g)?.filter((w) => (w.length > 2 || /\d/.test(w)) && !COMMON.has(w)) || []); }
 function shared(a, b) { let n = 0; for (const w of a) if (b.has(w)) n++; return n; }
@@ -388,8 +399,10 @@ async function verify(question, segments) {
   // (the question, then the claim; was the claim alone until 10/20) and check only the new pages. Found 10/19 in the log:
   // in every "no source" case the first search had kept pages; the Verifier just found nothing in them.
   let retry = null;
+  // Off since 10/22 (Ben): it rescued 5 of 93 claims. Set to true to bring it back.
+  const SECOND_SEARCH = false;
   const missIdx = read.sections.map((sec, i) => (!sec.confirms.length && !sec.contradicts.length && !sec.unsettled.length && !FAIL_VERDICTS.includes(sec.verdict)) ? i : -1).filter((i) => i >= 0);
-  if (missIdx.length) {
+  if (missIdx.length && SECOND_SEARCH) {
     const seen = new Set(searches.flatMap((x) => x.kept.map((r) => r.url)));
     const items2 = missIdx.map((i) => ({ ...items[i] }));
     const queries2 = items2.map((x) => x.claim);
@@ -416,4 +429,4 @@ async function verify(question, segments) {
   };
 }
 
-module.exports = { isJunkLine, verify, claimsFromSegments, sentencesOf, buildSources, readReply, quoteFor, verdictFor, bucketFor, onList, paragraphs, parseCsv, trustedSites, MODEL };
+module.exports = { setReadLimits, isJunkLine, verify, claimsFromSegments, sentencesOf, buildSources, readReply, quoteFor, verdictFor, bucketFor, onList, paragraphs, parseCsv, trustedSites, MODEL };
