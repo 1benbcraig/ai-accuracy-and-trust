@@ -955,14 +955,14 @@
     // Collapsed shows the first two. Open/closed is remembered as last used. Clicking a question fills the box and submits.
     // Closes on a click outside, Escape, or submitting. Typing narrows both lists to questions containing the typed text.
     // Recent questions: the last 6 this visitor asked, kept in this browser only; asking again moves it to the top.
-    // Suggested list is Ben's Figma draft, still to be chosen. Empty recent list says "none" (Ben, 10/23); filter details are Claude's.
-    const SUGGESTED = [
+    // Suggested list chosen by Ben 10/23. Empty recent list says "none" (Ben, 10/23); filter details are Claude's.
+    const SUGGESTED = [ // Ben, 10/23: the two questions about LLMs are kept apart
+      "I thought Claude AI and Claude Cowork had merged, but they still have very different functionality. What's going on?",
       "Was Napoleon unusually short?",
-      "Was Walt Disney Studios' Snow White and the Seven Dwarfs the first animated film to be feature-length?",
-      "What percentage of startups fail in their first year?",
       "Which modern LLM is the most powerful? Which is best to act as a coworker to a UX designer?",
-      "How long will it take Gouda cheese to digest?",
-      "How long is the average job tenure in the US?"
+      "Was Walt Disney Studios' Snow White and the Seven Dwarfs the first animated film to be feature-length?",
+      "If I save $500 a month at 5% interest, how much will I have after 10 years?",
+      "How many r's are in the word strawberry?"
     ];
     const qmenu = document.getElementById("qmenu"), qwrap = document.getElementById("qwrap");
     const store = { get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch { return d; } },
