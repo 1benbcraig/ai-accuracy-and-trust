@@ -1014,7 +1014,7 @@
       e.preventDefault();
       if (send.disabled) return;
       if (!q.value.trim()) return;
-      closeQMenu(); addRecent(q.value); // question menu (Ben, 10/23)
+      closeQMenu(); addRecent(q.value); q.blur(); // question menu; cursor leaves the box on submit (Ben, 10/23)
       // The user can't move forward until both answers are in (blocking).
       q.disabled = true; send.disabled = true; verifyOn.disabled = true;
       answer.textContent = ""; verified.textContent = ""; extraRoom = 0; mainEl.style.paddingBottom = ""; vBox.querySelectorAll(".f-all").forEach((x) => x.remove()); vSummary.textContent = ""; findingsEl.textContent = ""; vBox.hidden = true; searchUrls = []; searched.textContent = ""; searchOverlay.textContent = ""; setOverlay(false);
@@ -1080,7 +1080,7 @@
         verified.querySelectorAll(".v-working").forEach((w) => w.remove()); answer.querySelectorAll(".v-working").forEach((w) => w.remove()); // no spinner left running after an error
       }
       q.disabled = false; send.disabled = false; verifyOn.disabled = false;
-      q.focus(); // cursor back in the box for the next question
+      // No refocus after the answer: it reopened the question menu (Ben, 10/23). The user clicks the box to ask again.
       await showBuild();
       saveScreenshot();
     });
