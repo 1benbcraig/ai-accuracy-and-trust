@@ -727,11 +727,11 @@
     // Not tested on Claude. Five levels and cut points are Claude's; method and numbers in the project doc finding-adele-ability-tiers.md.
     const ABILITY_TIER = {
       "Mind modelling & social cognition": "one of AI’s strongest abilities", "Social sciences & humanities knowledge": "one of AI’s strongest abilities",
-      "Everyday knowledge": "one of AI’s stronger abilities",
+      "Everyday knowledge": "a strong ability for AI",
       "Spatial & physical reasoning": "an average ability for AI", "Verbal comprehension": "an average ability for AI", "Identifying relevant information": "an average ability for AI",
       "Applied sciences knowledge": "an average ability for AI", "Conceptualisation & abstraction": "an average ability for AI",
-      "Critical thinking": "one of AI’s weaker abilities", "Formal sciences knowledge": "one of AI’s weaker abilities", "Logical reasoning": "one of AI’s weaker abilities",
-      "Natural sciences knowledge": "one of AI’s weaker abilities", "Verbal expression": "one of AI’s weaker abilities", "Quantitative reasoning": "one of AI’s weaker abilities",
+      "Critical thinking": "a weak ability for AI", "Formal sciences knowledge": "a weak ability for AI", "Logical reasoning": "a weak ability for AI",
+      "Natural sciences knowledge": "a weak ability for AI", "Verbal expression": "a weak ability for AI", "Quantitative reasoning": "a weak ability for AI",
       "Calibrating knowns & unknowns": "one of AI’s weakest abilities", "Attention & scan": "one of AI’s weakest abilities"
     };
     function showFindings(sections, scored, ab) {
@@ -754,7 +754,7 @@
       const jump = (text, list) => { const a = el("a"); a.href = "#"; a.append(document.createTextNode(text)); a.insertAdjacentHTML("beforeend", JUMP);
         a.addEventListener("click", (e) => { e.preventDefault(); const rowsEl = list.map((r) => verified.querySelector('.vclaim[data-n="' + r.n + '"]')).filter(Boolean);
           if (!rowsEl.length) return; rowsEl[0].scrollIntoView({ behavior: "smooth", block: "start" });
-          rowsEl.forEach((x) => { x.classList.add("flash"); setTimeout(() => x.classList.remove("flash"), 1500); }); }); return a; };
+          rowsEl.forEach((x) => { x.classList.add("flash"); setTimeout(() => x.classList.remove("flash"), 3500); }); }); return a; };
       const line = (label, parts, ph) => { const u = el("ul"), li = el("li"); li.append(el("span", "s-label", label + ":"), document.createTextNode(" "));
         for (const p of parts) li.append(typeof p === "string" ? document.createTextNode(p) : jump(p.t, p.list));
         if (ph !== undefined) li.append(document.createTextNode(ph ? ", " + ph + "." : ".")); u.append(li); return u; };
@@ -791,7 +791,7 @@
           else if (Array.isArray(part)) li.append(el("b", "", part[0]));
           else {
             const a = el("a"); a.href = "#"; a.dataset.full = part.link; a.append(el("span", "t", part.link)); a.insertAdjacentHTML("beforeend", '<svg class="jump" width="10" height="12" viewBox="0 0 10 12" fill="none" aria-hidden="true"><path d="M5 1.5v8.5M1.5 6.5 5 10l3.5-3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>');
-            a.addEventListener("click", (e) => { e.preventDefault(); const row = verified.querySelector('.vclaim[data-n="' + it.n + '"]'); if (row) { row.scrollIntoView({ behavior: "smooth", block: "start" }); row.classList.add("flash"); setTimeout(() => row.classList.remove("flash"), 1500); } });
+            a.addEventListener("click", (e) => { e.preventDefault(); const row = verified.querySelector('.vclaim[data-n="' + it.n + '"]'); if (row) { row.scrollIntoView({ behavior: "smooth", block: "start" }); row.classList.add("flash"); setTimeout(() => row.classList.remove("flash"), 3500); } });
             li.append(a);
           }
         }
