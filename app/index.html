@@ -195,6 +195,7 @@
     .ex-qs p:first-child { font-weight: 600; } /* "When Claude gets it wrong, why?" semibold (Ben, 10/22) */
     .ex-box { margin: 28px 0 0 150px; width: 1141px; box-sizing: border-box; border: 1px solid rgba(31,30,29,0.4); background: #f9f9f7; padding: 16px; font-size: 16px; line-height: 30px; letter-spacing: normal; color: #141413; }
     .ex-box ul { margin: 0; padding-left: 24px; }
+    .ex-box a { color: #3266ad; text-decoration: underline; text-decoration-thickness: from-font; } /* same as the source-list links above */
     .ph { color: var(--text-tertiary); } /* visible placeholder (Ben, 10/22) */
     /* Summary box lines (Figma 2099:6993): each line its own bullet, 16px apart (the box's gap), label semibold */
     #v-findings { display: flex; flex-direction: column; gap: 16px; }
@@ -631,8 +632,8 @@
       </div>
       <div class="ex-qs"><p>When Claude gets it wrong, why?</p><p>How does Claude’s accuracy, judged by the Verifier, correlate to: Abilities used, Likely Familiarity, and Claude’s Confidence in its own claims?</p></div>
       <div class="ex-box"><ul>
-        <li>AI accuracy varies by ability <span class="ph">[link to research here]</span>.</li>
-        <li>Familiarity of a topic SHOULD increase accuracy <span class="ph">[link to research here]</span>.</li>
+        <li>AI accuracy varies by ability (<a href="https://arxiv.org/abs/2503.06378" target="_blank" rel="noopener">ADeLe, 2025</a>).</li>
+        <li>Familiarity of a topic SHOULD increase accuracy (<a href="https://arxiv.org/abs/2509.04664" target="_blank" rel="noopener">Kalai et al., 2025</a>).</li>
         <li>Do higher confidence scores correlate with more accurate claims (and vice-versa)?</li>
       </ul></div>
     </div>`;
