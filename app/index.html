@@ -203,11 +203,11 @@
     #v-findings ul { margin: 0; padding-left: 22.5px; }
     #v-findings .s-label { font-weight: 600; }
     .cites { display: flex; flex-direction: column; gap: 16px; align-items: flex-end; min-width: 0; }
-    .no-source { font-size: 15px; color: var(--text-tertiary); padding-top: 8px; width: 100%; max-width: 520px; padding-left: 30px; } /* lines up with the verdict words ("Citation supports claim") */
+    .no-source { font-size: 15px; color: var(--text-tertiary); padding-top: 8px; width: 100%; max-width: 520px; padding-left: 0; } /* lines up with the citation quotes (Ben, 10/22) */ /* lines up with the verdict words ("Citation supports claim") */
     /* Short "why" next to "No reliable source found" (Ben, 10/22): one line, the reasons on hover. Tooltip anchored left so it stays inside the column. */
     .ns-link { position: relative; display: inline-block; cursor: default; } /* plain text, same gray as before; hover shows the reasons (Ben, 10/22) */
-    .ns-link .tip { left: 0; transform: none; text-align: left; }
-    .ns-link .tip .down { left: 24px; transform: none; }
+    .ns-link .tip { left: 0; top: calc(100% + 10px); bottom: auto; transform: none; text-align: left; } /* opens below the text (Ben, 10/22) */
+    .ns-link .tip .down { left: 24px; top: auto; bottom: calc(100% - 1px); transform: rotate(180deg); } /* arrow points up at the text */
     .ns-link .bubble { white-space: normal; width: max-content; max-width: 320px; line-height: 1.45; text-decoration: none; }
     .ns-link .ns-title { font-weight: 600; }
     .ns-link .bubble ul { margin: 4px 0 0; padding-left: 18px; }
