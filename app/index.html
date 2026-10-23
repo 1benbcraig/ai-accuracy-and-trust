@@ -146,7 +146,7 @@
     .gauge .base { position: absolute; left: 1px; top: 46px; width: 86px; height: 0; border-top: 1px solid var(--border-tertiary); }
     /* Verifier heading: title + (?) icon, no line under it (Figma 10/21) */
     .head.vhead { display: flex; align-items: center; justify-content: flex-start; gap: 8px; border-bottom: 0; margin-bottom: 4px; }
-    #explain-btn { border: 0; background: none; padding: 0; cursor: pointer; font: inherit; font-size: 15px; color: var(--text-info); text-decoration: underline; text-decoration-thickness: from-font; margin-left: 8px; } /* text link, not an icon (Ben, 10/22) */
+    #explain-btn { border: 0; background: none; padding: 0; cursor: pointer; font-family: var(--sans); font-weight: 400; font-size: 14px; line-height: 1.6; letter-spacing: -0.14px; color: #3266ad; text-decoration: underline; text-decoration-color: #3266ad; text-decoration-thickness: 10%; } /* text link, not an icon (Ben, 10/22; Figma 2099:7072) */
     /* Summary box (Figma 10/21): count line, then the confidence/source mismatches as bullets */
     #v-box[hidden] { display: none; }
     #v-box { background: var(--claim-bg); border: 0.5px solid rgba(31,30,29,0.4); padding: 16px 16px 24px; display: flex; flex-direction: column; gap: 16px; margin-bottom: 36px; }
@@ -158,33 +158,49 @@
     #v-findings p { margin: 0; }
     .vclaim.flash { background: var(--claim-bg); transition: background 0.3s; }
     #verify-col { position: relative; }
-    /* "What am I looking at?" takes over the full page; BACK closes it (Ben, 10/22). Layout follows Ben's Figma draft of 10/22 (screenshot), roughly. */
+    /* "What am I looking at?" full page, built from Figma "More info overlay" (node 2117:8504, Ben 10/22).
+       All positions are the Figma frame's: a 1440px-wide page, content starting 150px in. */
     #explain[hidden] { display: none; }
-    #explain { position: fixed; inset: 0; z-index: 60; background: var(--bg); overflow-y: auto; }
-    .ex-page { max-width: 1100px; margin: 0 auto; padding: 32px 24px 80px 120px; position: relative; }
-    .ex-back { position: absolute; left: 24px; top: 38px; border: 0; background: none; padding: 0; cursor: pointer; font: inherit; font-size: 13px; font-weight: 600; letter-spacing: 0.02em; color: var(--text-primary); }
-    .ex-page h1 { font-family: var(--serif); font-weight: 600; font-size: 26px; margin: 0 0 40px; }
-    .ex-page h3 { margin: 0; font-size: 15px; font-weight: 700; }
-    .ex-page p { margin: 0; }
-    .callout { border: 1px solid var(--border-secondary); background: #fff; padding: 10px 14px 12px; max-width: 340px; font-size: 15px; line-height: 1.45; position: relative; }
-    .ex-top, .ex-bottom { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 40px; }
-    .ex-top .callout::after { content: ""; position: absolute; left: 24px; top: 100%; height: 40px; border-left: 1px solid #e26aa6; }
-    .ex-bottom .callout::before { content: ""; position: absolute; left: 24px; bottom: 100%; height: 40px; border-left: 1px solid #e26aa6; }
-    .ex-bottom-l { display: flex; flex-direction: column; gap: 40px; }
-    .ex-example { margin: 40px 0; padding: 24px; border: 1px solid var(--border-secondary); }
-    .ex-example .vclaim { border-bottom: 0; padding-bottom: 0; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 40px; }
-    .ex-q { margin-top: 48px !important; font-size: 16px; }
-    .ex-q + .ex-q { margin-top: 8px !important; }
-    .ex-box { border: 1px solid var(--text-primary); padding: 16px 24px; margin-top: 24px; }
-    .ex-box ul, .ex-ver ul { margin: 0; padding-left: 20px; }
-    .ex-box li + li, .ex-ver li + li { margin-top: 8px; }
+    #explain { position: fixed; inset: 0; z-index: 60; background: #fff; overflow: auto; }
+    .ex-page { position: relative; width: 1440px; margin: 0 auto; padding: 30px 0 219px; box-sizing: border-box; color: #000; }
+    .ex-back { position: absolute; left: 46px; top: 29px; height: 32px; padding: 0 12px; display: flex; align-items: center; gap: 4px; border: 0; border-radius: 6px; background: none; cursor: pointer;
+      font-family: var(--sans); font-weight: 600; font-size: 12px; line-height: 1.4; color: #3d3d3a; font-feature-settings: "salt" 1; }
+    .ex-back svg { display: block; flex: none; }
+    .ex-h { margin: 0 0 0 150px; font-family: var(--serif); font-weight: 600; font-size: 24px; line-height: 30px; color: #000; }
+    /* About the Verifier: two 570px columns from 83px (title ends at 60 -> 23px gap); 15px / 24px text; a blank 24px line between items */
+    .ex-cols { display: flex; margin: 23px 0 0 150px; width: 1140px; font-size: 15px; line-height: 24px; letter-spacing: normal; }
+    .ex-cols > div { width: 570px; box-sizing: border-box; }
+    .ex-cols .ex-l { padding-right: 24px; } .ex-cols .ex-r { padding-left: 24px; }
+    .ex-cols p { margin: 0; } .ex-cols ul { margin: 0; padding-left: 45px; }
+    .ex-cols p + *, .ex-cols ul + * { margin-top: 24px; }
+    .ex-cols .ex-lim { font-weight: 600; }
+    .ex-cols a { color: #3266ad; text-decoration: underline; text-decoration-thickness: from-font; }
+    /* Anatomy title at 459 (left column ends at 419 -> 40px), diagram from 520 (31px below the title) to 1201 (681px tall) */
+    .ex-anat { margin-top: 40px; }
+    .ex-diagram { position: relative; margin: 31px 0 0 150px; width: 1140px; height: 681px; }
+    .ex-diagram .ex-claimimg { position: absolute; left: 0; top: 112px; width: 1140px; height: 280px; box-sizing: border-box; border: 1px solid rgba(31,30,29,0.4); overflow: hidden; }
+    .ex-claimimg img { position: absolute; left: -3.78%; top: -2.31%; width: 110.67%; height: 104.29%; max-width: none; }
+    .ex-claimimg .ex-live { padding: 24px; background: var(--bg); height: 100%; box-sizing: border-box; } /* stand-in until the Figma image is exported */
+    .ex-claimimg .ex-live .vclaim { border-bottom: 0; padding-bottom: 0; grid-template-columns: minmax(0, 520px) minmax(0, 520px); column-gap: 52px; }
+    /* Pink connector lines (Figma "lines" group): a 1px line with an 11px dot at the item end */
+    .ex-line { position: absolute; width: 11px; }
+    .ex-line::before { content: ""; position: absolute; left: 5px; top: 0; bottom: 0; border-left: 1px solid #EF5DA8; }
+    .ex-line::after { content: ""; position: absolute; left: 0; width: 11px; height: 11px; border-radius: 50%; background: #EF5DA8; }
+    .ex-line.dot-bottom::after { bottom: 0; } .ex-line.dot-top::after { top: 0; }
+    /* Callouts (Figma "Claim" frames): 370px, white, 1px border, 8px / 12px padding, bold title, 5px gap, 16px text */
+    .callout { position: absolute; width: 370px; box-sizing: border-box; background: #fff; border: 1px solid rgba(31,30,29,0.3); padding: 8px 12px; display: flex; flex-direction: column; gap: 5px;
+      font-family: var(--sans); font-size: 16px; line-height: normal; letter-spacing: normal; color: #141413; z-index: 1; }
+    .callout b { font-weight: 700; } .callout p { margin: 0; }
+    .ex-qs { margin: 0 0 0 150px; font-size: 16px; line-height: 30px; letter-spacing: normal; }
+    .ex-qs p { margin: 0; }
+    .ex-box { margin: 28px 0 0 150px; width: 1141px; box-sizing: border-box; border: 1px solid #000; padding: 16px; font-size: 16px; line-height: 30px; letter-spacing: normal; color: #141413; }
+    .ex-box ul { margin: 0; padding-left: 24px; }
     .ph { color: var(--text-tertiary); } /* visible placeholder (Ben, 10/22) */
-    .ex-ver { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 40px; row-gap: 16px; margin-top: 48px; }
-    .ex-ver h3 { margin-bottom: 8px; }
-    .ex-ver .ex-note { grid-column: 1 / -1; }
-    /* New summary box lines (Ben, 10/22): one line each for abilities, likely familiarity, confidence */
-    .s-line { margin: 0; }
-    .s-line + .s-line { margin-top: 8px; }
+    /* Summary box lines (Figma 2099:6993): each line its own bullet, 16px apart (the box's gap), label semibold */
+    #v-findings { display: flex; flex-direction: column; gap: 16px; }
+    #v-findings:empty { display: none; }
+    #v-findings ul { margin: 0; padding-left: 22.5px; }
+    #v-findings .s-label { font-weight: 600; }
     .cites { display: flex; flex-direction: column; gap: 16px; align-items: flex-end; min-width: 0; }
     .no-source { font-size: 15px; color: var(--text-tertiary); padding-top: 8px; width: 100%; max-width: 520px; padding-left: 30px; } /* lines up with the verdict words ("Citation supports claim") */
     /* Short "why" next to "No reliable source found" (Ben, 10/22): one line, the reasons on hover. Tooltip anchored left so it stays inside the column. */
@@ -565,9 +581,9 @@
       if (verdict === "Sources disagree") return "sources disagree";
       if (verdict === "Opinion, source found") return "opinion held by a source";
       if (FAILED.includes(verdict)) return "not checked";
-      return "no reliable source"; // Not found, Opinion with no source
+      return "no source"; // Not found, Opinion with no source (Figma 10/22 wording)
     }
-    const SUMMARY_ORDER = ["supported", "contradicted", "sources disagree", "opinion held by a source", "no reliable source", "not checked"];
+    const SUMMARY_ORDER = ["supported", "contradicted", "sources disagree", "opinion held by a source", "no source", "not checked"];
     function showSummary(verdicts) {
       if (!verdicts.length) { vSummary.textContent = ""; vBox.querySelectorAll(".f-all").forEach((x) => x.remove()); vBox.hidden = true; return; }
       const n = {}; verdicts.forEach((v) => { const k = summaryLabel(v); n[k] = (n[k] || 0) + 1; });
@@ -582,40 +598,42 @@
     // One explanation panel for abilities, rarity and confidence (Ben, 10/21). Claude's draft wording; plain styling for Ben to redesign.
     // "What am I looking at?" page (Ben's wording and layout, 10/22).
     const EXPLAIN_HTML = `<div class="ex-page">
-      <button type="button" class="ex-back">← BACK</button>
-      <h1>Anatomy of a checked claim</h1>
-      <div class="ex-top">
-        <div class="callout"><h3>Claim</h3><p>Claude splits its responses into checkable claims.</p></div>
-        <div class="callout"><h3>Citation</h3><p>The Verifier quotes relevant sources &amp; marks whether or not they support the claim.</p></div>
-      </div>
-      <div class="ex-example" id="ex-example"></div>
-      <div class="ex-bottom">
-        <div class="ex-bottom-l">
-          <div class="callout"><h3>Abilities</h3><p>Types of thinking and knowledge presumably used by Claude when making this claim.</p></div>
-          <div class="callout"><h3>Likely Familiarity</h3><p>Estimated amount written on this topic. Our proxy for how often it appeared in Claude’s training.</p></div>
+      <button type="button" class="ex-back"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M11 6H1.5M5.5 2 1.5 6l4 4" stroke="#3d3d3a" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>BACK</button>
+      <h2 class="ex-h">About the Verifier</h2>
+      <div class="ex-cols">
+        <div class="ex-l">
+          <p>The Verifier searches a list of 1,200 reputable sites, the most our search tool (Exa) allows per search.</p>
+          <ul><li>Our source list combines <a href="https://en.wikipedia.org/wiki/Wikipedia:Reliable_sources/Perennial_sources" target="_blank" rel="noopener">Wikipedia’s “generally reliable” sources</a> with <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10500312/" target="_blank" rel="noopener">top-rated news sites</a> from a 2023 peer-reviewed study</li></ul>
+          <ul><li>We added some government and data sources, like the Census Bureau and the Bureau of Labor Statistics</li></ul>
+          <p>The Verifier is run by a separate instance of Claude, which can hallucinate. To keep it as accurate as we can, we restrict it to quoting sources, never writing its own words. These restrictions, along with the limitations listed to the right, also keep the Verifier from seeing wider context or reading between the lines, which could turn up more evidence.</p>
         </div>
-        <div><div class="callout"><h3>Claude’s Confidence</h3><p>Claude’s self-reported confidence score in the accuracy of this claim.</p></div></div>
+        <div class="ex-r">
+          <p class="ex-lim">Known limitations</p>
+          <ul><li>Searches only a limited set of sites (not the whole web, like Claude can)</li></ul>
+          <ul><li>Reads only part of each page (to save cost)</li></ul>
+          <ul><li>Literal by design, so it can miss a source that says the same thing in other words</li></ul>
+        </div>
       </div>
-      <p class="ex-q">When Claude gets it wrong, why?</p>
-      <p class="ex-q">How does Claude’s accuracy, judged by the Verifier, correlate to abilities used, likely familiarity, and Claude’s confidence in its own claims?</p>
+      <h2 class="ex-h ex-anat">Anatomy of a checked claim</h2>
+      <div class="ex-diagram">
+        <div class="ex-claimimg" id="ex-example"></div>
+        <div class="ex-line dot-bottom" style="left:22px; top:80px; height:75px"></div>
+        <div class="ex-line dot-top" style="left:22px; top:187px; height:240px"></div>
+        <div class="ex-line dot-top" style="left:22px; top:280px; height:272px"></div>
+        <div class="ex-line dot-top" style="left:516px; top:187px; height:240px"></div>
+        <div class="ex-line dot-bottom" style="left:580px; top:78px; height:75px"></div>
+        <div class="callout" style="left:0; top:2px"><b>Claim</b><p>Claude splits its responses into checkable claims.</p></div>
+        <div class="callout" style="left:570px; top:0"><b>Citation</b><p>The Verifier quotes relevant sources &amp; marks whether or not they support the claim.</p></div>
+        <div class="callout" style="left:0; top:422px"><b>Abilities</b><p>Types of thinking and knowledge presumably used by Claude when making this claim.</p></div>
+        <div class="callout" style="left:430px; top:422px"><b>Claude’s Confidence</b><p>Claude’s self-reported confidence score in the accuracy of this claim.</p></div>
+        <div class="callout" style="left:0; top:531px"><b>Likely Familiarity</b><p>Estimated amount written on this topic. Our proxy for how often it appeared in Claude’s training.</p></div>
+      </div>
+      <div class="ex-qs"><p>When Claude gets it wrong, why?</p><p>How does Claude’s accuracy, judged by the Verifier, correlate to: Abilities used, Likely Familiarity, and Claude’s Confidence in its own claims?</p></div>
       <div class="ex-box"><ul>
         <li>AI accuracy varies by ability <span class="ph">[link to research here]</span>.</li>
         <li>Familiarity of a topic SHOULD increase accuracy <span class="ph">[link to research here]</span>.</li>
-        <li>Do higher confidence scores actually correlate with more accurate claims (and vice versa)?</li>
+        <li>Do higher confidence scores correlate with more accurate claims (and vice-versa)?</li>
       </ul></div>
-      <div class="ex-ver">
-        <div><h3>About the Verifier</h3><ul>
-          <li>Searches a list of 1,200 reputable sites, the most our search tool (Exa) allows per search</li>
-          <li>The source list combines Wikipedia’s “generally reliable” sources with top-rated news sites from a 2023 peer-reviewed study</li>
-          <li>We added some government and data sources, like the Census Bureau and the Bureau of Labor Statistics</li>
-        </ul></div>
-        <div><h3>Known limitations</h3><ul>
-          <li>Searches a limited set of sites (not the whole web, as Claude can)</li>
-          <li>Reads only part of each page (to save cost)</li>
-          <li>Counts only sentences that state the claim directly (literal by design)</li>
-        </ul></div>
-        <p class="ex-note">The Verifier is run by a separate instance of Claude, which can hallucinate. To keep it as accurate as we can, we restrict it to quoting sources, never writing its own prose. These restrictions, along with the limitations listed here, also keep it from seeing wider context or reading between the lines, which could turn up more evidence.</p>
-      </div>
     </div>`;
     const explain = document.getElementById("explain"), explainBtn = document.getElementById("explain-btn");
     explain.innerHTML = EXPLAIN_HTML;
@@ -623,6 +641,9 @@
     let exBuilt = false;
     function buildExample() {
       if (exBuilt) return; exBuilt = true;
+      const slot = document.getElementById("ex-example");
+      if (typeof EX_CLAIM_IMG === "string" && EX_CLAIM_IMG) { const im = el("img"); im.src = EX_CLAIM_IMG; im.alt = ""; slot.append(im); return; } // the Figma image (node 2118:8507)
+      const live = el("div", "ex-live"); slot.append(live);
       const row = el("div", "vclaim"); const left = el("div", "vleft");
       left.append(el("div", "claim-box", "“The Amazon is usually given as about 6,400 km (4,000 miles).”"));
       const info = el("div", "cinfo"), l = el("div", "cinfo-l"), r = el("div", "cinfo-r");
@@ -635,7 +656,7 @@
         quote: "… The Encyclopedia Britannica gives the length of the Nile as 6,650 kilometers (4,132 miles), to 6,400 kilometers (3,977 miles) for the Amazon." }));
       right.append(citation("Supported", { host: "kids.britannica.com", url: "https://kids.britannica.com/kids/article/Amazon-River/346079",
         quote: "… It carries more water than any other river. It is about 4,000 miles (6,400 kilometers) long. Only the Nile River in Africa is longer." }));
-      row.append(left, right); document.getElementById("ex-example").append(row);
+      row.append(left, right); live.append(row);
     }
     function openExplain() { buildExample(); explain.hidden = false; explain.scrollTop = 0; document.body.style.overflow = "hidden"; }
     function closeExplain() { explain.hidden = true; document.body.style.overflow = ""; }
@@ -698,19 +719,26 @@
         return ["High", "Medium", "Low"].filter((k) => c[k]).map((k) => c[k] + " " + k.toLowerCase()).join(", ") || "not scored"; };
       const commonAbility = (list) => { const c = new Map(); list.forEach((r) => (r.ab?.names || []).forEach((nm) => c.set(nm, (c.get(nm) || 0) + 1)));
         let best = null; for (const [nm, k] of c) if (!best || k > best[1]) best = [nm, k]; return best; };
-      const line = (label, text) => { const p = el("p", "s-line"); p.append(el("b", "", label + ": "), document.createTextNode(text)); return p; };
-      const withPh = (p) => { p.append(document.createTextNode(" "), el("span", "ph", "[ability rating to come]")); return p; };
+      // One bullet per line, label semibold (Figma 2099:6993, Ben 10/22)
+      const line = (label, text, ph) => { const u = el("ul"), li = el("li"); li.append(el("span", "s-label", label + ":"), document.createTextNode(" " + text));
+        if (ph) li.append(document.createTextNode(" "), el("span", "ph", "[ability rating to come]"), document.createTextNode(".")); u.append(li); return u; };
+      const lc = (t) => t.charAt(0).toLowerCase() + t.slice(1);
+      const group = (N, what) => N === 1 ? "the " + what + " claim" : N === 2 ? "both " + what + " claims" : "all " + N + " " + what + " claims";
+      const famLine = (list, what) => { const c = {}; list.forEach((r) => { if (r.ab) c[r.ab.fam] = (c[r.ab.fam] || 0) + 1; });
+        const keys = ["High", "Medium", "Low"].filter((k) => c[k]); if (!keys.length) return "not scored";
+        if (keys.length === 1 && c[keys[0]] === list.length) return group(list.length, what) + (list.length === 1 ? " scored " : " scored ") + keys[0].toLowerCase();
+        return what + " claims scored " + keys.map((k) => c[k] + " " + k.toLowerCase()).join(", "); };
       findingsEl.textContent = "";
       const base = con.length ? con : sup;
-      if (!base.length) { findingsEl.append(el("p", "s-line", dis.length ? "Sources disagreed on every checked claim, so there's nothing to compare." : "No supported or contradicted claims, so nothing to compare.")); 
+      if (!base.length) { const p = el("p", "", dis.length ? "Sources disagreed on every checked claim, so there's nothing to compare." : "No supported or contradicted claims, so nothing to compare."); p.style.margin = "0"; findingsEl.append(p);
         if (dis.length) findingsEl.append(line("Confidence", "average " + avg(dis) + " where sources disagree")); return; }
       const best = commonAbility(base); const N = base.length, what = con.length ? "contradicted" : "supported";
       if (!best) findingsEl.append(line("Abilities", "not scored"));
-      else findingsEl.append(withPh(line("Abilities", (best[1] === N ? (N === 1 ? "The " + what + " claim" : N === 2 ? "Both " + what + " claims" : "All " + N + " " + what + " claims") : best[1] + " of " + N + " " + what + " claims") + " used " + best[0])));
-      if (con.length) findingsEl.append(line("Likely familiarity", (con.length === 1 ? "contradicted claim " : "contradicted claims ") + famCounts(con) + (sup.length ? "; supported " + famCounts(sup) : "")));
-      else findingsEl.append(line("Likely familiarity", famCounts(sup)));
+      else { const who = best[1] === N ? (N === 1 ? "The " + what + " claim used " : N === 2 ? "The 2 " + what + " claims both used " : "All " + N + " " + what + " claims used ") : best[1] + " of the " + N + " " + what + " claims used ";
+        findingsEl.append(line("Abilities", who + lc(best[0]) + ",", true)); }
+      findingsEl.append(line("Likely Familiarity", famLine(base, what)));
       let conf;
-      if (con.length) conf = [sup.length ? "average " + avg(sup) + " on supported claims" : null, avg(con) + " on contradicted"].filter(Boolean).join(", ");
+      if (con.length) conf = [sup.length ? "average " + avg(sup) + " on supported claims" : "average", avg(con) + " on contradicted claims"].join(sup.length ? ", " : " ");
       else conf = "average " + avg(sup) + ", lowest " + Math.min(...sup.map((r) => r.conf)) + "%";
       if (dis.length) conf += ", " + avg(dis) + " where sources disagree";
       findingsEl.append(line("Confidence", conf));
