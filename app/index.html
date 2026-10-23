@@ -96,6 +96,7 @@
     .cap-row { display: flex; gap: 8px; margin-top: 8px; }
     .cap-btn { font: inherit; padding: 4px 12px; border: 1px solid var(--border-secondary); border-radius: 8px; background: #fff; cursor: pointer; }
     .no-search { font-weight: 400; color: var(--text-secondary); } /* regular weight (Ben, 10/19) */
+    #searched.none { padding-top: 0; } /* "No sources checked" sits on the same line as the answer's first line (Ben, 10/22); the 4px drop is only for the "CLAUDE SEARCHED:" label */
 
     /* Verifier */
     #verify-col { display: flex; flex-direction: column; gap: 0; }
@@ -409,7 +410,7 @@
     }
     function showSearched() {
       searched.textContent = ""; searchOverlay.textContent = ""; setOverlay(false);
-      searched.style.height = "";
+      searched.style.height = ""; searched.classList.toggle("none", !searchUrls.length);
       if (!searchUrls.length) { searched.append(el("span", "no-search", "No sources checked — answered from memory")); return; }
       const caret = caretButton(); caret.addEventListener("click", () => setOverlay(true));
       searched.append(searchedHead(caret), el("div", "links"));
