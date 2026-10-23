@@ -162,7 +162,8 @@
     /* "What am I looking at?" full page, built from Figma "More info overlay" (node 2117:8504, Ben 10/22).
        All positions are the Figma frame's: a 1440px-wide page, content starting 150px in. */
     #explain[hidden] { display: none; }
-    #explain { position: fixed; inset: 0; z-index: 60; background: #eee; overflow: auto; } /* page color #eee (Ben, 10/22) */
+    #explain { position: fixed; inset: 0; z-index: 60; background: #eee; overflow: auto; opacity: 0; transition: opacity 0.25s ease; } /* page color #eee (Ben, 10/22) */
+    #explain.show { opacity: 1; } /* dissolve in and out, a quarter second (Ben, 10/22) */
     .ex-page { position: relative; width: 1440px; margin: 0 auto; padding: 30px 0 219px; box-sizing: border-box; color: #000; }
     .ex-back { position: absolute; left: 46px; top: 29px; height: 32px; padding: 0 12px; display: flex; align-items: center; gap: 4px; border: 0; border-radius: 6px; background: none; cursor: pointer;
       font-family: var(--sans); font-weight: 600; font-size: 12px; line-height: 1.4; color: #3d3d3a; font-feature-settings: "salt" 1; }
@@ -543,9 +544,14 @@
       return out;
     }
 
+    // A quote inside our quote marks: the source's own double quotes become single quotes, so the ends don't show "” (Ben, 10/22).
+    // Curly “ ” map to ‘ ’; a straight " opens after a space, start, bracket or dash, otherwise it closes.
+    function innerQuotes(t) {
+      return String(t).replace(/“/g, "‘").replace(/”/g, "’").replace(/"/g, (m, i, str) => (i === 0 || /[\s(\[{\u2014\u2013-]/.test(str[i - 1])) ? "‘" : "’");
+    }
     function citation(verdict, p) {
       const wrap = el("div", "cite");
-      const quote = "“" + p.quote + "”";
+      const quote = "“" + innerQuotes(p.quote) + "”";
       // Resting card: quote cut to two lines, site name under it.
       const row = el("div", "cite-row");
       const r = el("div", "rcol"); r.append(el("p", "quote", quote));
@@ -675,8 +681,10 @@
       // Confidence dot sits 9px right of its label, as in Ben's Figma (the label's width varies with the layout)
       const lb = ex.conf.getBoundingClientRect(); document.getElementById("exl-conf").style.left = Math.round(lb.right + 9 - d.left) + "px";
     }
-    function openExplain() { buildExample(); explain.hidden = false; explain.scrollTop = 0; document.body.style.overflow = "hidden"; alignDots(); document.fonts.ready.then(alignDots); }
-    function closeExplain() { explain.hidden = true; document.body.style.overflow = ""; }
+    let exTimer = null;
+    function openExplain() { clearTimeout(exTimer); buildExample(); explain.hidden = false; explain.scrollTop = 0; document.body.style.overflow = "hidden"; alignDots(); document.fonts.ready.then(alignDots);
+      void explain.offsetWidth; explain.classList.add("show"); }
+    function closeExplain() { explain.classList.remove("show"); document.body.style.overflow = ""; exTimer = setTimeout(() => { explain.hidden = true; }, 250); }
     explainBtn.addEventListener("click", openExplain);
     explain.querySelector(".ex-back").addEventListener("click", closeExplain);
     document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !explain.hidden) closeExplain(); });
