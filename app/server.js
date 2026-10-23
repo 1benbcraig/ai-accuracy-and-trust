@@ -43,7 +43,7 @@ async function askOnce(question) {
   const key = readKey();
   if (!key) throw new Error("No API key found. Add it to the .env file (see setup steps).");
   const messages = [{ role: "user", content: question }];
-  let data, content = [];
+  let data, content = []; const rounds = []; // what each API round returned, for the log when a reply can't be read (10/22)
   // A long search turn can come back paused ("pause_turn"); send it back unchanged to continue (Anthropic's docs).
   for (let round = 0; round < 4; round++) {
     const res = await fetch("https://api.anthropic.com/v1/messages", {
@@ -54,6 +54,7 @@ async function askOnce(question) {
     data = await res.json();
     if (!res.ok) throw new Error(`API error ${res.status}: ${data?.error?.message ?? JSON.stringify(data)}`);
     content = content.concat(data.content);
+    rounds.push({ stop_reason: data.stop_reason, blocks: (data.content || []).map((c) => c.type), usage: data.usage });
     if (data.stop_reason !== "pause_turn") break;
     messages.push({ role: "assistant", content: data.content });
   }
@@ -74,7 +75,7 @@ async function askOnce(question) {
   }
   if (!parsed) {
     const err = new Error("Claude's reply wasn't in the expected format. Raw reply:\n" + text);
-    err.formatError = true; err.rawText = text; err.usage = data.usage;
+    err.formatError = true; err.rawText = text; err.usage = data.usage; err.rounds = rounds;
     throw err;
   }
   const multiple = answers.length > 1 ? { answersInReply: answers.length, usedAnswer: usedAnswer + 1 } : null;
@@ -100,11 +101,14 @@ function stripCiteTags(parsed) {
 
 // If the Replier's reply still can't be read after the fixes above, ask it the same question once more (Ben, 10/13).
 // Costs about one more Replier call, only when it happens. The log keeps the unreadable first reply.
+let lastQuestion = "";
 async function ask(question) {
   try { return await askOnce(question); }
   catch (err) {
     if (!err.formatError) throw err;
-    const second = await askOnce(question);
+    let second;
+    try { second = await askOnce(question); }
+    catch (err2) { if (err2.formatError) err2.firstRounds = err.rounds; throw err2; }
     return { ...second, retried: { firstReply: err.rawText, firstUsage: err.usage } };
   }
 }
@@ -216,7 +220,7 @@ http.createServer(async (req, res) => {
   }
   if (req.method === "POST" && req.url === "/ask") {
     try {
-      const { question } = await readBody(req);
+      const { question } = await readBody(req); lastQuestion = question;
       const [{ parsed, usage, searches, resultUrls, repaired, multiple, rawReply, retried, citeTags }, gateOut] = await Promise.all([ask(question), gate(question)]);
       parsed.gate = gateOut.label; parsed.gateReason = gateOut.reason;
       // Replier's searches and the addresses it got back are logged (no page text) (Ben, 10/8).
@@ -224,7 +228,11 @@ http.createServer(async (req, res) => {
       logResult({ time: new Date().toISOString(), kind: "replier", model: MODEL, question, summary: parsed.summary, segments: parsed.segments, usage, searches, resultUrls,
         gate: { label: gateOut.label, reason: gateOut.reason, readable: gateOut.readable, usage: gateOut.usage }, ...(repaired ? { repairedBrackets: repaired } : {}), ...(multiple || {}), ...(rawReply ? { rawReply } : {}), ...(citeTags && citeTags.length ? { citeTags } : {}), ...(retried ? { askedAgain: true, firstReply: retried.firstReply, firstUsage: retried.firstUsage } : {}) });
       return send(res, 200, { ...parsed, searches, resultUrls });
-    } catch (err) { return send(res, 500, { error: err.message }); }
+    } catch (err) {
+      // Unreadable reply, even after asking again: log why (stop reasons and block types per round), so it can be diagnosed (10/22)
+      if (err.formatError) { try { logResult({ time: new Date().toISOString(), kind: "replier-failed", model: MODEL, question: (await Promise.resolve(lastQuestion)), rawText: err.rawText, rounds: err.rounds, firstRounds: err.firstRounds }); } catch {} }
+      return send(res, 500, { error: err.message });
+    }
   }
   if (req.method === "POST" && req.url === "/verify") {
     try {
