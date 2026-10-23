@@ -204,12 +204,13 @@
     .cites { display: flex; flex-direction: column; gap: 16px; align-items: flex-end; min-width: 0; }
     .no-source { font-size: 15px; color: var(--text-tertiary); padding-top: 8px; width: 100%; max-width: 520px; padding-left: 30px; } /* lines up with the verdict words ("Citation supports claim") */
     /* Short "why" next to "No reliable source found" (Ben, 10/22): one line, the reasons on hover. Tooltip anchored left so it stays inside the column. */
-    .ns-why { display: inline-block; margin-left: 8px; font-size: 14px; color: var(--text-tertiary); text-decoration: underline dotted; text-underline-offset: 3px; }
-    .ns-why .tip { left: 0; transform: none; text-align: left; }
-    .ns-why .tip .down { left: 24px; transform: none; }
-    .ns-why .bubble { white-space: normal; width: max-content; max-width: 320px; line-height: 1.45; }
-    .ns-why .bubble ul { margin: 4px 0 0; padding-left: 18px; }
-    .ns-why:hover .tip { display: block; }
+    .ns-link { position: relative; display: inline-block; color: var(--text-info); text-decoration: underline; text-decoration-thickness: 6%; cursor: default; } /* same as the citation site links */
+    .ns-link .tip { left: 0; transform: none; text-align: left; }
+    .ns-link .tip .down { left: 24px; transform: none; }
+    .ns-link .bubble { white-space: normal; width: max-content; max-width: 320px; line-height: 1.45; text-decoration: none; }
+    .ns-link .ns-title { font-weight: 600; }
+    .ns-link .bubble ul { margin: 4px 0 0; padding-left: 18px; }
+    .ns-link:hover .tip { display: block; }
     .bucket-note, .v-working { max-width: 520px; } /* Verifier messages outside the claim/citation rows stay within the left column, like Claude's response (Ben, 10/20) */
     .bucket-note { color: var(--text-secondary); }
 
@@ -223,14 +224,14 @@
     .cite-head .vicon svg { display: block; }
     .cite-head .vlabel { font-weight: 500; white-space: nowrap; }
     .cite-row .rcol { display: flex; flex-direction: column; gap: 4px; padding: 0; min-width: 0; }
-    .cite-row .quote { margin: 0; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+    .cite-row .quote { margin: 0; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; overflow-wrap: anywhere; }
     .cite-row .src { display: flex; justify-content: flex-end; gap: 4px; font-size: 14px; white-space: nowrap; align-items: baseline; }
     .cite-row .src .host { color: var(--text-info); text-decoration: underline; text-decoration-thickness: 6%; }
     .cite-full { display: none; position: absolute; left: -18px; top: -2px; right: 0; z-index: 10; background: #fff; padding: 8px 14px 8px 16px;
       border: 2px solid var(--border-info); color: inherit; text-decoration: none; cursor: pointer;
       box-shadow: 2px 2px 2px rgba(0,0,0,0.15); } /* shadow on the card's edge only, not the text (Ben, 10/21). Figma 10/21: card sticks out 18px to the left so its text lines up with the resting text; top -2px keeps the text from moving */ /* shadow only on the hover card, not the resting rows (Ben, 10/19). top -4px: the hover card has 4px more top padding than the resting row, so the text no longer drops on hover (Ben, 10/20) */
     .cite-full .rcol { gap: 4px; }
-    .cite-full .quote { display: block; -webkit-line-clamp: unset; overflow: visible; }
+    .cite-full .quote { display: -webkit-box; -webkit-line-clamp: 8; overflow: hidden; } /* hover card: at most 8 lines, then "…" (Ben, 10/22: very long quotes broke the page) */
     .cite-full .src .lead { font-size: 15px; font-weight: 500; color: var(--text-primary); }
     .cite:hover .cite-full { display: flex; }
     .cite:hover { z-index: 11; }
@@ -357,12 +358,12 @@
       return g;
     }
 
-    // "No reliable source found" plus a short reason line; the causes show on hover (Ben, 10/22: scannable, bite-sized)
+    // "No reliable source found" is the link; hovering it shows why (Ben, 10/22). Link style = the citation site links.
     const NS_REASONS = ["Few sites searched", "Literal by design", "Reads only part of each page", "Can’t read tables or images", "Paywalls and new info", "Bundled claims"];
     function noSource() {
-      const d = el("div", "no-source", "No reliable source found");
-      const w = el("span", "ns-why tip-host", "Not found doesn’t mean wrong");
-      const t = el("div", "tip"); const b = el("div", "bubble", "Our search is limited:");
+      const d = el("div", "no-source");
+      const w = el("span", "ns-link tip-host", "No reliable source found");
+      const t = el("div", "tip"); const b = el("div", "bubble"); b.append(el("div", "ns-title", "Not found doesn’t mean wrong. Our search is limited."));
       const ul = document.createElement("ul"); for (const r of NS_REASONS) ul.append(el("li", "", r)); b.append(ul); t.append(b);
       t.insertAdjacentHTML("beforeend", '<svg class="down" width="18" height="10" viewBox="0 0 18 10"><path d="M0.5 0.5 L9 9 L17.5 0.5" fill="#fff" stroke="rgba(31,30,29,0.4)"/><rect x="1" y="0" width="16" height="1" fill="#fff"/></svg>');
       w.append(t); d.append(w); return d;
@@ -710,7 +711,7 @@
       for (const s of sections) {
         const seg = scored[s.n - 1]; if (!seg || s.kind === "opinion" || FAILED.includes(s.verdict)) continue;
         const kind = (s.verdict === "Supported" || s.verdict === "Partly supported") ? "sup" : s.verdict === "Contradicted" ? "con" : s.verdict === "Sources disagree" ? "dis" : null;
-        if (kind) rows.push({ kind, conf: seg.confidence, ab: topAbilities(ab, s.n) });
+        if (kind) rows.push({ n: s.n, kind, conf: seg.confidence, ab: topAbilities(ab, s.n) });
       }
       const sup = rows.filter((r) => r.kind === "sup"), con = rows.filter((r) => r.kind === "con"), dis = rows.filter((r) => r.kind === "dis");
       const avg = (list) => Math.round(list.reduce((a, r) => a + r.conf, 0) / list.length) + "%";
@@ -719,28 +720,40 @@
         return ["High", "Medium", "Low"].filter((k) => c[k]).map((k) => c[k] + " " + k.toLowerCase()).join(", ") || "not scored"; };
       const commonAbility = (list) => { const c = new Map(); list.forEach((r) => (r.ab?.names || []).forEach((nm) => c.set(nm, (c.get(nm) || 0) + 1)));
         let best = null; for (const [nm, k] of c) if (!best || k > best[1]) best = [nm, k]; return best; };
-      // One bullet per line, label semibold (Figma 2099:6993, Ben 10/22)
-      const line = (label, text, ph) => { const u = el("ul"), li = el("li"); li.append(el("span", "s-label", label + ":"), document.createTextNode(" " + text));
+      // One bullet per line, label semibold (Figma 2099:6993, Ben 10/22). Claim phrases are in-page links (down arrow) that
+      // scroll to the first of those claims and briefly highlight all of them.
+      const JUMP = '<svg class="jump" width="10" height="12" viewBox="0 0 10 12" fill="none" aria-hidden="true"><path d="M5 1.5v8.5M1.5 6.5 5 10l3.5-3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      const jump = (text, list) => { const a = el("a"); a.href = "#"; a.append(document.createTextNode(text)); a.insertAdjacentHTML("beforeend", JUMP);
+        a.addEventListener("click", (e) => { e.preventDefault(); const rowsEl = list.map((r) => verified.querySelector('.vclaim[data-n="' + r.n + '"]')).filter(Boolean);
+          if (!rowsEl.length) return; rowsEl[0].scrollIntoView({ behavior: "smooth", block: "start" });
+          rowsEl.forEach((x) => { x.classList.add("flash"); setTimeout(() => x.classList.remove("flash"), 1500); }); }); return a; };
+      const line = (label, parts, ph) => { const u = el("ul"), li = el("li"); li.append(el("span", "s-label", label + ":"), document.createTextNode(" "));
+        for (const p of parts) li.append(typeof p === "string" ? document.createTextNode(p) : jump(p.t, p.list));
         if (ph) li.append(document.createTextNode(" "), el("span", "ph", "[ability rating to come]"), document.createTextNode(".")); u.append(li); return u; };
       const lc = (t) => t.charAt(0).toLowerCase() + t.slice(1);
-      const group = (N, what) => N === 1 ? "the " + what + " claim" : N === 2 ? "both " + what + " claims" : "all " + N + " " + what + " claims";
-      const famLine = (list, what) => { const c = {}; list.forEach((r) => { if (r.ab) c[r.ab.fam] = (c[r.ab.fam] || 0) + 1; });
-        const keys = ["High", "Medium", "Low"].filter((k) => c[k]); if (!keys.length) return "not scored";
-        if (keys.length === 1 && c[keys[0]] === list.length) return group(list.length, what) + (list.length === 1 ? " scored " : " scored ") + keys[0].toLowerCase();
-        return what + " claims scored " + keys.map((k) => c[k] + " " + k.toLowerCase()).join(", "); };
+      const groupPhrase = (N, what) => N === 1 ? "the " + what + " claim" : N === 2 ? "both " + what + " claims" : "all " + N + " " + what + " claims";
       findingsEl.textContent = "";
       const base = con.length ? con : sup;
       if (!base.length) { const p = el("p", "", dis.length ? "Sources disagreed on every checked claim, so there's nothing to compare." : "No supported or contradicted claims, so nothing to compare."); p.style.margin = "0"; findingsEl.append(p);
-        if (dis.length) findingsEl.append(line("Confidence", "average " + avg(dis) + " where sources disagree")); return; }
+        if (dis.length) findingsEl.append(line("Confidence", ["average " + avg(dis) + " where ", { t: "sources disagree", list: dis }])); return; }
       const best = commonAbility(base); const N = base.length, what = con.length ? "contradicted" : "supported";
-      if (!best) findingsEl.append(line("Abilities", "not scored"));
-      else { const who = best[1] === N ? (N === 1 ? "The " + what + " claim used " : N === 2 ? "The 2 " + what + " claims both used " : "All " + N + " " + what + " claims used ") : best[1] + " of the " + N + " " + what + " claims used ";
-        findingsEl.append(line("Abilities", who + lc(best[0]) + ",", true)); }
-      findingsEl.append(line("Likely Familiarity", famLine(base, what)));
+      if (!best) findingsEl.append(line("Abilities", ["not scored"]));
+      else {
+        const users = base.filter((r) => (r.ab?.names || []).includes(best[0]));
+        const parts = best[1] === N
+          ? (N === 1 ? [{ t: "The " + what + " claim", list: base }, " used "] : N === 2 ? [{ t: "The 2 " + what + " claims", list: base }, " both used "] : [{ t: "All " + N + " " + what + " claims", list: base }, " used "])
+          : [{ t: best[1] + " of the " + N + " " + what + " claims", list: users }, " used "];
+        findingsEl.append(line("Abilities", parts.concat(lc(best[0]) + ","), true));
+      }
+      { const c = {}; base.forEach((r) => { if (r.ab) c[r.ab.fam] = (c[r.ab.fam] || 0) + 1; });
+        const keys = ["High", "Medium", "Low"].filter((k) => c[k]);
+        if (!keys.length) findingsEl.append(line("Likely Familiarity", ["not scored"]));
+        else if (keys.length === 1 && c[keys[0]] === base.length) findingsEl.append(line("Likely Familiarity", [{ t: groupPhrase(base.length, what), list: base }, " scored " + keys[0].toLowerCase()]));
+        else findingsEl.append(line("Likely Familiarity", [{ t: what + " claims", list: base }, " scored " + keys.map((k) => c[k] + " " + k.toLowerCase()).join(", ")])); }
       let conf;
-      if (con.length) conf = [sup.length ? "average " + avg(sup) + " on supported claims" : "average", avg(con) + " on contradicted claims"].join(sup.length ? ", " : " ");
-      else conf = "average " + avg(sup) + ", lowest " + Math.min(...sup.map((r) => r.conf)) + "%";
-      if (dis.length) conf += ", " + avg(dis) + " where sources disagree";
+      if (con.length) conf = sup.length ? ["average " + avg(sup) + " on ", { t: "supported claims", list: sup }, ", " + avg(con) + " on ", { t: "contradicted claims", list: con }] : ["average " + avg(con) + " on ", { t: "contradicted claims", list: con }];
+      else conf = ["average " + avg(sup) + ", lowest " + Math.min(...sup.map((r) => r.conf)) + "%"];
+      if (dis.length) conf.push(", " + avg(dis) + " where ", { t: "sources disagree", list: dis });
       findingsEl.append(line("Confidence", conf));
     }
     function findingLi(it) {
