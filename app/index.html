@@ -875,6 +875,9 @@
         [new RegExp(`(${NUM})\\s*(?:%|percent)\\s+of\\s+(${NUM})${IS}(${APPROX})(${NUM})`, "i"), (m) => [numOf(m[1]) / 100 * numOf(m[2]), `${fmtN(numOf(m[1]))}% of ${fmtN(numOf(m[2]))}`, m[3], m[4]]],
         [new RegExp(`(${NUM})\\s*([×*÷/+]|\\s[x-]\\s)\\s*(${NUM})${IS}(${APPROX})(${NUM})`, "i"), (m) => { const a = numOf(m[1]), b = numOf(m[3]), o = m[2].trim();
           const v = o === "+" ? a + b : o === "-" ? a - b : (o === "/" || o === "÷") ? a / b : a * b; return [v, `${fmtN(a)} ${o === "*" || o === "x" ? "×" : o} ${fmtN(b)}`, m[4], m[5]]; }],
+        // "Total: $60,000 ($500 × 120 months)": a total followed by the sum that makes it, in brackets (Ben, 10/23)
+        [new RegExp(`(${APPROX})(${NUM})\\s*\\(\\s*(${NUM})(?:\\s+[a-z]+)?\\s*([×*x])\\s*(${NUM})(?:\\s+[a-z]+)*\\s*\\)`, "i"), (m) => { const a = numOf(m[3]), b = numOf(m[5]);
+          return [a * b, `${fmtN(a)} × ${fmtN(b)}`, m[1], m[2]]; }],
         [new RegExp(`(${NUM})\\s+(times|plus|minus|divided by)\\s+(${NUM})${IS}(${APPROX})(${NUM})`, "i"), (m) => { const a = numOf(m[1]), b = numOf(m[3]), o = m[2].toLowerCase();
           const v = o === "plus" ? a + b : o === "minus" ? a - b : o === "divided by" ? a / b : a * b; return [v, `${fmtN(a)} ${o} ${fmtN(b)}`, m[4], m[5]]; }],
       ];

@@ -347,6 +347,7 @@ The first real runs of the contested, opinion and "no source" labels, on four qu
 - **Code checks say what checked them:** "Calculator supports claim" and "Letter count supports claim" (or "contradicts").
 - **Small menu polish.** Questions in the menu get a light blue row on hover (the summary box's blue); an empty Recent list says "none."
 - **Menu bug fixed.** The menu popped back open when an answer arrived, because the page put the cursor back in the question box. Now the cursor leaves the box on submit and stays out.
+- **The calculator reads one more pattern:** a total followed by the sum that makes it, in brackets, like "$60,000 ($500 × 120 months)." Tested on sample sentences only.
 - **Browser autofill turned off on the question box.** The browser's own list of past entries was popping up over the new menu; Ben chose to hide it, since the Recent list does the same job.
 - Not yet run live with a real question.
 
