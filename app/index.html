@@ -793,7 +793,7 @@
       findingsEl.textContent = "";
       const base = con.length ? con : sup;
       if (!base.length) { const p = el("p", "", dis.length ? "Sources disagreed on every checked claim, so there's nothing to compare." : "No supported or contradicted claims, so nothing to compare."); p.style.margin = "0"; findingsEl.append(p);
-        if (dis.length) findingsEl.append(line("Confidence", ["average " + avg(dis) + " where ", { t: "sources disagree", list: dis }])); return; }
+        if (dis.length) findingsEl.append(line("Confidence", ["average " + avg(dis) + " on ", { t: "mixed claims", list: dis }])); return; }
       // Abilities line (Ben, 10/23): ability in quotes, then "= weak on the ability scale". Ties name every tied ability;
       // when no ability is shared, each claim's top ability is listed. Counts shown when only some claims share it.
       const N = base.length, what = con.length ? "contradicted" : "supported";
@@ -825,7 +825,7 @@
       let conf;
       if (con.length) conf = sup.length ? ["average " + avg(sup) + " on ", { t: "supported claims", list: sup }, ", " + avg(con) + " on ", { t: "contradicted claims", list: con }] : ["average " + avg(con) + " on ", { t: "contradicted claims", list: con }];
       else conf = ["average " + avg(sup) + ", lowest " + Math.min(...sup.map((r) => r.conf)) + "%"];
-      if (dis.length) conf.push(", " + avg(dis) + " where ", { t: "sources disagree", list: dis });
+      if (dis.length) conf.push(", " + avg(dis) + " on ", { t: "mixed claims", list: dis }); // "mixed claims" (Ben, 10/23)
       findingsEl.append(line("Confidence", conf));
     }
     function findingLi(it) {
