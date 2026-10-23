@@ -360,7 +360,7 @@
     }
 
     // "No reliable source found" is the link; hovering it shows why (Ben, 10/22). Link style = the citation site links.
-    const NS_REASONS = ["Few sites searched", "Literal by design", "Reads only part of each page", "Can’t read tables or images", "Paywalls and new info", "Bundled claims"];
+    const NS_REASONS = ["Few sites searched", "Literal by design", "Reads only part of each page", "Can’t read tables or images", "Can’t access paywalls, may miss new info", "Can’t parse bundled claims"];
     function noSource() {
       const d = el("div", "no-source");
       const w = el("span", "ns-link tip-host", "No reliable source found");
