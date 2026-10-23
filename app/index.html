@@ -360,7 +360,7 @@
     }
 
     // "No reliable source found" is the link; hovering it shows why (Ben, 10/22). Link style = the citation site links.
-    const NS_REASONS = ["Few sites searched", "Literal by design", "Reads only part of each page", "Can’t read tables or images", "Can’t access paywalls, may miss new info", "Can’t parse bundled claims"];
+    const NS_REASONS = ["Few sites searched", "Literal by design", "Reads only part of each page", "Can’t read tables or images", "Can’t get past paywalls", "May miss very recent news", "Struggles with bundled claims"];
     function noSource() {
       const d = el("div", "no-source");
       const w = el("span", "ns-link tip-host", "No reliable source found");
@@ -632,8 +632,8 @@
       </div>
       <div class="ex-qs"><p>When Claude gets it wrong, why?</p><p>How does Claude’s accuracy, judged by the Verifier, correlate to: Abilities used, Likely Familiarity, and Claude’s Confidence in its own claims?</p></div>
       <div class="ex-box"><ul>
-        <li>AI accuracy varies by ability (<a href="https://arxiv.org/abs/2503.06378" target="_blank" rel="noopener">ADeLe, 2025</a>).</li>
-        <li>Familiarity of a topic SHOULD increase accuracy (<a href="https://arxiv.org/html/2509.04664v1#:~:text=at%20least%2020%25%20of%20birthday%20facts" target="_blank" rel="noopener">Kalai et al., 2025</a>).</li>
+        <li>AI accuracy varies by ability (<a href="https://arxiv.org/html/2503.06378v2#:~:text=Ability%20profiles%20of%20the%2015%20LLMs" target="_blank" rel="noopener">ADeLe, 2025</a>).</li>
+        <li>Familiarity of a topic SHOULD increase accuracy (<a href="https://arxiv.org/abs/2211.08411#:~:text=strong%20correlational%20and%20causal%20relationships%20between%20accuracy%20and%20relevant%20document%20count" target="_blank" rel="noopener">Kandpal et al., 2023</a>).</li>
         <li>Do higher confidence scores correlate with more accurate claims (and vice-versa)?</li>
       </ul></div>
     </div>`;
