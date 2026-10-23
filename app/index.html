@@ -74,6 +74,7 @@
     .qcaret[aria-expanded="true"] svg { transform: rotate(180deg); }
     .qitem { border: 0; background: none; padding: 0; font: inherit; font-size: 15px; font-weight: 400; line-height: normal; color: var(--text-tertiary); text-align: left;
       cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+    .qitem:hover, .qitem:focus-visible { color: var(--text-primary); outline: none; } /* subtle hover: text darkens (Ben, 10/23) */
     .qempty { font-size: 15px; line-height: normal; color: var(--text-tertiary); margin: 0; }
 
     /* Section headings */
@@ -953,7 +954,7 @@
     // Collapsed shows the first two. Open/closed is remembered as last used. Clicking a question fills the box and submits.
     // Closes on a click outside, Escape, or submitting. Typing narrows both lists to questions containing the typed text.
     // Recent questions: the last 6 this visitor asked, kept in this browser only; asking again moves it to the top.
-    // Suggested list is Ben's Figma draft, still to be chosen. Empty recent list says "None" (Ben, 10/23); filter details are Claude's.
+    // Suggested list is Ben's Figma draft, still to be chosen. Empty recent list says "none" (Ben, 10/23); filter details are Claude's.
     const SUGGESTED = [
       "Was Napoleon unusually short?",
       "Was Walt Disney Studios' Snow White and the Seven Dwarfs the first animated film to be feature-length?",
@@ -984,7 +985,7 @@
       let list = f ? items.filter((x) => x.toLowerCase().includes(f)) : items;
       if (f && !list.length) return null;
       if (!f && !qOpen[key]) list = list.slice(0, 2);
-      if (!items.length) sec.append(el("p", "qempty", "None"));
+      if (!items.length) sec.append(el("p", "qempty", "none"));
       for (const text of list) {
         const b = el("button", "qitem", text); b.type = "button"; b.title = text;
         b.addEventListener("mousedown", (e) => e.preventDefault());

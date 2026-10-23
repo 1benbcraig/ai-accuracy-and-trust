@@ -345,6 +345,7 @@ The first real runs of the contested, opinion and "no source" labels, on four qu
 - **A question menu under the box.** Clicking into the question box opens two lists: suggested questions, then the visitor's recent questions. Each shows two until opened. Clicking a question asks it right away. Typing narrows the lists. Recent questions are the last six asked, kept in that visitor's own browser, so no one sees anyone else's questions. Ben's design; which questions get suggested is still being chosen.
 - **Summary wording.** Claims where sources disagree are counted as "mixed" ("13 claims: 5 supported, 2 contradicted, 3 mixed…"). The abilities line now reads like "The 2 contradicted claims both used 'quantitative reasoning' = weak on the ability scale," with versions for one claim, some claims, ties, and no shared ability. The confidence line names the same group: "88% on mixed claims."
 - **Code checks say what checked them:** "Calculator supports claim" and "Letter count supports claim" (or "contradicts").
+- **Small menu polish.** Questions in the menu darken slightly on hover; an empty Recent list says "none."
 - **Browser autofill turned off on the question box.** The browser's own list of past entries was popping up over the new menu; Ben chose to hide it, since the Recent list does the same job.
 - Not yet run live with a real question.
 
