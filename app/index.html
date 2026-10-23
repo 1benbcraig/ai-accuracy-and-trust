@@ -632,7 +632,7 @@
       </div>
       <div class="ex-qs"><p>When Claude gets it wrong, why?</p><p>How does Claude’s accuracy, judged by the Verifier, correlate to: Abilities used, Likely Familiarity, and Claude’s Confidence in its own claims?</p></div>
       <div class="ex-box"><ul>
-        <li>AI accuracy varies by ability (<a href="https://arxiv.org/html/2503.06378v2#:~:text=Ability%20profiles%20of%20the%2015%20LLMs" target="_blank" rel="noopener">ADeLe, 2025</a>).</li>
+        <li>AI accuracy varies by ability (<a href="https://doi.org/10.1038/s41586-026-10303-2" target="_blank" rel="noopener">ADeLe, 2026</a>; ratings data: <a href="https://github.com/General-Purpose-AI-Policy-Lab/adele-extension" target="_blank" rel="noopener">GPAI Policy Lab</a>).</li>
         <li>Familiarity of a topic SHOULD increase accuracy (<a href="https://arxiv.org/abs/2211.08411#:~:text=strong%20correlational%20and%20causal%20relationships%20between%20accuracy%20and%20relevant%20document%20count" target="_blank" rel="noopener">Kandpal et al., 2023</a>).</li>
         <li>Do higher confidence scores correlate with more accurate claims (and vice-versa)?</li>
       </ul></div>
@@ -722,6 +722,18 @@
     // Summary box (Ben, 10/22): plain counts, no quotes. Compares claims the sources supported with claims they contradicted,
     // by abilities, likely familiarity and Claude's confidence. "Sources disagree" claims get only a confidence figure;
     // "no reliable source" and opinions are left out. With nothing contradicted, the lines describe the supported claims.
+    // How strong AI models are at each ability, relative to their other abilities (Ben, 10/22). From ADeLe ability scores
+    // (Zhou et al., Nature 2026) for 7 recent models, published by the GPAI Policy Lab (github.com/General-Purpose-AI-Policy-Lab/adele-extension).
+    // Not tested on Claude. Five levels and cut points are Claude's; method and numbers in the project doc finding-adele-ability-tiers.md.
+    const ABILITY_TIER = {
+      "Mind modelling & social cognition": "one of AI’s strongest abilities", "Social sciences & humanities knowledge": "one of AI’s strongest abilities",
+      "Everyday knowledge": "one of AI’s stronger abilities",
+      "Spatial & physical reasoning": "an average ability for AI", "Verbal comprehension": "an average ability for AI", "Identifying relevant information": "an average ability for AI",
+      "Applied sciences knowledge": "an average ability for AI", "Conceptualisation & abstraction": "an average ability for AI",
+      "Critical thinking": "one of AI’s weaker abilities", "Formal sciences knowledge": "one of AI’s weaker abilities", "Logical reasoning": "one of AI’s weaker abilities",
+      "Natural sciences knowledge": "one of AI’s weaker abilities", "Verbal expression": "one of AI’s weaker abilities", "Quantitative reasoning": "one of AI’s weaker abilities",
+      "Calibrating knowns & unknowns": "one of AI’s weakest abilities", "Attention & scan": "one of AI’s weakest abilities"
+    };
     function showFindings(sections, scored, ab) {
       const rows = [];
       for (const s of sections) {
@@ -745,7 +757,7 @@
           rowsEl.forEach((x) => { x.classList.add("flash"); setTimeout(() => x.classList.remove("flash"), 1500); }); }); return a; };
       const line = (label, parts, ph) => { const u = el("ul"), li = el("li"); li.append(el("span", "s-label", label + ":"), document.createTextNode(" "));
         for (const p of parts) li.append(typeof p === "string" ? document.createTextNode(p) : jump(p.t, p.list));
-        if (ph) li.append(document.createTextNode(" "), el("span", "ph", "[ability rating to come]"), document.createTextNode(".")); u.append(li); return u; };
+        if (ph !== undefined) li.append(document.createTextNode(ph ? ", " + ph + "." : ".")); u.append(li); return u; };
       const lc = (t) => t.charAt(0).toLowerCase() + t.slice(1);
       const groupPhrase = (N, what) => N === 1 ? "the " + what + " claim" : N === 2 ? "both " + what + " claims" : "all " + N + " " + what + " claims";
       findingsEl.textContent = "";
@@ -759,7 +771,7 @@
         const parts = best[1] === N
           ? (N === 1 ? [{ t: "The " + what + " claim", list: base }, " used "] : N === 2 ? [{ t: "The 2 " + what + " claims", list: base }, " both used "] : [{ t: "All " + N + " " + what + " claims", list: base }, " used "])
           : [{ t: best[1] + " of the " + N + " " + what + " claims", list: users }, " used "];
-        findingsEl.append(line("Abilities", parts.concat(lc(best[0]) + ","), true));
+        findingsEl.append(line("Abilities", parts.concat(lc(best[0])), ABILITY_TIER[best[0]] || ""));
       }
       { const c = {}; base.forEach((r) => { if (r.ab) c[r.ab.fam] = (c[r.ab.fam] || 0) + 1; });
         const keys = ["High", "Medium", "Low"].filter((k) => c[k]);
