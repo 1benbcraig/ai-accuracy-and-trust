@@ -988,7 +988,7 @@
       const f = filter.trim().toLowerCase();
       let list = f ? items.filter((x) => x.toLowerCase().includes(f)) : items;
       if (f && !list.length) return null;
-      if (!f && !qOpen[key]) list = list.slice(0, 2);
+      if (!qOpen[key]) list = list.slice(0, 2); // carets work while filtering too
       if (!items.length) sec.append(el("p", "qempty", "none"));
       for (const text of list) {
         const b = el("button", "qitem", text); b.type = "button"; b.title = text;
@@ -1000,15 +1000,17 @@
     }
     function renderQMenu() {
       qmenu.textContent = "";
-      const parts = [qSection("suggested", "SUGGESTED QUESTIONS", SUGGESTED, q.value), qSection("recent", "RECENT QUESTIONS", recentQs(), q.value)].filter(Boolean);
+      const f = qTyped ? q.value : ""; // narrow only after the user types, not by the question left in the box (Ben, 10/23)
+      const parts = [qSection("suggested", "SUGGESTED QUESTIONS", SUGGESTED, f), qSection("recent", "RECENT QUESTIONS", recentQs(), f)].filter(Boolean);
       if (!parts.length) { qmenu.hidden = true; return; }
       qmenu.append(...parts); qmenu.hidden = false;
     }
     function closeQMenu() { qmenu.hidden = true; }
+    let qTyped = false;
     function openQMenu() { if (!q.disabled) renderQMenu(); }
-    q.addEventListener("focus", openQMenu);
-    q.addEventListener("click", openQMenu);
-    q.addEventListener("input", openQMenu);
+    q.addEventListener("focus", () => { qTyped = false; openQMenu(); });
+    q.addEventListener("click", () => { if (qmenu.hidden) { qTyped = false; openQMenu(); } });
+    q.addEventListener("input", () => { qTyped = true; openQMenu(); });
     q.addEventListener("keydown", (e) => { if (e.key === "Escape") closeQMenu(); });
     document.addEventListener("mousedown", (e) => { if (!qwrap.contains(e.target)) closeQMenu(); });
 
