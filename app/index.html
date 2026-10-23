@@ -205,7 +205,7 @@
     .cites { display: flex; flex-direction: column; gap: 16px; align-items: flex-end; min-width: 0; }
     .no-source { font-size: 15px; color: var(--text-tertiary); padding-top: 8px; width: 100%; max-width: 520px; padding-left: 30px; } /* lines up with the verdict words ("Citation supports claim") */
     /* Short "why" next to "No reliable source found" (Ben, 10/22): one line, the reasons on hover. Tooltip anchored left so it stays inside the column. */
-    .ns-link { position: relative; display: inline-block; color: var(--text-info); text-decoration: underline; text-decoration-thickness: 6%; cursor: default; } /* same as the citation site links */
+    .ns-link { position: relative; display: inline-block; cursor: default; } /* plain text, same gray as before; hover shows the reasons (Ben, 10/22) */
     .ns-link .tip { left: 0; transform: none; text-align: left; }
     .ns-link .tip .down { left: 24px; transform: none; }
     .ns-link .bubble { white-space: normal; width: max-content; max-width: 320px; line-height: 1.45; text-decoration: none; }
@@ -632,7 +632,7 @@
       </div>
       <div class="ex-qs"><p>When Claude gets it wrong, why?</p><p>How does Claude’s accuracy, judged by the Verifier, correlate to: Abilities used, Likely Familiarity, and Claude’s Confidence in its own claims?</p></div>
       <div class="ex-box"><ul>
-        <li>AI accuracy varies by ability (<a href="https://www.microsoft.com/en-us/research/blog/adele-predicting-and-explaining-ai-performance-across-tasks/" target="_blank" rel="noopener">ADeLe, Microsoft Research</a>).</li>
+        <li>AI accuracy varies by ability (<a href="https://arxiv.org/abs/2503.06378" target="_blank" rel="noopener">ADeLe, 2025</a>).</li>
         <li>Familiarity of a topic SHOULD increase accuracy (<a href="https://arxiv.org/abs/2509.04664" target="_blank" rel="noopener">Kalai et al., 2025</a>).</li>
         <li>Do higher confidence scores correlate with more accurate claims (and vice-versa)?</li>
       </ul></div>
