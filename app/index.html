@@ -179,8 +179,9 @@
     /* Anatomy title at 459 (left column ends at 419 -> 40px), diagram from 520 (31px below the title) to 1201 (681px tall) */
     .ex-anat { margin-top: 40px; }
     .ex-diagram { position: relative; margin: 31px 0 0 150px; width: 1140px; height: 681px; }
-    .ex-diagram .ex-claimimg { position: absolute; left: 0; top: 112px; width: 1140px; height: 280px; box-sizing: border-box; border: 1px solid rgba(31,30,29,0.4); overflow: hidden; }
-    .ex-claimimg.has-img { border: 0; } /* Ben's exported image already includes its 1px border */
+    .ex-diagram .ex-claimimg { position: absolute; left: 0; top: 112px; width: 1140px; height: 280px; box-sizing: border-box; border: 1px solid #1F1E1D; overflow: hidden; }
+    .ex-claimimg.has-img { border: 0; }
+    .ex-claimimg.has-img::after { content: ""; position: absolute; inset: 0; border: 1px solid #1F1E1D; pointer-events: none; } /* all overlay borders #1F1E1D (Ben, 10/22); drawn over the image's own lighter border */
     .ex-claimimg img { position: absolute; left: 0; top: 0; width: 1140px; height: 280px; max-width: none; }
     .ex-claimimg .ex-live { padding: 24px; background: var(--bg); height: 100%; box-sizing: border-box; } /* stand-in until the Figma image is exported */
     .ex-claimimg .ex-live .vclaim { border-bottom: 0; padding-bottom: 0; grid-template-columns: minmax(0, 520px) minmax(0, 520px); column-gap: 52px; }
@@ -190,13 +191,13 @@
     .ex-line::after { content: ""; position: absolute; left: 0; width: 11px; height: 11px; border-radius: 50%; background: #EF5DA8; }
     .ex-line.dot-bottom::after { bottom: 0; } .ex-line.dot-top::after { top: 0; }
     /* Callouts (Figma "Claim" frames): 370px, white, 1px border, 8px / 12px padding, bold title, 5px gap, 16px text */
-    .callout { position: absolute; width: 370px; box-sizing: border-box; background: #fff; border: 1px solid rgba(31,30,29,0.3); padding: 8px 12px; display: flex; flex-direction: column; gap: 5px;
+    .callout { position: absolute; width: 370px; box-sizing: border-box; background: #fff; border: 1px solid #1F1E1D; padding: 8px 12px; display: flex; flex-direction: column; gap: 5px;
       font-family: var(--sans); font-size: 16px; line-height: normal; letter-spacing: normal; color: #141413; z-index: 1; }
     .callout b { font-weight: 700; } .callout p { margin: 0; }
     .ex-qs { margin: 0 0 0 150px; font-size: 16px; line-height: 30px; letter-spacing: normal; }
     .ex-qs p { margin: 0; }
     .ex-qs p:first-child { font-weight: 600; } /* "When Claude gets it wrong, why?" semibold (Ben, 10/22) */
-    .ex-box { margin: 28px 0 0 150px; width: 1141px; box-sizing: border-box; border: 1px solid #000; background: #f9f9f7; padding: 16px; font-size: 16px; line-height: 30px; letter-spacing: normal; color: #141413; }
+    .ex-box { margin: 28px 0 0 150px; width: 1141px; box-sizing: border-box; border: 1px solid #1F1E1D; background: #f9f9f7; padding: 16px; font-size: 16px; line-height: 30px; letter-spacing: normal; color: #141413; }
     .ex-box ul { margin: 0; padding-left: 24px; }
     .ph { color: var(--text-tertiary); } /* visible placeholder (Ben, 10/22) */
     /* Summary box lines (Figma 2099:6993): each line its own bullet, 16px apart (the box's gap), label semibold */
