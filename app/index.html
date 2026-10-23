@@ -57,6 +57,25 @@
     #status { margin: -24px 0 0; min-height: 0; color: var(--text-tertiary); font-size: 14px; }
     #status:empty { display: none; }
 
+    /* Question menu (Figma 2154:4811 open, 2154:5334 collapsed; Ben, 10/23) */
+    #qwrap { position: relative; z-index: 30; width: 765px; max-width: 100%; }
+    #qwrap #query { position: relative; z-index: 2; }
+    #qmenu { position: absolute; left: 0.5px; top: 37px; width: 764px; max-width: calc(100% - 1px); z-index: 1; background: #fff;
+      border: 1px solid var(--border-tertiary); border-radius: 0 0 16px 16px; padding: 24px 16px 16px; display: flex; flex-direction: column; gap: 16px;
+      filter: drop-shadow(-1px -1px 2px rgba(0,0,0,0.2)) drop-shadow(1px 1px 2px rgba(0,0,0,0.2)); }
+    #qmenu[hidden] { display: none; }
+    .qsec { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+    .qsec.recent { gap: 10px; }
+    .qsec[hidden] { display: none; }
+    .qhead { display: flex; gap: 12px; align-items: flex-start; }
+    .qhead span { flex: 1; min-width: 0; font-weight: 500; font-size: 12px; line-height: normal; color: var(--text-primary); }
+    .qcaret { border: 0; background: none; padding: 4px 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; align-self: stretch; color: var(--text-primary); }
+    .qcaret svg { display: block; }
+    .qcaret[aria-expanded="true"] svg { transform: rotate(180deg); }
+    .qitem { border: 0; background: none; padding: 0; font: inherit; font-size: 15px; font-weight: 400; line-height: normal; color: var(--text-tertiary); text-align: left;
+      cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+    .qempty { font-size: 15px; line-height: normal; color: var(--text-tertiary); margin: 0; }
+
     /* Section headings */
     .head { display: flex; align-items: center; justify-content: space-between; gap: 60px; border-bottom: 0.5px solid var(--border-secondary); }
     .head h2 { margin: 0; font-family: var(--serif); font-weight: 600; font-size: 18px; line-height: 1.6; letter-spacing: -0.01em; }
@@ -266,10 +285,13 @@
   <div id="sidebar-tip"><div class="tip-wrap"><svg class="arrow" width="15" height="18" viewBox="0 0 15 18"><path d="M15 0.5 L0.5 9 L15 17.5" fill="#fff" stroke="rgba(31,30,29,0.4)"/></svg><div class="bubble">Claude sidebar — not active in this demo.</div></div></div>
 
   <main id="main">
+    <div id="qwrap">
     <form id="query">
       <input id="question" type="text" aria-label="Your question" />
       <button id="send" type="submit" aria-label="Submit"><svg width="14" height="12" viewBox="0 0 14 12" fill="none"><path d="M11 1.24898e-06C11.3873 1.24898e-06 11.7516 -0.000838312 12.0556 0.0410169C12.3683 0.0840557 12.689 0.179926 12.9472 0.428712C13.2022 0.674381 13.3313 1.00666 13.4033 1.38086C13.4751 1.75444 13.5 2.22727 13.5 2.8125V6C13.5 6.48461 13.5009 6.9009 13.456 7.22461C13.4097 7.55777 13.3025 7.89858 13 8.14063C12.7211 8.36368 12.3569 8.43412 11.9892 8.4668C11.6102 8.50046 11.115 8.5 10.5 8.5H1.70699L4.03512 10.8281C4.23038 11.0234 4.23038 11.3399 4.03512 11.5352C3.83986 11.7304 3.52335 11.7304 3.32809 11.5352L0.146446 8.35352C-0.0488156 8.15825 -0.0488151 7.84175 0.146446 7.64649L3.32809 4.46485C3.52335 4.26958 3.83986 4.26958 4.03512 4.46485C4.23038 4.66011 4.23038 4.97661 4.03512 5.17188L1.70699 7.5H10.5C11.1348 7.5 11.5772 7.49951 11.9013 7.4707C12.2366 7.44088 12.3413 7.38631 12.375 7.35938C12.3849 7.35143 12.4339 7.31687 12.4658 7.08789C12.4989 6.84916 12.5 6.5152 12.5 6V2.8125C12.5 2.24177 12.475 1.84711 12.4218 1.57031C12.3688 1.29444 12.2978 1.19276 12.2529 1.14942C12.2111 1.10914 12.1312 1.06048 11.9189 1.03125C11.698 1.00089 11.4124 1 11 1H6.99996V1.24898e-06H11Z" fill="#73726C"/></svg></button>
     </form>
+    <div id="qmenu" hidden></div>
+    </div>
     <p id="status"></p>
 
     <section id="response" class="content">
@@ -478,7 +500,7 @@
       const sents = answerText.match(/[^.!?\n]+[.!?]*/g) || [answerText];
       return (sents.find(test) || sents[sents.length - 1] || "").trim();
     }
-    function codeCheckRow(claimText, verdict, line, label) {
+    function codeCheckRow(claimText, verdict, line, label, kind) {
       const rowEl = el("div", "vclaim");
       const left = el("div", "vleft");
       left.append(el("div", "claim-box", "“" + stripBold(claimText).trim() + "”"));
@@ -487,10 +509,10 @@
       const right = el("div", "cites");
       if (verdict) {
         const wrap = el("div", "cite"); const row = el("div", "cite-row");
-        // Header words for code checks are Claude's placeholder (10/20), pending Ben's wording.
+        // Header words (Ben, 10/23): "Calculator supports claim" / "Letter count supports claim", and the "contradicts" versions.
         const r = el("div", "rcol"); r.append(el("p", "quote", line));
         const src = el("div", "src"); src.append(el("span", "", label)); r.append(src);
-        row.append(citeHead(verdict, verdict === "Supported" ? "Result supports claim" : "Result contradicts claim"), r); wrap.append(row); right.append(wrap);
+        row.append(citeHead(verdict, (kind || "Calculator") + (verdict === "Supported" ? " supports claim" : " contradicts claim")), r); wrap.append(row); right.append(wrap);
       } else right.append(el("div", "no-source", line));
       rowEl.append(left, right);
       verified.textContent = ""; verified.append(rowEl);
@@ -521,7 +543,7 @@
       const saysIn = (t) => { const set = new Set((t.match(/\b\d+\b/g) || []).map(Number)); t.toLowerCase().replace(/\b[a-z]+\b/g, (w) => { const i = NUMWORDS.indexOf(w); if (i >= 0) set.add(i); return w; }); return set; };
       const hit = saysIn(answerText).has(lc.count);
       const claim = sentenceWith(answerText, (t) => hit ? saysIn(t).has(lc.count) : saysIn(t).size > 0);
-      codeCheckRow(claim, hit ? "Supported" : "Contradicted", "Counted by code, not AI: " + lc.count + ' "' + lc.letter + '" in "' + lc.target + '"', "Second Source counter");
+      codeCheckRow(claim, hit ? "Supported" : "Contradicted", "Counted by code, not AI: " + lc.count + ' "' + lc.letter + '" in "' + lc.target + '"', "Second Source counter", "Letter count");
     }
     function showNotCheckable(reason) {
       verified.textContent = "";
@@ -586,12 +608,12 @@
     function summaryLabel(verdict) {
       if (verdict === "Supported" || verdict === "Partly supported") return "supported";
       if (verdict === "Contradicted") return "contradicted";
-      if (verdict === "Sources disagree") return "sources disagree";
+      if (verdict === "Sources disagree") return "mixed"; // count line word (Ben, 10/23)
       if (verdict === "Opinion, source found") return "opinion held by a source";
       if (FAILED.includes(verdict)) return "not checked";
       return "no source"; // Not found, Opinion with no source (Figma 10/22 wording)
     }
-    const SUMMARY_ORDER = ["supported", "contradicted", "sources disagree", "opinion held by a source", "no source", "not checked"];
+    const SUMMARY_ORDER = ["supported", "contradicted", "mixed", "opinion held by a source", "no source", "not checked"];
     function showSummary(verdicts) {
       if (!verdicts.length) { vSummary.textContent = ""; vBox.querySelectorAll(".f-all").forEach((x) => x.remove()); vBox.hidden = true; return; }
       const n = {}; verdicts.forEach((v) => { const k = summaryLabel(v); n[k] = (n[k] || 0) + 1; });
@@ -772,14 +794,28 @@
       const base = con.length ? con : sup;
       if (!base.length) { const p = el("p", "", dis.length ? "Sources disagreed on every checked claim, so there's nothing to compare." : "No supported or contradicted claims, so nothing to compare."); p.style.margin = "0"; findingsEl.append(p);
         if (dis.length) findingsEl.append(line("Confidence", ["average " + avg(dis) + " where ", { t: "sources disagree", list: dis }])); return; }
-      const best = commonAbility(base); const N = base.length, what = con.length ? "contradicted" : "supported";
-      if (!best) findingsEl.append(line("Abilities", ["not scored"]));
+      // Abilities line (Ben, 10/23): ability in quotes, then "= weak on the ability scale". Ties name every tied ability;
+      // when no ability is shared, each claim's top ability is listed. Counts shown when only some claims share it.
+      const N = base.length, what = con.length ? "contradicted" : "supported";
+      const TIER_WORD = (nm) => { const t = ABILITY_TIER[nm] || ""; return /strongest/.test(t) ? "strongest" : /strong/.test(t) ? "strong" : /weakest/.test(t) ? "weakest" : /weak/.test(t) ? "weak" : /average/.test(t) ? "average" : "unrated"; };
+      const abq = (nm) => "\u201C" + lc(nm) + "\u201D = " + TIER_WORD(nm);
+      const andList = (arr) => arr.length < 2 ? arr.join("") : arr.slice(0, -1).join(", ") + " and " + arr[arr.length - 1];
+      const cnt = new Map(); base.forEach((r) => (r.ab?.names || []).forEach((nm) => cnt.set(nm, (cnt.get(nm) || 0) + 1)));
+      if (!cnt.size) findingsEl.append(line("Abilities", ["not scored"]));
+      else if (N === 1) findingsEl.append(line("Abilities", [{ t: "The " + what + " claim", list: base }, " used " + abq(base[0].ab.names[0]) + " on the ability scale."]));
       else {
-        const users = base.filter((r) => (r.ab?.names || []).includes(best[0]));
-        const parts = best[1] === N
-          ? (N === 1 ? [{ t: "The " + what + " claim", list: base }, " used "] : N === 2 ? [{ t: "The 2 " + what + " claims", list: base }, " both used "] : [{ t: "All " + N + " " + what + " claims", list: base }, " used "])
-          : [{ t: best[1] + " of the " + N + " " + what + " claims", list: users }, " used "];
-        findingsEl.append(line("Abilities", parts.concat(lc(best[0])), ABILITY_TIER[best[0]] || ""));
+        const max = Math.max(...cnt.values());
+        if (max === 1) {
+          const tops = base.filter((r) => r.ab?.names?.length).map((r) => abq(r.ab.names[0]));
+          findingsEl.append(line("Abilities", [{ t: "The " + N + " " + what + " claims", list: base }, " each used a different ability: " + tops.join(", ") + "."]));
+        } else {
+          const tied = [...cnt].filter(([, k]) => k === max).map(([nm]) => nm);
+          const users = base.filter((r) => tied.some((nm) => (r.ab?.names || []).includes(nm)));
+          const who = max === N
+            ? (N === 2 ? [{ t: "The 2 " + what + " claims", list: base }, " both used "] : [{ t: "All " + N + " " + what + " claims", list: base }, " used "])
+            : [{ t: max + (con.length ? " of the " : " of ") + N + " " + what + " claims", list: users }, " used "];
+          findingsEl.append(line("Abilities", who.concat(andList(tied.map(abq)) + " on the ability scale.")));
+        }
       }
       { const c = {}; base.forEach((r) => { if (r.ab) c[r.ab.fam] = (c[r.ab.fam] || 0) + 1; });
         const keys = ["High", "Medium", "Low"].filter((k) => c[k]);
@@ -854,7 +890,7 @@
       const wrap = el("div", "cite"); const row = el("div", "cite-row");
       const r = el("div", "rcol"); r.append(el("p", "quote", line));
       const src = el("div", "src"); src.append(el("span", "", "Second Source calculator")); r.append(src);
-      row.append(citeHead(verdict, verdict === "Supported" ? "Result supports claim" : "Result contradicts claim"), r); wrap.append(row); return wrap;
+      row.append(citeHead(verdict, verdict === "Supported" ? "Calculator supports claim" : "Calculator contradicts claim"), r); wrap.append(row); return wrap;
     }
     function showVerifier(out) {
       // Math found in a claim: a wrong sum makes the claim Contradicted; a right sum counts as support when no source was found.
@@ -913,11 +949,70 @@
       });
     }
 
+    // Question menu under the box (Ben, 10/23): Suggested questions above Recent questions, each an accordion.
+    // Collapsed shows the first two. Open/closed is remembered as last used. Clicking a question fills the box and submits.
+    // Closes on a click outside, Escape, or submitting. Typing narrows both lists to questions containing the typed text.
+    // Recent questions: the last 6 this visitor asked, kept in this browser only; asking again moves it to the top.
+    // Suggested list is Ben's Figma draft, still to be chosen. Empty recent list says "None" (Ben, 10/23); filter details are Claude's.
+    const SUGGESTED = [
+      "Was Napoleon unusually short?",
+      "Was Walt Disney Studios' Snow White and the Seven Dwarfs the first animated film to be feature-length?",
+      "What percentage of startups fail in their first year?",
+      "Which modern LLM is the most powerful? Which is best to act as a coworker to a UX designer?",
+      "How long will it take Gouda cheese to digest?",
+      "How long is the average job tenure in the US?"
+    ];
+    const qmenu = document.getElementById("qmenu"), qwrap = document.getElementById("qwrap");
+    const store = { get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch { return d; } },
+      set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} } };
+    let qOpen = store.get("2s-qmenu-open", { suggested: false, recent: false });
+    const recentQs = () => { const r = store.get("2s-recent", []); return Array.isArray(r) ? r.filter((x) => typeof x === "string") : []; };
+    function addRecent(text) {
+      const t = text.trim(); if (!t) return;
+      const r = recentQs().filter((x) => x.trim().toLowerCase() !== t.toLowerCase()); r.unshift(t); store.set("2s-recent", r.slice(0, 6));
+    }
+    const QCARET = '<svg width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true"><path d="M0.6 0.6 5 5 9.4 0.6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    function qSection(key, title, items, filter) {
+      const sec = el("div", "qsec" + (key === "recent" ? " recent" : ""));
+      const head = el("div", "qhead"); head.append(el("span", "", title));
+      const c = el("button", "qcaret"); c.type = "button"; c.innerHTML = QCARET;
+      c.setAttribute("aria-label", (qOpen[key] ? "Show fewer " : "Show all ") + title.toLowerCase()); c.setAttribute("aria-expanded", String(!!qOpen[key]));
+      c.addEventListener("mousedown", (e) => e.preventDefault()); // keep focus in the question box
+      c.addEventListener("click", () => { qOpen[key] = !qOpen[key]; store.set("2s-qmenu-open", qOpen); renderQMenu(); });
+      head.append(c); sec.append(head);
+      const f = filter.trim().toLowerCase();
+      let list = f ? items.filter((x) => x.toLowerCase().includes(f)) : items;
+      if (f && !list.length) return null;
+      if (!f && !qOpen[key]) list = list.slice(0, 2);
+      if (!items.length) sec.append(el("p", "qempty", "None"));
+      for (const text of list) {
+        const b = el("button", "qitem", text); b.type = "button"; b.title = text;
+        b.addEventListener("mousedown", (e) => e.preventDefault());
+        b.addEventListener("click", () => { q.value = text; closeQMenu(); document.getElementById("query").requestSubmit(); });
+        sec.append(b);
+      }
+      return sec;
+    }
+    function renderQMenu() {
+      qmenu.textContent = "";
+      const parts = [qSection("suggested", "SUGGESTED QUESTIONS", SUGGESTED, q.value), qSection("recent", "RECENT QUESTIONS", recentQs(), q.value)].filter(Boolean);
+      if (!parts.length) { qmenu.hidden = true; return; }
+      qmenu.append(...parts); qmenu.hidden = false;
+    }
+    function closeQMenu() { qmenu.hidden = true; }
+    function openQMenu() { if (!q.disabled) renderQMenu(); }
+    q.addEventListener("focus", openQMenu);
+    q.addEventListener("click", openQMenu);
+    q.addEventListener("input", openQMenu);
+    q.addEventListener("keydown", (e) => { if (e.key === "Escape") closeQMenu(); });
+    document.addEventListener("mousedown", (e) => { if (!qwrap.contains(e.target)) closeQMenu(); });
+
     // Return in the box submits, like the arrow button: the box is a form, so the browser handles it (Ben, 10/19).
     document.getElementById("query").addEventListener("submit", async (e) => {
       e.preventDefault();
       if (send.disabled) return;
       if (!q.value.trim()) return;
+      closeQMenu(); addRecent(q.value); // question menu (Ben, 10/23)
       // The user can't move forward until both answers are in (blocking).
       q.disabled = true; send.disabled = true; verifyOn.disabled = true;
       answer.textContent = ""; verified.textContent = ""; extraRoom = 0; mainEl.style.paddingBottom = ""; vBox.querySelectorAll(".f-all").forEach((x) => x.remove()); vSummary.textContent = ""; findingsEl.textContent = ""; vBox.hidden = true; searchUrls = []; searched.textContent = ""; searchOverlay.textContent = ""; setOverlay(false);
