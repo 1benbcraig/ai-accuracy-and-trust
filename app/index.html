@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Second Source</title>
+  <title>Verifier</title>
   <!-- Built to match Figma "Second Source 'final'" (node 2020:17988), 10/15. Earlier page: index-before-figma.html. -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -472,11 +472,11 @@
     const FAILED = ["Verifier's reply couldn't be read", "Verifier gave no answer for this claim", "Verifier's reply was cut off before this claim"];
     // Bucket zero (Ben, 10/13): say why nothing is checked, never go blank.
     const ZERO_REASONS = {
-      creative: "This looks like fiction. Second Source checks facts, so there's nothing here to verify.", // Ben, 10/19
-      draft: "This looks like a request to write or edit something. Second Source checks answers to questions of fact, not writing tasks.", // Ben, 10/19
+      creative: "This looks like fiction. The Verifier checks facts, so there's nothing here to verify.", // Ben, 10/19
+      draft: "This looks like a request to write or edit something. The Verifier checks answers to questions of fact, not writing tasks.", // Ben, 10/19
       chat: "This looks like small talk, so there is nothing here to check.",
-      code: "Second Source is currently unable to verify claims about code.",
-      reasoning: "Second Source checks claims by finding reliable sources that support or contradict them. Reasoning, math and puzzle questions are generally unsourced, so they can't be verified here.", // Ben's wording, 10/19; "or contradict" added 10/20
+      code: "The Verifier is currently unable to verify claims about code.",
+      reasoning: "The Verifier checks claims by finding reliable sources that support or contradict them. Reasoning, math and puzzle questions are generally unsourced, so they can't be verified here.", // Ben's wording, 10/19; "or contradict" added 10/20
       other: "This doesn't look like a question of fact, so nothing here was checked.",
     };
     // Plain arithmetic (Ben, 10/19): when the question is only numbers and operators, 2S does the sum in code
@@ -530,7 +530,7 @@
       const line = "Checked by calculator, not AI: " + fmt(calc.value);
       const claim = sentenceWith(answerText, (t) => hit ? numsIn(t).some(same) : numsIn(t).length > 0);
       if (!nums.length) return codeCheckRow(claim, null, line + ". Claude's answer has no number to compare.", "");
-      codeCheckRow(claim, hit ? "Supported" : "Contradicted", line, "Second Source calculator");
+      codeCheckRow(claim, hit ? "Supported" : "Contradicted", line, "Calculator");
     }
     // Letter counts (Ben, 10/19), e.g. "how many r in strawberry": counted by plain code, not AI.
     const NUMWORDS = ["zero","one","two","three","four","five","six","seven","eight","nine","ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen","eighteen","nineteen","twenty"];
@@ -545,7 +545,7 @@
       const saysIn = (t) => { const set = new Set((t.match(/\b\d+\b/g) || []).map(Number)); t.toLowerCase().replace(/\b[a-z]+\b/g, (w) => { const i = NUMWORDS.indexOf(w); if (i >= 0) set.add(i); return w; }); return set; };
       const hit = saysIn(answerText).has(lc.count);
       const claim = sentenceWith(answerText, (t) => hit ? saysIn(t).has(lc.count) : saysIn(t).size > 0);
-      codeCheckRow(claim, hit ? "Supported" : "Contradicted", "Counted by code, not AI: " + lc.count + ' "' + lc.letter + '" in "' + lc.target + '"', "Second Source counter", "Letter count");
+      codeCheckRow(claim, hit ? "Supported" : "Contradicted", "Counted by code, not AI: " + lc.count + ' "' + lc.letter + '" in "' + lc.target + '"', "Letter counter", "Letter count");
     }
     function showNotCheckable(reason) {
       verified.textContent = "";
@@ -894,7 +894,7 @@
     function calcCite(verdict, line) {
       const wrap = el("div", "cite"); const row = el("div", "cite-row");
       const r = el("div", "rcol"); r.append(el("p", "quote", line));
-      const src = el("div", "src"); src.append(el("span", "", "Second Source calculator")); r.append(src);
+      const src = el("div", "src"); src.append(el("span", "", "Calculator")); r.append(src);
       row.append(citeHead(verdict, verdict === "Supported" ? "Calculator supports claim" : "Calculator contradicts claim"), r); wrap.append(row); return wrap;
     }
     function showVerifier(out) {

@@ -349,6 +349,7 @@ The first real runs of the contested, opinion and "no source" labels, on four qu
 - **Menu bug fixed.** The menu popped back open when an answer arrived, because the page put the cursor back in the question box. Now the cursor leaves the box on submit and stays out.
 - **The calculator reads one more pattern:** a total followed by the sum that makes it, in brackets, like "$60,000 ($500 × 120 months)." Tested on sample sentences only.
 - **Menu bug fixed: carets didn't work after an answer.** The question left in the box was being treated as a search, so the lists stayed narrowed. Now the lists narrow only after the visitor types, and the carets work either way.
+- **"Second Source" taken off the page for now.** The name was never shown prominently, yet a few messages used it. Those now say "the Verifier"; the code-check labels say "Calculator" and "Letter counter"; the browser tab says "Verifier."
 - **Browser autofill turned off on the question box.** The browser's own list of past entries was popping up over the new menu; Ben chose to hide it, since the Recent list does the same job.
 - Not yet run live with a real question.
 
