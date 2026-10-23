@@ -800,11 +800,11 @@
       // when no ability is shared, each claim's top ability is listed. Counts shown when only some claims share it.
       const N = base.length, what = con.length ? "contradicted" : "supported";
       const TIER_WORD = (nm) => { const t = ABILITY_TIER[nm] || ""; return /strongest/.test(t) ? "strongest" : /strong/.test(t) ? "strong" : /weakest/.test(t) ? "weakest" : /weak/.test(t) ? "weak" : /average/.test(t) ? "average" : "unrated"; };
-      const abq = (nm) => "\u201C" + lc(nm) + "\u201D = " + TIER_WORD(nm);
+      const abq = (nm) => "\u201C" + lc(nm) + "\u201D = " + TIER_WORD(nm) + " accuracy"; // "= average accuracy" (Ben, 10/23)
       const andList = (arr) => arr.length < 2 ? arr.join("") : arr.slice(0, -1).join(", ") + " and " + arr[arr.length - 1];
       const cnt = new Map(); base.forEach((r) => (r.ab?.names || []).forEach((nm) => cnt.set(nm, (cnt.get(nm) || 0) + 1)));
       if (!cnt.size) findingsEl.append(line("Abilities", ["not scored"]));
-      else if (N === 1) findingsEl.append(line("Abilities", [{ t: "The " + what + " claim", list: base }, " used " + abq(base[0].ab.names[0]) + " on the ability scale."]));
+      else if (N === 1) findingsEl.append(line("Abilities", [{ t: "The " + what + " claim", list: base }, " used " + abq(base[0].ab.names[0]) + "."]));
       else {
         const max = Math.max(...cnt.values());
         if (max === 1) {
@@ -816,7 +816,7 @@
           const who = max === N
             ? (N === 2 ? [{ t: "The 2 " + what + " claims", list: base }, " both used "] : [{ t: "All " + N + " " + what + " claims", list: base }, " used "])
             : [{ t: max + (con.length ? " of the " : " of ") + N + " " + what + " claims", list: users }, " used "];
-          findingsEl.append(line("Abilities", who.concat(andList(tied.map(abq)) + " on the ability scale.")));
+          findingsEl.append(line("Abilities", who.concat(andList(tied.map(abq)) + ".")));
         }
       }
       { const c = {}; base.forEach((r) => { if (r.ab) c[r.ab.fam] = (c[r.ab.fam] || 0) + 1; });
