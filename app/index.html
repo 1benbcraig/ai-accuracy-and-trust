@@ -800,7 +800,7 @@
       // when no ability is shared, each claim's top ability is listed. Counts shown when only some claims share it.
       const N = base.length, what = con.length ? "contradicted" : "supported";
       const TIER_WORD = (nm) => { const t = ABILITY_TIER[nm] || ""; return /strongest/.test(t) ? "strongest" : /strong/.test(t) ? "strong" : /weakest/.test(t) ? "weakest" : /weak/.test(t) ? "weak" : /average/.test(t) ? "average" : "unrated"; };
-      const abq = (nm) => "\u201C" + lc(nm) + "\u201D = " + TIER_WORD(nm) + " accuracy"; // "= average accuracy" (Ben, 10/23)
+      const abq = (nm) => "\u201C" + lc(nm) + "\u201D (" + TIER_WORD(nm) + " accuracy)"; // "(weakest accuracy)" (Ben, 10/26)
       const andList = (arr) => arr.length < 2 ? arr.join("") : arr.slice(0, -1).join(", ") + " and " + arr[arr.length - 1];
       const cnt = new Map(); base.forEach((r) => (r.ab?.names || []).forEach((nm) => cnt.set(nm, (cnt.get(nm) || 0) + 1)));
       if (!cnt.size) findingsEl.append(line("Abilities", ["not scored"]));
