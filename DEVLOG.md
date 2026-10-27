@@ -388,6 +388,10 @@ The first real runs of the contested, opinion and "no source" labels, on four qu
 
 - **Live test (Ben):** after restarting the app, the résumé question that failed on Oct 22 ("What percentage of job seekers lie on their résumés?") answered normally: 11 claims, 4 supported, 3 contradicted, 4 no source.
 
+- **Ben's decision:** prototype 1 is done. All five suggested questions ran cleanly after the restart (Claude checked the log: no failures).
+
+- The project guide and orientation doc were caught up with the session notes from Oct 14 to Oct 27 (they live in the project, not this repo).
+
 ---
 
 ## Open questions
