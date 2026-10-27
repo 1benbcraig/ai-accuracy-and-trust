@@ -400,6 +400,10 @@ The first real runs of the contested, opinion and "no source" labels, on four qu
 
 - **Ben's decisions:** prototype 2 will likely be a short video of the happy path for one made-up question, built as a Figma prototype and screen recorded. It won't be connected to a real extractive AI. The example moves from legal to medical, and Claude drafts the made-up content.
 
+- **Ben's decision:** the button that brings in the generative step reads "Have AI rewrite answer," so the user is the one choosing to bring AI in.
+
+- **Research (quick, page summaries only):** no study found asks lawyers or clinicians why they want a generated answer instead of extracted passages; surveys point to speed and efficiency. Studies of AI-written medical summaries find unsupported claims and wrong numbers, which is what the review step is meant to catch.
+
 ---
 
 ## Open questions
