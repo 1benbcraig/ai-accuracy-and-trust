@@ -378,6 +378,8 @@ The first real runs of the contested, opinion and "no source" labels, on four qu
 
 - **Ben's decision:** the Cowork merger question is removed from the suggested questions. A replacement is still to be chosen.
 
+- **Ben's decision:** Snow White is now the first suggested question and Napoleon the second. Ben calls this the last change before the MVP is done.
+
 ---
 
 ## Open questions
