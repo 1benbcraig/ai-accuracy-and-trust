@@ -372,6 +372,8 @@ The first real runs of the contested, opinion and "no source" labels, on four qu
 
 - **Ben's decision:** the closing questions lose their box, line up with the body text, and sit 60px below the Abilities box. The Citation box moves left so its pink line meets it the same distance in from the left edge as the other boxes. Checked in a test browser.
 
+- **Ben's decision:** the space above the closing questions is now 40px, the same as the space above "Anatomy of a checked claim" (was 60px). Checked in a test browser.
+
 ---
 
 ## Open questions
