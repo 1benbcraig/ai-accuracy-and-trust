@@ -392,6 +392,10 @@ The first real runs of the contested, opinion and "no source" labels, on four qu
 
 - The project guide and orientation doc were caught up with the session notes from Oct 14 to Oct 27 (they live in the project, not this repo).
 
+- **Correction (Ben's, from Oct 2):** Report 1 said teaching a model to say "I don't know" "is not the same as being accurate." Wrong: an honest "I don't know" is accurate. Fixed in `research/`.
+
+- **Ben:** the essay is under way (its outline exists), and prototype 2, a mock-up of an extractive AI core with a dial, is next.
+
 ---
 
 ## Open questions

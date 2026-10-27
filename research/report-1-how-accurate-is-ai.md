@@ -18,7 +18,7 @@ The clearest current explanation comes from a 2026 *Nature* paper by Kalai and c
 
 **The way AI is scored rewards guessing.** Most tests count right answers and nothing else. A wrong guess and "I don't know" both score zero, but a guess is sometimes right. So models learn to guess instead of admitting uncertainty. The paper notes that penalising wrong answers is an old, known fix. It proposes tests that state their penalty up front, and changing the major tests rather than adding new ones that few people look at.
 
-One limit on that fix: teaching a model to say "I don't know" does not give it the missing knowledge. It turns confident wrong answers into honest gaps. That is real progress, but it is not the same as being accurate.
+One limit on that fix: teaching a model to say "I don't know" does not give it the missing knowledge. It turns confident wrong answers into honest gaps. An honest "I don't know" is itself accurate, but the question still goes unanswered. *(Corrected 2026-10-27: the earlier wording said this "is not the same as being accurate," which was wrong.)*
 
 **Worth knowing:** most of the paper's authors work at OpenAI. It was peer-reviewed, but it comes from inside the industry.
 
