@@ -404,6 +404,10 @@ The first real runs of the contested, opinion and "no source" labels, on four qu
 
 - **Research (quick, page summaries only):** no study found asks lawyers or clinicians why they want a generated answer instead of extracted passages; surveys point to speed and efficiency. Studies of AI-written medical summaries find unsupported claims and wrong numbers, which is what the review step is meant to catch.
 
+- **XSearch (working title for prototype 2), Ben's decisions:** clarity over usability, since this is a demo nobody will really use. The flow: ask a question; see the extracted answer alone; click "Have AI rewrite answer"; the rewrite appears beside it, identical at first; moving the slider rewords it and brings up "Review for accuracy"; the review highlights sentences that drifted from the extraction, with a note on hover; the user then edits the sentence directly, moves the slider back, or asks for a fresh rewrite. Responses will carry citations, since doctors trust answers less without references. The real product wouldn't use a large general model to rewrite.
+
+- **Who checks the rewrite (an answer Ben agreed with, not built):** plain code first (numbers, doses, drug names and "not" must match the cited passage exactly); then a separate strong model compares each sentence with its cited passage, under a HIPAA agreement (Anthropic offers one for its API, per its support page); anything uncertain gets flagged for the person, because a false flag costs a second and a missed error could cost a patient.
+
 ---
 
 ## Open questions
