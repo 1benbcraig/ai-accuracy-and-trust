@@ -358,6 +358,10 @@ The first real runs of the contested, opinion and "no source" labels, on four qu
 - **Ben's decision:** the abilities line now reads like "The 2 contradicted claims both used 'quantitative reasoning' (weak accuracy)." The level words (strongest, strong, average, weak, weakest) are unchanged.
 - **Ben's decision:** the ability rating needs explaining on the page. Claude's draft wording is waiting on Ben's placement call.
 
+## October 27 — Help link waits for results
+
+- **Ben's decision:** "What am I looking at?" stays hidden until the Verifier shows something (results or a message), not while it's still working. Tested in a test browser.
+
 ---
 
 ## Open questions

@@ -168,6 +168,7 @@
     .gauge .base { position: absolute; left: 1px; top: 46px; width: 86px; height: 0; border-top: 1px solid var(--border-tertiary); }
     /* Verifier heading: title + (?) icon, no line under it (Figma 10/21) */
     .head.vhead { display: flex; align-items: center; justify-content: flex-start; gap: 8px; border-bottom: 0; margin-bottom: 4px; }
+    #explain-btn[hidden] { display: none; }
     #explain-btn { border: 0; background: none; padding: 0; cursor: pointer; font-family: var(--sans); font-weight: 400; font-size: 14px; line-height: 1.6; letter-spacing: -0.14px; color: #3266ad; text-decoration: underline; text-decoration-color: #3266ad; text-decoration-thickness: 10%; } /* text link, not an icon (Ben, 10/22; Figma 2099:7072) */
     /* Summary box (Figma 10/21): count line, then the confidence/source mismatches as bullets */
     #v-box[hidden] { display: none; }
@@ -308,7 +309,7 @@
     </section>
 
     <section id="verify-col" class="content">
-      <div class="head vhead"><h2 id="verify-head">Verifier</h2><button type="button" id="explain-btn">What am I looking at?</button></div>
+      <div class="head vhead"><h2 id="verify-head">Verifier</h2><button type="button" id="explain-btn" hidden>What am I looking at?</button></div>
       <div id="explain" hidden></div>
       <div id="v-box" hidden><div id="v-summary"></div><div id="v-findings"></div></div>
       <div id="verified"></div>
@@ -324,6 +325,10 @@
     const status = document.getElementById("status");
     const answer = document.getElementById("answer");
     const verified = document.getElementById("verified");
+    // "What am I looking at?" stays hidden until the Verifier shows something other than its spinner (Ben, 10/27)
+    { const btn = document.getElementById("explain-btn"), box = document.getElementById("v-box");
+      const sync = () => { btn.hidden = !(!box.hidden || [...verified.children].some((c) => !c.classList.contains("v-working"))); };
+      new MutationObserver(sync).observe(verified, { childList: true }); new MutationObserver(sync).observe(box, { attributes: true, attributeFilter: ["hidden"] }); sync(); }
     const verifyCol = document.getElementById("verify-col");
     const searched = document.getElementById("searched");
     const searchOverlay = document.getElementById("search-overlay");
