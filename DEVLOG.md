@@ -382,6 +382,12 @@ The first real runs of the contested, opinion and "no source" labels, on four qu
 
 - **Ben's decision:** the "What am I looking at?" link is now 15px and semibold (was 14px regular).
 
+- **Ben's decision:** the example citations on the "What am I looking at?" page no longer open a full-quote card on hover. Checked in a test browser.
+
+- **Ben's decision:** the separate claim-splitter module is dropped; Ben doesn't plan to build it. The gap stays known: the Replier sometimes leaves checkable statements unscored, so the Verifier never checks them.
+
+- **Live test (Ben):** after restarting the app, the résumé question that failed on Oct 22 ("What percentage of job seekers lie on their résumés?") answered normally: 11 claims, 4 supported, 3 contradicted, 4 no source.
+
 ---
 
 ## Open questions

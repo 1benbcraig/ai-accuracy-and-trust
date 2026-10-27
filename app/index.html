@@ -259,6 +259,7 @@
     .cite-full .quote { display: -webkit-box; -webkit-line-clamp: 8; overflow: hidden; } /* hover card: at most 8 lines, then "…" (Ben, 10/22: very long quotes broke the page) */
     .cite-full .src .lead { font-size: 15px; font-weight: 500; color: var(--text-primary); }
     .cite:hover .cite-full { display: flex; }
+    .ex-row .cite:hover .cite-full { display: none; } /* no hover card on the example citations in "What am I looking at?" (Ben, 10/27) */
     .cite:hover { z-index: 11; }
     /* Sidebar tooltip bubble */
     .bubble { background: #fff; border: 1px solid rgba(31,30,29,0.4); border-radius: 16px; padding: 8px 16px; font-size: 14px; color: #000;
