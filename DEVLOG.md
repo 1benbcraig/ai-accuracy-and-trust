@@ -362,6 +362,8 @@ The first real runs of the contested, opinion and "no source" labels, on four qu
 
 - **Ben's decision:** "What am I looking at?" stays hidden until the Verifier shows something (results or a message), not while it's still working. Tested in a test browser.
 
+- **Ben's decision:** math questions still skip the Verifier, but the page now runs its plain-code math check on each line of Claude's answer. For the savings question it confirms "Total contributions: $60,000 ($500 × 120 months)." It can't check totals that need a formula (the $77,641). Tested with sample text only.
+
 ---
 
 ## Open questions

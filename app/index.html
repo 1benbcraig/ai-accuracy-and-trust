@@ -507,7 +507,7 @@
       const sents = answerText.match(/[^.!?\n]+[.!?]*/g) || [answerText];
       return (sents.find(test) || sents[sents.length - 1] || "").trim();
     }
-    function codeCheckRow(claimText, verdict, line, label, kind) {
+    function codeCheckRow(claimText, verdict, line, label, kind, keep) {
       const rowEl = el("div", "vclaim");
       const left = el("div", "vleft");
       left.append(el("div", "claim-box", "“" + stripBold(claimText).trim() + "”"));
@@ -522,8 +522,20 @@
         row.append(citeHead(verdict, (kind || "Calculator") + (verdict === "Supported" ? " supports claim" : " contradicts claim")), r); wrap.append(row); right.append(wrap);
       } else right.append(el("div", "no-source", line));
       rowEl.append(left, right);
+      if (keep) { verified.append(rowEl); return; } // several rows in a row (math answers, Ben 10/27)
       verified.textContent = ""; verified.append(rowEl);
       showSummary(verdict ? [verdict] : []);
+    }
+    // Math questions (Ben, 10/27): the Verifier still skips them, but the free code math check runs on each line of
+    // Claude's answer, e.g. "$60,000 ($500 × 120 months)". If nothing matches, only the usual message shows.
+    function showMathInAnswer(answerText, reason) {
+      const lines = String(answerText).split(/\n+/).flatMap((l) => l.split(/(?<=[.!?])\s+(?=[A-Z$])/)).map((t) => stripBold(t).replace(/^\s*[-•*]\s*/, "").trim()).filter(Boolean);
+      const hits = []; for (const t of lines) { const c = mathCheck(t); if (c) hits.push([t, c]); }
+      if (!hits.length) return showNotCheckable(reason);
+      verified.textContent = "";
+      for (const [t, c] of hits) codeCheckRow(t, c.ok ? "Supported" : "Contradicted", c.line, "Calculator", "Calculator", true);
+      verified.append(el("p", "bucket-note", ZERO_REASONS[reason] || ZERO_REASONS.other));
+      showSummary(hits.map(([, c]) => c.ok ? "Supported" : "Contradicted"));
     }
     function showArithmetic(calc, answerText) {
       const fmt = (v) => typeof v === "bigint" ? v.toLocaleString("en-US") : Number(v.toPrecision(12)).toLocaleString("en-US", { maximumFractionDigits: 10 });
@@ -1060,7 +1072,7 @@
         const lc = calc ? null : letterCount(q.value);
         if (verifyOn.checked && calc) showArithmetic(calc, answer.textContent);
         else if (verifyOn.checked && lc) showLetterCount(lc, answer.textContent);
-        else if (verifyOn.checked && data.gate === "none") showNotCheckable(data.gateReason);
+        else if (verifyOn.checked && data.gate === "none") { if (data.gateReason === "reasoning") showMathInAnswer(answer.innerText || answer.textContent, data.gateReason); else showNotCheckable(data.gateReason); }
         // Never go blank (Ben, 10/13): if Claude marked no claims to check, say so.
         else if (verifyOn.checked && !claims.length) { verified.textContent = ""; verified.append(el("p", "bucket-note", "Claude didn't mark its answer as checkable fact, so nothing was verified.")); }
         else if (verifyOn.checked && claims.length) {
