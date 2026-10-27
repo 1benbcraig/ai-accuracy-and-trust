@@ -370,6 +370,8 @@ The first real runs of the contested, opinion and "no source" labels, on four qu
 
 - **Ben's decision (his Figma redesign of that page):** the research notes moved out of the separate box and into the three bottom boxes as bullets, with the same links; Likely Familiarity now sits between Abilities and Confidence; box text is 15px with more padding; pink lines are 1.5px and bend around to their boxes; the Familiarity dot sits to the right of its label. The closing questions sit in their own light box. Checked in a test browser; not yet checked on Ben's Mac.
 
+- **Ben's decision:** the closing questions lose their box, line up with the body text, and sit 60px below the Abilities box. The Citation box moves left so its pink line meets it the same distance in from the left edge as the other boxes. Checked in a test browser.
+
 ---
 
 ## Open questions

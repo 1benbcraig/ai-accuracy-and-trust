@@ -214,7 +214,7 @@
     .callout p + ul, .callout ul + ul { margin-top: 18px; }
     .callout a { color: #3266ad; text-decoration: underline; text-decoration-thickness: from-font; } /* same as the source-list links above */
     .ex-row { position: absolute; left: 39px; top: 16px; width: 1058px; border-bottom: 0; padding-bottom: 0; } /* where the row sat in Ben's image */
-    .ex-qs { margin: 43px 0 0 140px; width: 1140px; box-sizing: border-box; background: #f9f9f7; padding: 16px; font-size: 15px; line-height: 30px; letter-spacing: normal; } /* Figma 10/27: its own light box, 43px below the diagram */
+    .ex-qs { margin: 60px 0 0 150px; font-size: 15px; line-height: 30px; letter-spacing: normal; } /* no box, lined up with the body text, 60px below the Abilities box (Ben, 10/27) */
     .ex-qs p { margin: 0; }
     .ex-qs p:first-child { font-weight: 600; } /* "When Claude gets it wrong, why?" semibold (Ben, 10/22) */
     .ex-box { margin: 28px 0 0 150px; width: 1141px; box-sizing: border-box; border: 1px solid rgba(31,30,29,0.4); background: #f9f9f7; padding: 16px; font-size: 15px; line-height: 30px; letter-spacing: normal; color: #141413; }
@@ -669,8 +669,8 @@
         <div class="ex-claimimg" id="ex-example"></div>
         <svg class="ex-lines" id="ex-lines" width="1140" height="697" aria-hidden="true"></svg>
         <div class="callout" style="left:0; top:0"><b>Claim</b><p>Claude splits its responses into checkable claims.</p></div>
-        <div class="callout" style="left:570px; top:0"><b>Citation</b><p>The Verifier quotes relevant sources &amp; marks whether or not they support the claim.</p></div>
-        <div class="callout" style="left:0; top:429px"><b>Abilities</b><div><p>Types of thinking and knowledge presumably used by Claude when making this claim.</p>
+        <div class="callout" style="left:560px; top:0"><b>Citation</b><p>The Verifier quotes relevant sources &amp; marks whether or not they support the claim.</p></div>
+        <div class="callout" id="ex-ab-box" style="left:0; top:429px"><b>Abilities</b><div><p>Types of thinking and knowledge presumably used by Claude when making this claim.</p>
           <ul><li>AI accuracy varies by ability (<a href="https://doi.org/10.1038/s41586-026-10303-2" target="_blank" rel="noopener">ADeLe, 2026</a>; ratings data: <a href="https://github.com/General-Purpose-AI-Policy-Lab/adele-extension" target="_blank" rel="noopener">GPAI Policy Lab</a>).</li></ul>
           <ul><li>Ability ratings measure how hard a question can get before AI gets about half wrong.</li></ul>
           <ul><li>Averaged over 7 recent AI models tested with ADeLe (Claude was not one of them).</li></ul></div></div>
@@ -720,6 +720,8 @@
       const yClaim = mid(ex.claim, true), yCite = mid(ex.cite), yAb = mid(ex.ab), yFam = mid(ex.fam), yConf = mid(ex.conf);
       const xL = 27.5, xCite = 587.5;
       const xFam = Math.round(textRight(ex.fam) + 9) + 5.5, xConf = Math.round(textRight(ex.conf) + 9) + 5.5; // dots 9px right of their labels (Figma; Familiarity moved to the right, Ben 10/27)
+      // Diagram ends at the bottom of the Abilities box, so the questions below sit exactly 60px under it
+      const abBox = document.getElementById("ex-ab-box"); document.querySelector(".ex-diagram").style.height = (abBox.offsetTop + abBox.offsetHeight) + "px";
       document.getElementById("ex-lines").innerHTML =
         path([[xL, 80], [xL, yClaim]]) + dot(xL, yClaim) +
         path([[xCite, 80], [xCite, yCite]]) + dot(xCite, yCite) +
