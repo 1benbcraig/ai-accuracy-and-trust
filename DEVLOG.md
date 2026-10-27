@@ -396,6 +396,8 @@ The first real runs of the contested, opinion and "no source" labels, on four qu
 
 - **Ben:** the essay is under way (its outline exists), and prototype 2, a mock-up of an extractive AI core with a dial, is next.
 
+- **Prototype 2 walkthrough (Ben's decisions):** the user picks an industry database, asks, and first gets a plain extractive answer. Only then do the dial (Accuracy to Eloquence), a prose version of the same answer and a "Review for accuracy" button appear. The review flags anything in the prose that the extraction doesn't back up. Ben is leaning toward showing the extraction and the prose side by side (not final). Untested; design in progress.
+
 ---
 
 ## Open questions
