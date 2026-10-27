@@ -398,6 +398,8 @@ The first real runs of the contested, opinion and "no source" labels, on four qu
 
 - **Prototype 2 walkthrough (Ben's decisions):** the user picks an industry database, asks, and first gets a plain extractive answer. Only then do the dial (Accuracy to Eloquence), a prose version of the same answer and a "Review for accuracy" button appear. The review flags anything in the prose that the extraction doesn't back up. Ben is leaning toward showing the extraction and the prose side by side (not final). Untested; design in progress.
 
+- **Ben's decisions:** prototype 2 will likely be a short video of the happy path for one made-up question, built as a Figma prototype and screen recorded. It won't be connected to a real extractive AI. The example moves from legal to medical, and Claude drafts the made-up content.
+
 ---
 
 ## Open questions
