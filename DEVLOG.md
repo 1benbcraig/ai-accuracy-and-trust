@@ -364,6 +364,8 @@ The first real runs of the contested, opinion and "no source" labels, on four qu
 
 - **Ben's decision:** math questions still skip the Verifier, but the page now runs its plain-code math check on each line of Claude's answer. For the savings question it confirms "Total contributions: $60,000 ($500 × 120 months)." It can't check totals that need a formula (the $77,641). Tested with sample text only.
 
+- **Ben's decision:** the math message now puts the limit on the tool, not the question: "The Verifier checks claims against reliable sources. It doesn't check reasoning, math or puzzles." When the calculator found sums, it adds: "Simple sums above were checked by calculator."
+
 ---
 
 ## Open questions

@@ -481,7 +481,7 @@
       draft: "This looks like a request to write or edit something. The Verifier checks answers to questions of fact, not writing tasks.", // Ben, 10/19
       chat: "This looks like small talk, so there is nothing here to check.",
       code: "The Verifier is currently unable to verify claims about code.",
-      reasoning: "The Verifier checks claims by finding reliable sources that support or contradict them. Reasoning, math and puzzle questions are generally unsourced, so they can't be verified here.", // Ben's wording, 10/19; "or contradict" added 10/20
+      reasoning: "The Verifier checks claims against reliable sources. It doesn't check reasoning, math or puzzles.", // Ben, 10/27 // Ben's wording, 10/19; "or contradict" added 10/20
       other: "This doesn't look like a question of fact, so nothing here was checked.",
     };
     // Plain arithmetic (Ben, 10/19): when the question is only numbers and operators, 2S does the sum in code
@@ -534,7 +534,7 @@
       if (!hits.length) return showNotCheckable(reason);
       verified.textContent = "";
       for (const [t, c] of hits) codeCheckRow(t, c.ok ? "Supported" : "Contradicted", c.line, "Calculator", "Calculator", true);
-      verified.append(el("p", "bucket-note", ZERO_REASONS[reason] || ZERO_REASONS.other));
+      verified.append(el("p", "bucket-note", (ZERO_REASONS[reason] || ZERO_REASONS.other) + " Simple sums above were checked by calculator.")); // Ben, 10/27
       showSummary(hits.map(([, c]) => c.ok ? "Supported" : "Contradicted"));
     }
     function showArithmetic(calc, answerText) {
