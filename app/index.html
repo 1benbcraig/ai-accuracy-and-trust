@@ -186,7 +186,7 @@
     #explain[hidden] { display: none; }
     #explain { position: fixed; inset: 0; z-index: 60; background: #eee; overflow: auto; opacity: 0; transition: opacity 0.25s ease; } /* page color #eee (Ben, 10/22) */
     #explain.show { opacity: 1; } /* dissolve in and out, a quarter second (Ben, 10/22) */
-    .ex-page { position: relative; width: 1440px; margin: 0 auto; padding: 30px 0 219px; box-sizing: border-box; color: #000; }
+    .ex-page { position: relative; width: 1440px; margin: 0 auto; padding: 30px 0 184px; box-sizing: border-box; color: #000; }
     .ex-back { position: absolute; left: 46px; top: 29px; height: 32px; padding: 0 12px; display: flex; align-items: center; gap: 4px; border: 0; border-radius: 6px; background: none; cursor: pointer;
       font-family: var(--sans); font-weight: 600; font-size: 12px; line-height: 1.4; color: #3d3d3a; font-feature-settings: "salt" 1; }
     .ex-back svg { display: block; flex: none; }
@@ -201,19 +201,20 @@
     .ex-cols a { color: #3266ad; text-decoration: underline; text-decoration-thickness: from-font; }
     /* Anatomy title at 459 (left column ends at 419 -> 40px), diagram from 520 (31px below the title) to 1201 (681px tall) */
     .ex-anat { margin-top: 40px; }
-    .ex-diagram { position: relative; margin: 31px 0 0 150px; width: 1140px; height: 681px; }
-    .ex-diagram .ex-claimimg { position: absolute; left: 0; top: 112px; width: 1140px; height: 280px; box-sizing: border-box; border: 1px solid rgba(31,30,29,0.4); background: var(--bg); } /* live example, page parts placed to match Ben's image (10/22) */
-    /* Pink connector lines (Figma "lines" group): a 1px line with an 11px dot at the item end */
-    .ex-line { position: absolute; width: 11px; }
-    .ex-line::before { content: ""; position: absolute; left: 5px; top: 0; bottom: 0; border-left: 1px solid #EF5DA8; }
-    .ex-line::after { content: ""; position: absolute; left: 0; width: 11px; height: 11px; border-radius: 50%; background: #EF5DA8; }
-    .ex-line.dot-bottom::after { bottom: 0; } .ex-line.dot-top::after { top: 0; }
-    /* Callouts (Figma "Claim" frames): 370px, white, 1px border, 8px / 12px padding, bold title, 5px gap, 16px text */
-    .callout { position: absolute; width: 370px; box-sizing: border-box; background: #fff; border: 1px solid rgba(31,30,29,0.4); padding: 8px 12px; display: flex; flex-direction: column; gap: 5px;
-      font-family: var(--sans); font-size: 16px; line-height: normal; letter-spacing: normal; color: #141413; z-index: 1; }
+    /* Figma "More info overlay_2" (node 2164:2832, Ben 10/27): diagram 24px below the title, 697px tall (callouts top to Abilities bottom) */
+    .ex-diagram { position: relative; margin: 24px 0 0 150px; width: 1140px; height: 697px; }
+    .ex-diagram .ex-claimimg { position: absolute; left: 0; top: 119px; width: 1140px; height: 280px; box-sizing: border-box; border: 1px solid rgba(31,30,29,0.4); background: var(--bg); } /* live example, page parts placed to match Ben's image (10/22) */
+    /* Pink connector lines, drawn in one SVG: 1.5px lines (Ben, 10/27; was 1px), 11px dots. Callouts sit on top, so lines tuck under their edges. */
+    .ex-lines { position: absolute; left: 0; top: 0; overflow: visible; pointer-events: none; }
+    /* Callouts (Figma "Claim" frames, 10/27): 360px, white, 1px border, 12px top/bottom and 16px left/right padding, 8px gap, 15px text (Ben, 10/27) */
+    .callout { position: absolute; width: 360px; box-sizing: border-box; background: #fff; border: 1px solid rgba(31,30,29,0.4); padding: 12px 16px; display: flex; flex-direction: column; gap: 8px;
+      font-family: var(--sans); font-size: 15px; line-height: normal; letter-spacing: normal; color: #141413; z-index: 1; }
     .callout b { font-weight: 700; } .callout p { margin: 0; }
+    .callout ul { margin: 0; padding-left: 22.5px; } /* bullets (Ben, 10/27), a blank line between items as in Figma */
+    .callout p + ul, .callout ul + ul { margin-top: 18px; }
+    .callout a { color: #3266ad; text-decoration: underline; text-decoration-thickness: from-font; } /* same as the source-list links above */
     .ex-row { position: absolute; left: 39px; top: 16px; width: 1058px; border-bottom: 0; padding-bottom: 0; } /* where the row sat in Ben's image */
-    .ex-qs { margin: 0 0 0 150px; font-size: 15px; line-height: 30px; letter-spacing: normal; }
+    .ex-qs { margin: 43px 0 0 140px; width: 1140px; box-sizing: border-box; background: #f9f9f7; padding: 16px; font-size: 15px; line-height: 30px; letter-spacing: normal; } /* Figma 10/27: its own light box, 43px below the diagram */
     .ex-qs p { margin: 0; }
     .ex-qs p:first-child { font-weight: 600; } /* "When Claude gets it wrong, why?" semibold (Ben, 10/22) */
     .ex-box { margin: 28px 0 0 150px; width: 1141px; box-sizing: border-box; border: 1px solid rgba(31,30,29,0.4); background: #f9f9f7; padding: 16px; font-size: 15px; line-height: 30px; letter-spacing: normal; color: #141413; }
@@ -666,23 +667,19 @@
       <h2 class="ex-h ex-anat">Anatomy of a checked claim</h2>
       <div class="ex-diagram">
         <div class="ex-claimimg" id="ex-example"></div>
-        <div class="ex-line dot-bottom" id="exl-claim" style="left:22px; top:80px; height:75px"></div>
-        <div class="ex-line dot-top" id="exl-ab" style="left:22px; top:211px; height:240px"></div>
-        <div class="ex-line dot-top" id="exl-fam" style="left:22px; top:303px; height:272px"></div>
-        <div class="ex-line dot-top" id="exl-conf" style="left:516px; top:211px; height:240px"></div>
-        <div class="ex-line dot-bottom" id="exl-cite" style="left:580px; top:78px; height:75px"></div>
-        <div class="callout" style="left:0; top:2px"><b>Claim</b><p>Claude splits its responses into checkable claims.</p></div>
+        <svg class="ex-lines" id="ex-lines" width="1140" height="697" aria-hidden="true"></svg>
+        <div class="callout" style="left:0; top:0"><b>Claim</b><p>Claude splits its responses into checkable claims.</p></div>
         <div class="callout" style="left:570px; top:0"><b>Citation</b><p>The Verifier quotes relevant sources &amp; marks whether or not they support the claim.</p></div>
-        <div class="callout" style="left:0; top:422px"><b>Abilities</b><p>Types of thinking and knowledge presumably used by Claude when making this claim.</p></div>
-        <div class="callout" style="left:430px; top:422px"><b>Claude’s Confidence</b><p>Claude’s self-reported confidence score in the accuracy of this claim.</p></div>
-        <div class="callout" style="left:0; top:531px"><b>Likely Familiarity</b><p>Estimated amount written on this topic. Our proxy for how often it appeared in Claude’s training.</p></div>
+        <div class="callout" style="left:0; top:429px"><b>Abilities</b><div><p>Types of thinking and knowledge presumably used by Claude when making this claim.</p>
+          <ul><li>AI accuracy varies by ability (<a href="https://doi.org/10.1038/s41586-026-10303-2" target="_blank" rel="noopener">ADeLe, 2026</a>; ratings data: <a href="https://github.com/General-Purpose-AI-Policy-Lab/adele-extension" target="_blank" rel="noopener">GPAI Policy Lab</a>).</li></ul>
+          <ul><li>Ability ratings measure how hard a question can get before AI gets about half wrong.</li></ul>
+          <ul><li>Averaged over 7 recent AI models tested with ADeLe (Claude was not one of them).</li></ul></div></div>
+        <div class="callout" style="left:385px; top:429px"><b>Likely Familiarity</b><div><p>Estimated amount written on this topic. Our proxy for how often it appeared in Claude’s training.</p>
+          <ul><li>Familiarity of a topic SHOULD increase accuracy (<a href="https://arxiv.org/abs/2211.08411#:~:text=strong%20correlational%20and%20causal%20relationships%20between%20accuracy%20and%20relevant%20document%20count" target="_blank" rel="noopener">Kandpal et al., 2023</a>).</li></ul></div></div>
+        <div class="callout" style="left:770px; top:429px"><b>Claude’s Confidence</b><div><p>Claude’s self-reported confidence score in the accuracy of this claim.</p>
+          <ul><li>Do higher confidence scores correlate with more accurate claims (and vice-versa)?</li></ul></div></div>
       </div>
       <div class="ex-qs"><p>When Claude gets it wrong, why?</p><p>How does Claude’s accuracy, judged by the Verifier, correlate to: Abilities used, Likely Familiarity, and Claude’s Confidence in its own claims?</p></div>
-      <div class="ex-box"><ul>
-        <li>AI accuracy varies by ability (<a href="https://doi.org/10.1038/s41586-026-10303-2" target="_blank" rel="noopener">ADeLe, 2026</a>; ratings data: <a href="https://github.com/General-Purpose-AI-Policy-Lab/adele-extension" target="_blank" rel="noopener">GPAI Policy Lab</a>).</li>
-        <li>Familiarity of a topic SHOULD increase accuracy (<a href="https://arxiv.org/abs/2211.08411#:~:text=strong%20correlational%20and%20causal%20relationships%20between%20accuracy%20and%20relevant%20document%20count" target="_blank" rel="noopener">Kandpal et al., 2023</a>).</li>
-        <li>Do higher confidence scores correlate with more accurate claims (and vice-versa)?</li>
-      </ul></div>
     </div>`;
     const explain = document.getElementById("explain"), explainBtn = document.getElementById("explain-btn");
     explain.innerHTML = EXPLAIN_HTML;
@@ -715,12 +712,20 @@
       if (!ex || explain.hidden) return;
       const d = document.querySelector(".ex-diagram").getBoundingClientRect();
       const mid = (node, firstLine) => { const b = node.getBoundingClientRect(); return (firstLine ? b.top + 8 + 12 : b.top + b.height / 2) - d.top; };
-      const toDot = (id, y) => { const ln = document.getElementById(id); ln.style.height = Math.round(y + 5.5 - parseFloat(ln.style.top)) + "px"; };   // line from the callout down to the dot
-      const fromDot = (id, y, end) => { const ln = document.getElementById(id); const top = Math.round(y - 5.5); ln.style.top = top + "px"; ln.style.height = (end - top) + "px"; }; // dot down to the callout
-      toDot("exl-claim", mid(ex.claim, true)); toDot("exl-cite", mid(ex.cite));
-      fromDot("exl-ab", mid(ex.ab), 451); fromDot("exl-conf", mid(ex.conf), 451); fromDot("exl-fam", mid(ex.fam), 575);
-      // Confidence dot sits 9px right of its label, as in Ben's Figma (the label's width varies with the layout)
-      const lb = ex.conf.getBoundingClientRect(); document.getElementById("exl-conf").style.left = Math.round(lb.right + 9 - d.left) + "px";
+      // Right end of a label's text (the label box itself is full width)
+      const textRight = (node) => { const r = document.createRange(); r.selectNodeContents(node); return r.getBoundingClientRect().right - d.left; };
+      const P = "#EF5DA8", BEND = 414, UNDER = 440; // horizontal runs 15px above the bottom callouts (Figma); lines end under the callouts' top edge
+      const path = (pts) => `<polyline points="${pts.map((q) => q.join(",")).join(" ")}" fill="none" stroke="${P}" stroke-width="1.5"/>`;
+      const dot = (x, y) => `<circle cx="${x}" cy="${y}" r="5.5" fill="${P}"/>`;
+      const yClaim = mid(ex.claim, true), yCite = mid(ex.cite), yAb = mid(ex.ab), yFam = mid(ex.fam), yConf = mid(ex.conf);
+      const xL = 27.5, xCite = 587.5;
+      const xFam = Math.round(textRight(ex.fam) + 9) + 5.5, xConf = Math.round(textRight(ex.conf) + 9) + 5.5; // dots 9px right of their labels (Figma; Familiarity moved to the right, Ben 10/27)
+      document.getElementById("ex-lines").innerHTML =
+        path([[xL, 80], [xL, yClaim]]) + dot(xL, yClaim) +
+        path([[xCite, 80], [xCite, yCite]]) + dot(xCite, yCite) +
+        path([[xL, yAb], [xL, UNDER]]) + dot(xL, yAb) +
+        path([[xFam, yFam], [xFam, BEND], [413, BEND], [413, UNDER]]) + dot(xFam, yFam) +
+        path([[xConf, yConf], [xConf, BEND], [796, BEND], [796, UNDER]]) + dot(xConf, yConf);
     }
     let exTimer = null;
     function openExplain() { clearTimeout(exTimer); buildExample(); explain.hidden = false; explain.scrollTop = 0; document.body.style.overflow = "hidden"; alignDots(); document.fonts.ready.then(alignDots);

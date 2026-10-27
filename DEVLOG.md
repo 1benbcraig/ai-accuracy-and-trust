@@ -366,6 +366,10 @@ The first real runs of the contested, opinion and "no source" labels, on four qu
 
 - **Ben's decision:** the math message now puts the limit on the tool, not the question: "The Verifier checks claims against reliable sources. It doesn't check reasoning, math or puzzles." When the calculator found sums, it adds: "Simple sums above were checked by calculator."
 
+- **Ben's decision:** the ability rating is explained on the "What am I looking at?" page, in the Abilities box: "Ability ratings measure how hard a question can get before AI gets about half wrong." and "Averaged over 7 recent AI models tested with ADeLe (Claude was not one of them)." Wording worked out together; Ben chose it.
+
+- **Ben's decision (his Figma redesign of that page):** the research notes moved out of the separate box and into the three bottom boxes as bullets, with the same links; Likely Familiarity now sits between Abilities and Confidence; box text is 15px with more padding; pink lines are 1.5px and bend around to their boxes; the Familiarity dot sits to the right of its label. The closing questions sit in their own light box. Checked in a test browser; not yet checked on Ben's Mac.
+
 ---
 
 ## Open questions
