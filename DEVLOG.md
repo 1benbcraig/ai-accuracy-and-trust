@@ -374,6 +374,10 @@ The first real runs of the contested, opinion and "no source" labels, on four qu
 
 - **Ben's decision:** the space above the closing questions is now 40px, the same as the space above "Anatomy of a checked claim" (was 60px). Checked in a test browser.
 
+- **Ben's decision:** the three bottom boxes keep their size; only the spacing changes. Claude's Confidence now ends at the right edge of the example above, and Likely Familiarity sits centered between the other two. Checked in a test browser.
+
+- **Ben's decision:** the Cowork merger question is removed from the suggested questions. A replacement is still to be chosen.
+
 ---
 
 ## Open questions

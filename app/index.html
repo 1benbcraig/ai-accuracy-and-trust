@@ -674,9 +674,9 @@
           <ul><li>AI accuracy varies by ability (<a href="https://doi.org/10.1038/s41586-026-10303-2" target="_blank" rel="noopener">ADeLe, 2026</a>; ratings data: <a href="https://github.com/General-Purpose-AI-Policy-Lab/adele-extension" target="_blank" rel="noopener">GPAI Policy Lab</a>).</li></ul>
           <ul><li>Ability ratings measure how hard a question can get before AI gets about half wrong.</li></ul>
           <ul><li>Averaged over 7 recent AI models tested with ADeLe (Claude was not one of them).</li></ul></div></div>
-        <div class="callout" style="left:385px; top:429px"><b>Likely Familiarity</b><div><p>Estimated amount written on this topic. Our proxy for how often it appeared in Claude’s training.</p>
+        <div class="callout" style="left:390px; top:429px"><b>Likely Familiarity</b><div><p>Estimated amount written on this topic. Our proxy for how often it appeared in Claude’s training.</p>
           <ul><li>Familiarity of a topic SHOULD increase accuracy (<a href="https://arxiv.org/abs/2211.08411#:~:text=strong%20correlational%20and%20causal%20relationships%20between%20accuracy%20and%20relevant%20document%20count" target="_blank" rel="noopener">Kandpal et al., 2023</a>).</li></ul></div></div>
-        <div class="callout" style="left:770px; top:429px"><b>Claude’s Confidence</b><div><p>Claude’s self-reported confidence score in the accuracy of this claim.</p>
+        <div class="callout" style="left:780px; top:429px"><b>Claude’s Confidence</b><div><p>Claude’s self-reported confidence score in the accuracy of this claim.</p>
           <ul><li>Do higher confidence scores correlate with more accurate claims (and vice-versa)?</li></ul></div></div>
       </div>
       <div class="ex-qs"><p>When Claude gets it wrong, why?</p><p>How does Claude’s accuracy, judged by the Verifier, correlate to: Abilities used, Likely Familiarity, and Claude’s Confidence in its own claims?</p></div>
@@ -717,6 +717,7 @@
       const P = "#EF5DA8", BEND = 414, UNDER = 440; // horizontal runs 15px above the bottom callouts (Figma); lines end under the callouts' top edge
       const path = (pts) => `<polyline points="${pts.map((q) => q.join(",")).join(" ")}" fill="none" stroke="${P}" stroke-width="1.5"/>`;
       const dot = (x, y) => `<circle cx="${x}" cy="${y}" r="5.5" fill="${P}"/>`;
+      // Bottom boxes: same size; Confidence ends at the right content edge, Familiarity centered between (Ben, 10/27). Lines meet each box 27.5px in from its left edge.
       const yClaim = mid(ex.claim, true), yCite = mid(ex.cite), yAb = mid(ex.ab), yFam = mid(ex.fam), yConf = mid(ex.conf);
       const xL = 27.5, xCite = 587.5;
       const xFam = Math.round(textRight(ex.fam) + 9) + 5.5, xConf = Math.round(textRight(ex.conf) + 9) + 5.5; // dots 9px right of their labels (Figma; Familiarity moved to the right, Ben 10/27)
@@ -726,8 +727,8 @@
         path([[xL, 80], [xL, yClaim]]) + dot(xL, yClaim) +
         path([[xCite, 80], [xCite, yCite]]) + dot(xCite, yCite) +
         path([[xL, yAb], [xL, UNDER]]) + dot(xL, yAb) +
-        path([[xFam, yFam], [xFam, BEND], [413, BEND], [413, UNDER]]) + dot(xFam, yFam) +
-        path([[xConf, yConf], [xConf, BEND], [796, BEND], [796, UNDER]]) + dot(xConf, yConf);
+        path([[xFam, yFam], [xFam, BEND], [417.5, BEND], [417.5, UNDER]]) + dot(xFam, yFam) +
+        path([[xConf, yConf], [xConf, BEND], [807.5, BEND], [807.5, UNDER]]) + dot(xConf, yConf);
     }
     let exTimer = null;
     function openExplain() { clearTimeout(exTimer); buildExample(); explain.hidden = false; explain.scrollTop = 0; document.body.style.overflow = "hidden"; alignDots(); document.fonts.ready.then(alignDots);
@@ -984,7 +985,6 @@
     // Recent questions: the last 6 this visitor asked, kept in this browser only; asking again moves it to the top.
     // Suggested list chosen by Ben 10/23. Empty recent list says "none" (Ben, 10/23); filter details are Claude's.
     const SUGGESTED = [ // Ben, 10/23: the two questions about LLMs are kept apart, two questions between them
-      "I thought Claude AI and Claude Cowork had merged, but they still have very different functionality. What's going on?",
       "Was Napoleon unusually short?",
       "Was Walt Disney Studios' Snow White and the Seven Dwarfs the first animated film to be feature-length?",
       "Which modern LLM is the most powerful? Which is best to act as a coworker to a UX designer?",
