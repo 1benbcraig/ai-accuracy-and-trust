@@ -414,6 +414,7 @@ The first real runs of the contested, opinion and "no source" labels, on four qu
 - **Ben's decisions:** XSearch's example question is about warfarin and ibuprofen (Claude's pick, Ben agreed), with real public sources rather than invented ones; one question first to set the pattern.
 - Claude read the FDA warfarin label, the FDA label for IV ibuprofen (Caldolor) and a Harvard Health article in full. The warfarin label says to "closely monitor" patients taking NSAIDs, not to avoid them. Claude's first draft had said "avoid," which no source says: a small, real example of the drift XSearch is meant to catch.
 - Claude drafted the screen content (Claude's draft, not yet reviewed by Ben): seven real source passages on the left, and the AI rewrite at three slider positions. The first rewrite stays faithful, with nothing flagged. The middle one drifts in small ways (three flags). The most fluent one reverses the sources' meaning and invents reassurance (four flags). The rewrites are deliberately made up to show drift; they are not medical advice.
+- **Ben's decision:** the extracted side must contain only what an extractive AI could output, with nothing added: the source's exact text plus source details copied from the source page. Claude's first version had added its own shorthand headers ("same article"), which Ben caught; fixed.
 
 ---
 
