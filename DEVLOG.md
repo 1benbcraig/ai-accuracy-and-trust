@@ -417,6 +417,17 @@ The first real runs of the contested, opinion and "no source" labels, on four qu
 - **Ben's decision:** the extracted side must contain only what an extractive AI could output, with nothing added: the source's exact text plus source details copied from the source page. Claude's first version had added its own shorthand headers ("same article"), which Ben caught; fixed.
 - **Ben's decisions:** each extracted passage shows the quote first, then the source, then details and link, because the answer matters first. The labels Source, Section, Date and Link are part of the page design; everything after them is copied from the source. Described honestly, the left side is not real extractive output but "our best facsimile," made with Claude from real sources and real quotes. Claude chose which passages to show and where each one starts and stops, and the rewrites are made up on purpose to show drift.
 
+## October 28 (afternoon) — XSearch screens: citation chips, automatic check
+
+Ben designed the XSearch screens in Figma (not built in code; nothing here is tested).
+
+- **Ben's decisions:** the rewrite reads as a paragraph, with small number chips at the end of each sentence pointing to the numbered passages on the left. Hovering a chip highlights its passage on the left. Hover is kept to the chips; after the check, flagged phrases are highlighted instead, so the two never land on the same thing.
+- **Ben's decision:** the prototype shows only what a real system could do fairly easily. Cost isn't a constraint (an enterprise could pay for it), but speed is: a real check takes a few seconds, so flags can't appear while the slider is moving.
+- **Ben's decision:** the check runs on its own after the slider stops, with a short "Checking..." state. When it finishes it reports what it found ("5 sentences, 3 flagged for review" or "No flags found"), not a pass/fail grade.
+- **Ben's decision:** the rewrite gets an Edit button for changing it by hand. How edits work with the slider is open.
+- **Ben's decision:** the slider label keeps the word accuracy: "Source accuracy," with a moving percentage. Claude's alternatives ("Faithful"/"Fluent", "Closest to sources"/"Most rewritten", "Source match") were turned down. The word for the other end ("Eloquence" for now) is open, and so is what the percentage would measure in a real system.
+- Claude's suggestions, not agreed: after a hand edit, moving the slider warns that it will replace the edit; edited text gets checked once typing stops; the check results get pinned in place so a long rewrite doesn't push them down.
+
 ---
 
 ## Open questions
