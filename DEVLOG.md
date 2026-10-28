@@ -408,6 +408,12 @@ The first real runs of the contested, opinion and "no source" labels, on four qu
 
 - **Who checks the rewrite (an answer Ben agreed with, not built):** plain code first (numbers, doses, drug names and "not" must match the cited passage exactly); then a separate strong model compares each sentence with its cited passage, under a HIPAA agreement (Anthropic offers one for its API, per its support page); anything uncertain gets flagged for the person, because a false flag costs a second and a missed error could cost a patient.
 
+
+## October 28 — XSearch example: real medical sources
+
+- **Ben's decisions:** XSearch's example question is about warfarin and ibuprofen (Claude's pick, Ben agreed), with real public sources rather than invented ones; one question first to set the pattern.
+- Claude read the FDA warfarin label, the FDA label for IV ibuprofen (Caldolor) and a Harvard Health article in full. The warfarin label says to "closely monitor" patients taking NSAIDs, not to avoid them. Claude's first draft had said "avoid," which no source says: a small, real example of the drift XSearch is meant to catch.
+
 ---
 
 ## Open questions
