@@ -427,6 +427,7 @@ Ben designed the XSearch screens in Figma (not built in code; nothing here is te
 - **Ben's decision:** the rewrite gets an Edit button for changing it by hand. How edits work with the slider is open.
 - **Ben's decision:** the slider label keeps the word accuracy: "Source accuracy," with a moving percentage. Claude's alternatives ("Faithful"/"Fluent", "Closest to sources"/"Most rewritten", "Source match") were turned down. The word for the other end ("Eloquence" for now) is open, and so is what the percentage would measure in a real system.
 - **Ben's decisions (hover rules):** hovering a flagged phrase shows the flag's explanation and highlights the passage it refers to on the left. Hovering a number only highlights its passage. Hovering a passage on the left lights up its numbers on the right. Ways to keep the explanation open (moving the cursor into it, or clicking) were set aside as awkward.
+- **Ben's decision (citation placement):** each number goes right after the part of the sentence it supports, not at the end of the sentence, as Wikipedia does. Ben caught the problem while reviewing the hover screens: with numbers at the end of a sentence, a reader can't tell which part a number backs up, and that gets worse when only part of a sentence is flagged. Claude updated the example content to match.
 - Claude's suggestions, not agreed: after a hand edit, moving the slider warns that it will replace the edit; edited text gets checked once typing stops; the check results get pinned in place so a long rewrite doesn't push them down.
 
 ---
