@@ -424,11 +424,19 @@ Ben designed the XSearch screens in Figma (not built in code; nothing here is te
 - **Ben's decisions:** the rewrite reads as a paragraph, with small number chips at the end of each sentence pointing to the numbered passages on the left. Hovering a chip highlights its passage on the left. Hover is kept to the chips; after the check, flagged phrases are highlighted instead, so the two never land on the same thing.
 - **Ben's decision:** the prototype shows only what a real system could do fairly easily. Cost isn't a constraint (an enterprise could pay for it), but speed is: a real check takes a few seconds, so flags can't appear while the slider is moving.
 - **Ben's decision:** the check runs on its own after the slider stops, with a short "Checking..." state. When it finishes it reports what it found ("5 sentences, 3 flagged for review" or "No flags found"), not a pass/fail grade.
-- **Ben's decision:** the rewrite gets an Edit button for changing it by hand. How edits work with the slider is open.
+- **Ben's decision:** the rewrite gets an Edit button for changing it by hand. How edits work with the slider is open. *(Reversed the same evening; see below.)*
 - **Ben's decision:** the slider label keeps the word accuracy: "Source accuracy," with a moving percentage. Claude's alternatives ("Faithful"/"Fluent", "Closest to sources"/"Most rewritten", "Source match") were turned down. The word for the other end ("Eloquence" for now) is open, and so is what the percentage would measure in a real system.
 - **Ben's decisions (hover rules):** hovering a flagged phrase shows the flag's explanation and highlights the passage it refers to on the left. Hovering a number only highlights its passage. Hovering a passage on the left lights up its numbers on the right. Ways to keep the explanation open (moving the cursor into it, or clicking) were set aside as awkward.
 - **Ben's decision (citation placement):** each number goes right after the part of the sentence it supports, not at the end of the sentence, as Wikipedia does. Ben caught the problem while reviewing the hover screens: with numbers at the end of a sentence, a reader can't tell which part a number backs up, and that gets worse when only part of a sentence is flagged. Claude updated the example content to match.
 - Claude's suggestions, not agreed: after a hand edit, moving the slider warns that it will replace the edit; edited text gets checked once typing stops; the check results get pinned in place so a long rewrite doesn't push them down.
+
+## October 28 (evening) — XSearch: slider stops, flag rule, edit cut, clickable prototype
+
+- **Ben's decision (flag rule):** a flagged phrase lights up a passage on the left only when its explanation names one. "Not found in the sources" flags light up nothing. In the middle rewrite only the word "Yes" is flagged: Ben pointed out that "but with caution" is close to the FDA label's "closely monitor."
+- **Ben's decision (slider):** five stops that the handle snaps to. The slider sets a target; after the check, the result is reported as a measured percentage, so "asked for" and "measured" read as different things. Staged values in the demo: stop 1 is the extraction itself, stop 2 a faithful rewrite (100%, no flags), stop 3 small drift (72%, three flags), stop 5 serious drift (22%, four flags). Stop 4 is left out. The percentages are made up for the demo, not measured. The word for the right end ("Eloquence") is still open.
+- **Ben's decision:** hand editing is cut from XSearch entirely, button included. A partial answer wouldn't hold up, the score goes stale during editing, and it isn't the point of the prototype.
+- Ben built the screens as a clickable prototype in Claude Design, to be screen-recorded for the video.
+- Open: two "not found" explanations still name a passage, which the flag rule says shouldn't light up; Ben to decide.
 
 ---
 
