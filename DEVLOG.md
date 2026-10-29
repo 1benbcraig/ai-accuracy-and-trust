@@ -457,6 +457,13 @@ Ben designed the XSearch screens in Figma (not built in code; nothing here is te
 
 **XSearch MVP done (Ben, Oct 29):** "XSearch prototype is done. at least MVP." It is a clickable mock-up with real sources and made-up rewrites, not a working extractive AI; nothing in it shows the concept works.
 
+**What's next (Ben, Oct 29):**
+- The XSearch video is still to do and comes last; the prototype may still change as work continues.
+- The essay is probably next. The documentary quotes are a subtask of the essay, used only if they fit.
+- The slide deck will likely be a companion or short version of the essay, and the place for visuals.
+- The confidence/task map is still on the list.
+- Five suggested questions in prototype 1 is fine; no replacement for the removed one is needed.
+
 ---
 
 ## Open questions
