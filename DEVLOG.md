@@ -446,6 +446,7 @@ Ben designed the XSearch screens in Figma (not built in code; nothing here is te
 - **Ben's reasoning, meant to match how a real build would work:** rewriting again goes back to the extracted passages and starts over, rather than rewording the previous rewrite, so each try drifts in its own way. Claude agreed, as its own expectation rather than something checked against a real product.
 - **Ben's decision:** even the faithful stop may drop below 100% on another try. Stop 3's versions stay near 72% and stop 5's near 22%.
 - Claude wrote the six versions (staged scores: stop 2 at 100% and 91%, stop 3 at 68% and 76%, stop 5 at 24% and 19%). They are made up on purpose to show drift, are not medical advice, and haven't been tried in the prototype yet. They kept the content file's style; their "not found" flags name no passage, so they follow the flag rule.
+- **A new example of AI inaccuracy:** in the same session, Claude said twice that it could only read the project's files and couldn't change them, without checking its own tools. That was false; it could edit them and push to GitHub. Ben caught it by questioning the claim. At Ben's request the exchange is saved in [`examples/`](examples/claude-wrong-about-write-access-2026-10-29.md).
 
 ---
 

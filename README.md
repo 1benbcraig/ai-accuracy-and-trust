@@ -32,7 +32,7 @@ Prototype 1 is done as of October 27, 2026 (Ben's call). Still a prototype: it s
 | [`DEVLOG.md`](DEVLOG.md) | Dated decisions and turning points |
 | [`research/`](research/) | Two literature reviews (how accurate AI is; trust and showing uncertainty) and the full source list |
 | [`app/`](app/) | The app, the reliable-source lists, and the 30-question test set |
-| [`examples/`](examples/) | A real conversation showing an AI softening a false claim |
+| [`examples/`](examples/) | Real conversations showing AI inaccuracy: an AI softening a false claim, and Claude wrongly saying it couldn't edit files |
 | [`screenshots/`](screenshots/) | The app in use |
 
 ## Running it
