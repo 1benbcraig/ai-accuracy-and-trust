@@ -448,6 +448,13 @@ Ben designed the XSearch screens in Figma (not built in code; nothing here is te
 - Claude wrote the six versions (staged scores: stop 2 at 100% and 91%, stop 3 at 68% and 76%, stop 5 at 24% and 19%). They are made up on purpose to show drift, are not medical advice, and haven't been tried in the prototype yet. They kept the content file's style; their "not found" flags name no passage, so they follow the flag rule.
 - **A new example of AI inaccuracy:** in the same session, Claude said twice that it could only read the project's files and couldn't change them, without checking its own tools. That was false; it could edit them and push to GitHub. Ben caught it by questioning the claim. At Ben's request the exchange is saved in [`examples/`](examples/claude-wrong-about-write-access-2026-10-29.md).
 
+**Later the same day: the source menu cut to four.**
+- **Ben's design:** the extractive search reads from one source collection at a time, chosen from a menu next to the search box. Every quote then comes from one place the doctor picked.
+- **Ben's decision:** cut the menu from seven options to four: Drug Labels & Clinical References, Clinical Practice Guidelines, Peer-Reviewed Medical Journals, and Hospital Formulary & Protocols. The formulary is kept to show the idea; no questions or content are being built for it.
+- **Ben's decision:** hovering an option shows the kind of question it answers: "What does the drug's label say?", "What's the recommended treatment?", "What does the research show?", "What does my hospital allow?" Built in the Claude Design prototype.
+- **Claude's suggestions** (Ben agreed to drop them): Drug Interaction Checker overlaps with drug labels and is a tool rather than a set of documents; Clinical Trial Registry is mainly for researchers; Patient Education Materials are written for patients. Claude also suggested stopping at three, without the formulary; Ben chose four.
+- Untested: whether doctors would pick the right collection from these labels and hover questions.
+
 ---
 
 ## Open questions
