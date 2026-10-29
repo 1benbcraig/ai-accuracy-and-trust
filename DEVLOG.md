@@ -438,6 +438,15 @@ Ben designed the XSearch screens in Figma (not built in code; nothing here is te
 - Ben built the screens as a clickable prototype in Claude Design, to be screen-recorded for the video.
 - Open: two "not found" explanations still name a passage, which the flag rule says shouldn't light up; Ben to decide.
 
+
+## October 29 — XSearch: a working "rewrite again" button
+
+- **Ben's decision:** the refresh button next to the rewrite works in the prototype. Each click shows a different rewrite.
+- **Ben's decision:** stops 2, 3 and 5 each get two more versions, three per stop. Stop 1 is the extraction itself and needs none; stop 4 is still left out.
+- **Ben's reasoning, meant to match how a real build would work:** rewriting again goes back to the extracted passages and starts over, rather than rewording the previous rewrite, so each try drifts in its own way. Claude agreed, as its own expectation rather than something checked against a real product.
+- **Ben's decision:** even the faithful stop may drop below 100% on another try. Stop 3's versions stay near 72% and stop 5's near 22%.
+- Claude wrote the six versions (staged scores: stop 2 at 100% and 91%, stop 3 at 68% and 76%, stop 5 at 24% and 19%). They are made up on purpose to show drift, are not medical advice, and haven't been tried in the prototype yet. They kept the content file's style; their "not found" flags name no passage, so they follow the flag rule.
+
 ---
 
 ## Open questions
