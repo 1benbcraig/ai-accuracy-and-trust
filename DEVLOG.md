@@ -455,6 +455,8 @@ Ben designed the XSearch screens in Figma (not built in code; nothing here is te
 - **Claude's suggestions** (Ben agreed to drop them): Drug Interaction Checker overlaps with drug labels and is a tool rather than a set of documents; Clinical Trial Registry is mainly for researchers; Patient Education Materials are written for patients. Claude also suggested stopping at three, without the formulary; Ben chose four.
 - Untested: whether doctors would pick the right collection from these labels and hover questions.
 
+**XSearch MVP done (Ben, Oct 29):** "XSearch prototype is done. at least MVP." It is a clickable mock-up with real sources and made-up rewrites, not a working extractive AI; nothing in it shows the concept works.
+
 ---
 
 ## Open questions
