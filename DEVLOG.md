@@ -523,6 +523,16 @@ Ben designed the XSearch screens in Figma (not built in code; nothing here is te
 
 ---
 
+## 2026-10-30 (afternoon) — Essay: Musk–Page timing (no code changes)
+
+**Ben's decision**
+- The essay says Musk "later said" Page didn't care about AI safety; the sources go in the notes.
+
+**Checked**
+- The argument was at Musk's 44th birthday party, June 28, 2015 (Observer, June 28, 2024, citing Isaacson's 2023 biography). Musk described it at the 2023 DealBook Summit (per the same article), in the 2026 Netflix documentary, and in court testimony on April 28, 2026 (Yahoo Finance).
+
+---
+
 ## Open questions
 
 - What should a confidence number mean, and does the AI's own confidence predict its accuracy at all?
