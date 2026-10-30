@@ -484,6 +484,29 @@ Ben designed the XSearch screens in Figma (not built in code; nothing here is te
 
 ---
 
+## 2026-10-30 — Essay: why chatbots look alike and get things wrong (no code changes)
+
+**Ben's decisions**
+- Why all chatbots feel alike, three reasons: standard benchmarks reward confident guessing (Kalai et al., Nature 2026); human raters prefer agreeable, confident answers (Sharma et al.); companies copied ChatGPT (Szczesna). The "same design" and "same training text" reasons are cut.
+- Why chatbots get things wrong, three reasons: they predict likely words instead of checking facts; facts seen rarely in training don't stick; grading rewards guessing.
+- Accuracy figure: 68%, not "two-thirds." The "no web search" caveat and the date go in the notes, not the story.
+- Citations: small numbers in the story, no source names in the text. The notes page gives the exact quote and the link.
+- Szczesna quote used: "Chat became the default form of AI mostly because that is what the first tools to reach mass use looked like."
+- The Bremen chatbot paper (Rockstroh et al.) backs "they all look alike," not "why."
+- Alan Cooper: the "elastic user" matches the pocket knife; "dancing bearware" matches the rush.
+- Claude.ai and Cowork have merged; Cowork is not treated as a separate product.
+- "Egos collide" paragraph (DeepMind, OpenAI, Anthropic history): Ben approved the first version.
+
+**Claude's suggestions (not agreed)**
+- A new opening for the "Egos collide" paragraph.
+
+**Open**
+- A replacement for the word "fluency" ("sounding right" is the front-runner).
+- Exact quote from OpenAI's "Why language models hallucinate"; check benchmark numbers against the original sources; find Leonardi and Leavell (2026).
+- The Musk quote comes from the Netflix documentary; a court-testimony version is unverified. Anthropic founding year (2020 in the paragraph, 2021 in earlier notes) not yet checked.
+
+---
+
 ## Open questions
 
 - What should a confidence number mean, and does the AI's own confidence predict its accuracy at all?
