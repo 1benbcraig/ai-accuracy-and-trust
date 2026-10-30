@@ -549,6 +549,20 @@ Ben designed the XSearch screens in Figma (not built in code; nothing here is te
 
 ---
 
+## 2026-10-30 (late afternoon) — Essay: sections 5 and 6 drafted (no code changes)
+
+**Ben's decisions**
+- Wording: "Google knew about inaccuracy," not "knew about accuracy."
+
+**Checked**
+- The 68% figure: AA-Omniscience v1.1 live leaderboard (read Oct 30, 2026) shows the highest accuracy as 68% (Claude Fable 5.1), then 66% (Claude Opus 5.5).
+- The Google "code red" New York Times article, read in full via its syndicated copy. A line Claude had taken from a summary ("can make stuff up") is not in the article and was dropped.
+
+**Claude's suggestions (not agreed)**
+- A full story draft (sections 1–6) is in the project files: why they feel alike, how wrong they are, trained to sound right, what the screen hides, the wrong fix (hedging, with both sides of the research and the legal and medical costs), and the better fix (find facts first, then write, with a check between). Untested as writing; Ben hasn't reviewed it.
+
+---
+
 ## Open questions
 
 - What should a confidence number mean, and does the AI's own confidence predict its accuracy at all?
