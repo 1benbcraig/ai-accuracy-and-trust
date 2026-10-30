@@ -464,6 +464,24 @@ Ben designed the XSearch screens in Figma (not built in code; nothing here is te
 - The confidence/task map is still on the list.
 - Five suggested questions in prototype 1 is fine; no replacement for the removed one is needed.
 
+## 2026-10-29 (evening) — Essay direction (no code changes)
+
+**Ben's decisions**
+- The essay becomes a short story in Ben's voice, about a page to a page and a half, and that may be the deliverable. Ben: the academic draft "is kind of not me… almost like misrepresenting myself."
+- A separate references and notes page holds the sources for anyone who wants them.
+- Essay draft 2 is kept unchanged; Ben will pull favourite parts from it into the story.
+- With fewer words, unsupported claims stand out more, so the references page has to hold up and some lines may be softened or labelled as Ben's view.
+- Earlier the same day: section order for the long essay settled; "LLM" not "chatbot"; drop the word "fluency"; documentary quotes picked: David Evan Harris (strongest), Timnit Gebru, and possibly the unnamed "race to recklessness" line.
+
+**Claude's suggestions (not agreed)**
+- Structure: one-page story with quiet inline links, then a "longer read / notes" section.
+
+**Produced**
+- story-draft-1-2026-10-29.md (Google Drive). Untested as a piece of writing; Ben hasn't edited it yet.
+
+**Not done**
+- Session logs for this session are in Google Drive, not project memory (memory saving was blocked in that chat).
+
 ---
 
 ## Open questions
