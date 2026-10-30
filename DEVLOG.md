@@ -533,6 +533,22 @@ Ben designed the XSearch screens in Figma (not built in code; nothing here is te
 
 ---
 
+## 2026-10-30 (afternoon, later) — Essay: the race (no code changes)
+
+**Ben's decisions**
+- "The race makes them alike" is dropped. The race still gets a mention, ideally one line.
+- Keep the line "The people building it believe it's the most important thing humans will ever make, and whoever gets there first goes down in history" (Claude's wording, Ben approved).
+- The Sutskever "Today it is the case" exchange goes in the notes as a reference, not quoted in the essay.
+
+**Research done (findings, not decisions)**
+- Race quotes gathered from the documentary (whole transcript read) and the web: OpenAI's charter naming a "competitive race" as a danger; the March 2023 open letter's "out-of-control race"; Nadella's "we made them dance"; Google's December 2022 "code red" (second-hand).
+- The AGI finish line has no agreed definition: OpenAI's charter definition, a reported Microsoft–OpenAI $100 billion profit test, Altman calling AGI "not a super-useful term," Amodei calling it "a marketing term."
+
+**Not found**
+- A source for Ben's idea that builders want their names in history.
+
+---
+
 ## Open questions
 
 - What should a confidence number mean, and does the AI's own confidence predict its accuracy at all?
