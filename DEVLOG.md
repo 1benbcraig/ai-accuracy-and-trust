@@ -507,6 +507,22 @@ Ben designed the XSearch screens in Figma (not built in code; nothing here is te
 
 ---
 
+## 2026-10-30 (later) — Essay structure: the race (no code changes)
+
+**Ben's decisions**
+- The race is the missing link in "How we got here." The labs' history (Egos collide) makes their sameness unsurprising.
+- Too early to decide how much room any part gets; collecting ideas for now.
+- Project files are the home for project work; Drive is no longer used.
+
+**Ideas, not decided**
+- AGI as an undefined finish line; China as a single line.
+- Folding "Why all LLMs feel similar" into "How we got here" (Ben: "something like that needs to happen," not fully sold).
+
+**Claude's suggestions (not agreed)**
+- Essay order: the question → how inaccurate → how we got here (split, race, launch, money, then the three reasons) → trained to sound right (including why they're inaccurate) → the fix. A restructured draft of the setup sections is in the project files.
+
+---
+
 ## Open questions
 
 - What should a confidence number mean, and does the AI's own confidence predict its accuracy at all?
