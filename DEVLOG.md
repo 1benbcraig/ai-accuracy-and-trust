@@ -574,6 +574,18 @@ Ben designed the XSearch screens in Figma (not built in code; nothing here is te
 - Open question added: why buyers kept choosing generative tools after the errors showed up. No source found yet.
 - The new sources were read through page summaries; they still need reading in full before they go in the notes.
 
+## 2026-11-02 (later) — Essay: opening of "Why they all feel alike" (no code changes)
+
+**Ben's decisions (voice):**
+- Drop "fluent." Ben: for the many non-native English speakers in tech, "fluency" means mastery of a language, and that's not the point; the point is confidence. "There's no reason not to use the word confidence."
+- The chat window doesn't belong in the opening.
+- New opening line: "Ask any of the big LLMs a question and you get the same thing: a confident answer, whether it's right or not." ("Let's go with that for now.")
+- The section opens with a very short paragraph, then the three reasons as bullets.
+
+**Claude's suggestions, not yet agreed:**
+- The wording of the three bullets (the tests, the training, copying).
+- The "copying" reason lost its support: the Szczesna quote and the Bremen study are about the chat window. It needs a new source or a different angle.
+
 ---
 
 ## Open questions
