@@ -563,6 +563,19 @@ Ben designed the XSearch screens in Figma (not built in code; nothing here is te
 
 ---
 
+## 2026-11-02 — Essay draft fixes (no code changes)
+
+**Ben's decisions (from the 10/30 voice session)**
+- Accuracy-first tools exist: law and medicine used extractive AI before ChatGPT and LLMs. The draft had wrongly said none were found.
+- "LLM," not "chatbot" (his 10/29 decision), applied throughout the draft.
+
+**Changed in the story draft**
+- "Where are the accuracy-first tools?" now tells the history: extractive legal tools such as Kira, human-reviewed medical note-taking, then the move to generative tools (Casetext, built on GPT-4, bought by Thomson Reuters for $650 million in 2023; Microsoft's medical note-taker adding GPT-4).
+- Open question added: why buyers kept choosing generative tools after the errors showed up. No source found yet.
+- The new sources were read through page summaries; they still need reading in full before they go in the notes.
+
+---
+
 ## Open questions
 
 - What should a confidence number mean, and does the AI's own confidence predict its accuracy at all?
