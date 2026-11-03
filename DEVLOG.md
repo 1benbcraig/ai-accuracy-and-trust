@@ -586,6 +586,23 @@ Ben designed the XSearch screens in Figma (not built in code; nothing here is te
 - The wording of the three bullets (the tests, the training, copying).
 - The "copying" reason lost its support: the Szczesna quote and the Bremen study are about the chat window. It needs a new source or a different angle.
 
+## 2026-11-02 (evening) — Essay in a Claude Doc, and one home for project files (no code changes)
+
+**Ben's decisions**
+- Workflow: "Let's start saving at the beginning of sessions instead of the end of sessions. So no longer push to GitHub at the end of each session." This replaces pushing every turn.
+- The essay moves into a Claude Doc while Ben writes it; he edits it directly. Finished versions get copied into a project file in one go. No other work goes in Claude Docs.
+- Essay edits: the third "why they feel alike" reason is now "One tool for everything" (replacing "Copying"); the training reason ends "The model learns to aim for approval, not accuracy."; the hedge line "A hedge only helps if it matches how likely the answer is to be right, and nothing in the product makes sure it does" goes in ("That's perfect"); an intro under the title (uses AI daily, frustrated by confident wrong answers, what about people who need accuracy more) was added at his request. Keep writing now, redo citations in one pass later.
+- One home: project files hold everything; GitHub keeps a copy; Google Drive is emptied.
+- At the start of every chat, Claude does a real test save and reports the result before any work. Ben agreed to this after Claude said, wrongly, in two chats on the same day that it couldn't save project files.
+- Review the leftover Google Drive files without him and delete them once safely copied. Condense the project's running notes so new chats read less.
+
+**Done**
+- Six Claude-made Drive files copied word for word into project files (essay drafts 1 and 2, story draft 1, reference notes, two Oct 29 session logs); five moved to Drive's trash. Story draft 1 left in Drive untouched at Ben's request. Eleven copies of the test-questions spreadsheet stay in Drive for now: the connector can't read them in full, so they couldn't be checked or copied safely.
+- The project's start-of-chat file was rewritten as a short current-state summary (about 16 KB instead of roughly 19 KB plus a 90 KB decision log); the full decision log and the old version are kept as an archive.
+
+**Claude's suggestions, not agreed**
+- Essay: delete the duplicate anecdotes placeholder; soften "they seem to know their strengths and weaknesses" to what the research supports; add an OpenAI Model Spec line to "The wrong fix."
+
 ---
 
 ## Open questions
