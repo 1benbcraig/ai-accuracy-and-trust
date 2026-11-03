@@ -603,6 +603,14 @@ Ben designed the XSearch screens in Figma (not built in code; nothing here is te
 **Claude's suggestions, not agreed**
 - Essay: delete the duplicate anecdotes placeholder; soften "they seem to know their strengths and weaknesses" to what the research supports; add an OpenAI Model Spec line to "The wrong fix."
 
+## 2026-11-03 — Housekeeping: test questions moved off Google Drive (no code changes)
+
+**Ben's decisions**
+- New Project Instructions in force: a test save at the start of every chat; project files are the one home; push to GitHub at the start of each session.
+
+**Done**
+- The master test-questions spreadsheet (on Ben's Mac) copied as text into the project files; all 12 spreadsheet copies in Google Drive moved to Drive's trash. Drive now holds only files Ben asked to keep.
+
 ---
 
 ## Open questions
