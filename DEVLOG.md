@@ -598,7 +598,7 @@ Ben designed the XSearch screens in Figma (not built in code; nothing here is te
 
 **Done**
 - Six Claude-made Drive files copied word for word into project files (essay drafts 1 and 2, story draft 1, reference notes, two Oct 29 session logs); five moved to Drive's trash. Story draft 1 left in Drive untouched at Ben's request. Eleven copies of the test-questions spreadsheet stay in Drive for now: the connector can't read them in full, so they couldn't be checked or copied safely.
-- The project's start-of-chat file was rewritten as a short current-state summary (about 16 KB instead of roughly 19 KB plus a 90 KB decision log); the full decision log and the old version are kept as an archive.
+- The project's start-of-chat file was rewritten as a short current-state summary; the full decision log and the old version are kept as an archive.
 
 **Claude's suggestions, not agreed**
 - Essay: delete the duplicate anecdotes placeholder; soften "they seem to know their strengths and weaknesses" to what the research supports; add an OpenAI Model Spec line to "The wrong fix."
