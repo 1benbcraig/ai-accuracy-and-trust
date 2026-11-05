@@ -611,6 +611,35 @@ Ben designed the XSearch screens in Figma (not built in code; nothing here is te
 **Done**
 - The master test-questions spreadsheet (on Ben's Mac) copied as text into the project files; all 12 spreadsheet copies in Google Drive moved to Drive's trash. Drive now holds only files Ben asked to keep.
 
+## 2026-11-03 (evening) — Essay's main points and the deliverables plan (no code changes)
+
+**Ben's decisions**
+- The essay's main points had got lost in the detail. The big three: (1) hedging language doesn't express inaccuracy at all, which makes it close to a false solution; (2) LLMs weren't built for what people now use them for, and honestly no one is sure what they were designed for; (3) a more specific tool will work better. Point 3 is Ben's view and untested.
+- Doctors and lawyers stay as examples but shouldn't be overemphasized; they're simply the first two fields that need accuracy most.
+- The idea that "scalpels" may only be needed for a few years is, at most, a note at the end.
+- Deliverables: finish the essay, then a slide deck likely based on it. Prototype 1 (Verifier) will be hosted publicly so people can try it; Prototype 2 (XSearch) is shown only as a video.
+
+**Claude's suggestions, not agreed**
+- A pocket knife / scalpel paragraph to pay off "one tool for everything."
+- State the core goal (accurate trust, not more trust) plainly; tie Prototype 1 back to the "What the screen hides" section.
+- Add a daily spending cap when the Verifier is hosted.
+
+## 2026-11-04 — Essay editing pass (no code changes)
+
+**Ben's decisions**
+- Cost-of-inaccuracy section now opens with a Thomson Reuters 2025 survey (unproven accuracy named the top barrier by legal, tax and risk professionals). Law paragraph moves from tests to real courtrooms.
+- "Dancing bearware" (Alan Cooper) added; Cooper is the one source named in the text. Everything else stays in numbered notes.
+- "A better fix" rewritten: the industry already builds tools that search trusted sources before writing (retrieval-augmented generation, RAG). Ben reached a similar idea on his own; the essay says so plainly and doesn't claim it as new. The prototype's three differences: sources shown first and always; users control how much the answer is rewritten; every rewrite is checked automatically. None of this has been tested with users.
+- The two prototypes are labeled "Prototype 1" and "Prototype 2" in the text.
+- The history of the AI race and the documentary quotes are out of the essay (maybe the slide deck).
+- Adding a line that most trust research tries to raise trust rather than ask whether it's deserved.
+
+**Claude's suggestions, not agreed**
+- Describe the slider as showing how far each step strays from the source, since the prototype's percentages are staged.
+- Hedged claims can't be caught by the Verifier because they're too vague to contradict.
+
+**Open:** the "It's live, try it" line is only true once the Verifier is hosted.
+
 ---
 
 ## Open questions
