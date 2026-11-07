@@ -640,6 +640,30 @@ Ben designed the XSearch screens in Figma (not built in code; nothing here is te
 
 **Open:** the "It's live, try it" line is only true once the Verifier is hosted.
 
+## 2026-11-05 — Essay final pass and citations (no code changes)
+
+**Ben's decisions**
+- New closing section, "Scalpels over pocket knives." The essay ends on the scalpel paragraph, not on broad ideas about the future.
+- Added Ben's own observation: most trust studies he found tried to get people to trust AI more, not to help them know when to trust it. Sourced as his experience, not a statistic.
+- Hedging paragraph tightened: a hedge reflects how people talk about a topic, not how likely the AI is to be right. Neither hedging nor confidence numbers fix the real problem: LLMs are wrong a lot and overconfident about it.
+- CIA example reworded to match the source: in 1964 an analyst showed "a serious possibility" had meant anything from 20% to 80% to colleagues who signed the same report.
+- Notes use the standard style: the source title is the link.
+- The X-ray line "most of them went along with it" stays. Unverified: the source gives only the doctors' roughly 25% accuracy when the AI was wrong.
+- Next deliverable: the slide deck, showing the design process, loosely based on the essay.
+
+**Claude's work**
+- Rebuilt the notes section: 27 notes, every source opened and quotes matched.
+- Two notes still rely on secondary sources (Cooper's book not opened; the Codenames study page blocked).
+
+## 2026-11-06 — Slide deck first pass and how existing tools compare (no code changes)
+
+**Ben's decisions**
+- Slide deck in three groups: keeping the checker honest; iterations (ideas tried and cut); the pivot to extractive AI. "Iterations" is a placeholder label.
+- Each iteration slide ends with a lesson line.
+
+**Claude's research (vendor pages and reviews, not hands-on testing)**
+- Six leading legal and medical AI tools (CoCounsel, Lexis+ AI, GC AI, Harvey, UpToDate Expert AI, OpenEvidence) all lead with a generated answer, with sources one click away. None found lets users control how much is rewritten, and none found automatically checks each sentence against its source. Prototype 2 is untested with users.
+
 ---
 
 ## Open questions
