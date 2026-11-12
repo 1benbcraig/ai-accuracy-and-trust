@@ -664,6 +664,24 @@ Ben designed the XSearch screens in Figma (not built in code; nothing here is te
 **Claude's research (vendor pages and reviews, not hands-on testing)**
 - Six leading legal and medical AI tools (CoCounsel, Lexis+ AI, GC AI, Harvey, UpToDate Expert AI, OpenEvidence) all lead with a generated answer, with sources one click away. None found lets users control how much is rewritten, and none found automatically checks each sentence against its source. Prototype 2 is untested with users.
 
+## 2026-11-11 — XSearch (Prototype 2) rewrite stops, scoring rule, video (no app/ changes; XSearch lives in a Claude Design prototype)
+
+**Ben's decisions**
+- Stop 2 read too polished to make anyone move the slider. Rewritten stiff, close to source wording, one flag. Only stop 1 shows 100%.
+- Score colour follows the percentage, not the stop (green at 100, through yellow and orange, to red at the low end).
+- Regenerate versions B and C for stops 2, 3 and 5 rewritten and approved.
+- Score: weighted flags. Ben handed the weights to Claude as a proof of concept. Don't fudge scores to hit a range.
+- Slider right-end word: "Eloquence."
+- Keep stop 5 "because it's a demo." The prototype "does what it was intending to do, it is done."
+- Videos made: a 16-second silent loop of the slider for the slide deck, and a five-minute narrated walkthrough (to go on YouTube). Ben wrote his own narration.
+
+**Claude's suggestions and work**
+- Weights (Claude's choice): contradicts 1.0; not what the source says 0.8; not found / goes beyond 0.6; stronger, weaker, narrower and similar 0.5. Score = 100 x (1 - sum of weights / sentences). Resulting stop 2 / 3 / 5 scores: A 95/72/33, B 95/68/15, C 94/71/30.
+- Notes that said "Not found" but cited a passage now open "Goes beyond the source."
+- Tooltip layering fixes on the version arrows.
+- Short research on how rewrites drift from sources (abstracts and summaries, not full-paper reads).
+- All flags and rewrites were written by Claude to show drift. Nothing in the prototype runs; the design is untested with users.
+
 ---
 
 ## Open questions
