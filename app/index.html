@@ -56,6 +56,8 @@
     #send:disabled { cursor: default; opacity: 0.5; }
     #status { margin: -24px 0 0; min-height: 0; color: var(--text-tertiary); font-size: 14px; }
     #status:empty { display: none; }
+    #limit-note { margin: 0; max-width: 765px; color: var(--text-secondary); } /* daily limit message, below the question box (Ben, 11/16) */
+    #limit-note:empty { display: none; }
 
     /* Question menu (Figma 2154:4811 open, 2154:5334 collapsed; Ben, 10/23) */
     #qwrap { position: relative; z-index: 30; width: 765px; max-width: 100%; }
@@ -298,6 +300,7 @@
     <div id="qmenu" hidden></div>
     </div>
     <p id="status"></p>
+    <p id="limit-note"></p>
 
     <section id="response" class="content">
       <div class="head">
@@ -1050,6 +1053,7 @@
       closeQMenu(); addRecent(q.value); q.blur(); // question menu; cursor leaves the box on submit (Ben, 10/23)
       // The user can't move forward until both answers are in (blocking).
       q.disabled = true; send.disabled = true; verifyOn.disabled = true;
+      document.getElementById("limit-note").textContent = "";
       answer.textContent = ""; verified.textContent = ""; extraRoom = 0; mainEl.style.paddingBottom = ""; vBox.querySelectorAll(".f-all").forEach((x) => x.remove()); vSummary.textContent = ""; findingsEl.textContent = ""; vBox.hidden = true; searchUrls = []; searched.textContent = ""; searchOverlay.textContent = ""; setOverlay(false);
       { const w = el("div", "v-working"); w.append(el("span", "spinner"), el("span", "", "Thinking...")); answer.append(w); } // spinner + line, same as the Verifier (Ben, 10/21)
       try {
@@ -1109,7 +1113,7 @@
         }
         status.textContent = "";
       } catch (err) {
-        if (err?.limit) { answer.textContent = ""; answer.append(el("p", "bucket-note", err.message)); } // daily limit message, shown plainly (11/16)
+        if (err?.limit) { answer.textContent = ""; document.getElementById("limit-note").textContent = err.message; } // daily limit message, below the question box (Ben, 11/16)
         else if (!err?.skip) status.textContent = "ERROR: " + err.message;
         verified.querySelectorAll(".v-working").forEach((w) => w.remove()); answer.querySelectorAll(".v-working").forEach((w) => w.remove()); // no spinner left running after an error
       }

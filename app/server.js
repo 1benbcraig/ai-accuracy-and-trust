@@ -19,8 +19,8 @@ const credits = new Map(); // each answered question allows one check and one ab
 function today() { return new Date().toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" }); }
 function rollDay() { const d = today(); if (d !== day) { day = d; total = 0; perIp = new Map(); alerted = new Set(); credits.clear(); } }
 function visitor(req) { return String(req.headers["x-forwarded-for"] || req.socket.remoteAddress || "").split(",")[0].trim(); }
-function contactLine() { return process.env.CONTACT_EMAIL ? ` Questions? Email ${process.env.CONTACT_EMAIL}.` : ""; }
-const LIMIT_VISITOR = () => `You've reached today's limit of ${PER_VISITOR} questions. Thanks for trying the Verifier. The limit resets at midnight Pacific time.` + contactLine();
+function contactLine() { return process.env.CONTACT_EMAIL ? ` Email ${process.env.CONTACT_EMAIL} with any questions.` : ""; } // wording: Ben, 11/16
+const LIMIT_VISITOR = () => `You've reached today's limit of ${PER_VISITOR} questions. Thanks for trying The Verifier. The limit resets at midnight Pacific time.` + contactLine();
 const LIMIT_ALL = () => `The Verifier has reached its daily limit for all visitors. Thanks for trying it. The limit resets at midnight Pacific time.` + contactLine();
 // Returns null if the question may go ahead (and counts it), or the message to show if not.
 function takeQuestion(req) {

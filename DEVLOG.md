@@ -704,13 +704,12 @@ Ben designed the XSearch screens in Figma (not built in code; nothing here is te
 **Ben's decisions**
 - Host the Verifier on Render (Starter plan) so anyone with the link can use it; email alerts through Resend.
 - Limits: 20 questions per visitor per day, 100 for all visitors combined per day. Email Ben at 50 and at 100. Ben raised the daily cap back to 100 after considering 60, because the worst case is real visitors hitting the wall on a day the portfolio gets passed around.
-- Ben will review the limit message before launch.
+- Limit message wording (Ben): "...Thanks for trying The Verifier. The limit resets at midnight Pacific time. Email [Ben's address] with any questions." Shown below the question box, above Claude's response. The address comes from the host's settings, not the code.
 
 **Claude's suggestions and work**
 - The app now reads its keys from the host's private settings when there's no .env file, and opens up to outside visitors only when hosted. On Ben's Mac nothing changes: no limits, screenshots and the build line still work.
 - When hosted: questions over 2,000 characters are refused; the checking and ability-scoring steps only run after a counted question, so they can't be used on their own; no screenshots; no build line.
 - Counts are kept in memory, so a restart or redeploy resets them. A question that fails still counts. A visitor is identified by internet address, so people on one office network share a count.
-- Limit message wording is Claude's draft, pending Ben's review.
 
 **Untested**
 - Tested only on a local test run with a fake key. Not yet run on Render, and the alert emails haven't been sent for real.
