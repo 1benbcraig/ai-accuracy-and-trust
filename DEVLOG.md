@@ -682,6 +682,23 @@ Ben designed the XSearch screens in Figma (not built in code; nothing here is te
 - Short research on how rewrites drift from sources (abstracts and summaries, not full-paper reads).
 - All flags and rewrites were written by Claude to show drift. Nothing in the prototype runs; the design is untested with users.
 
+## 2026-11-12 to 11-16 — Suggested questions, slide deck nearly done, going live next (app/index.html changed)
+
+**Ben's decisions**
+- Prototype 2's name is "ExSearch" ("Ex" for extractive), not "XSearch." Earlier entries that say XSearch mean ExSearch.
+- Verifier suggested questions: "Was Napoleon unusually short?" replaced by "How long does gouda cheese take to digest?", and the startups question replaced by "What percentage of job seekers lie on their résumés?" Both returned several contradicted citations in Ben's runs. His reason: if every suggested question comes back fully supported, the tool looks pointless. Results vary from run to run.
+- Slide deck (the main deliverable) is mostly done: 16 slides, a "Project deliverables" slide up front (Verifier, ExSearch walkthrough, essay), larger prototype videos, and two colour-and-font styles left as finalists. Serif type only on the cover title; other headings sans-serif for scannability. Links not wired yet.
+- "Next steps" slide, ranked by impact and effort: user research with doctors and lawyers; weigh risk, not just accuracy ("Warn harder when the stakes are high, and explain how to verify"); test how well people catch wrong claims and drifting rewrites; map accuracy by thinking type; make ExSearch work for real; ExSearch edit mode.
+- Next phase: put the Verifier online, wire up the deck's links, and add the work to Ben's portfolio.
+
+**Claude's suggestions and work**
+- Found the short contradicted claims in past runs for a possible cover screenshot (cover question still open).
+- Made the deck's style variations (fonts and colours only; content and layout unchanged) at Ben's request; he picked the finalists.
+- Claude's suggestions Ben hasn't agreed to: a daily spending cap once the Verifier is public; a higher effort score for user research.
+
+**Untested**
+- Neither prototype has been tested with users. Whether the new suggested questions reliably show contradictions is unverified; run-to-run results vary.
+
 ---
 
 ## Open questions
