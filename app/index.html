@@ -330,6 +330,14 @@
   <script>
     const q = document.getElementById("question");
     const send = document.getElementById("send");
+    // Limit message with the email address as a link (Ben, 11/16). Built as text plus a link, never as raw HTML.
+    function showLimitNote(msg) {
+      const note = document.getElementById("limit-note"); note.textContent = "";
+      const m = msg.match(/[\w.+-]+@[\w-]+(\.[\w-]+)+/);
+      if (!m) { note.textContent = msg; return; }
+      const a = document.createElement("a"); a.href = "mailto:" + m[0]; a.textContent = m[0];
+      note.append(msg.slice(0, m.index), a, msg.slice(m.index + m[0].length));
+    }
     let limited = false; // set when the daily limit is reached; the box stays off until the page is reloaded
     const verifyOn = document.getElementById("verify-on");
     const status = document.getElementById("status");
@@ -1119,7 +1127,7 @@
         status.textContent = "";
       } catch (err) {
         if (err?.limit) { // daily limit: message below the question box, and the box greyed out (Ben, 11/16)
-          answer.textContent = ""; document.getElementById("limit-note").textContent = err.message;
+          answer.textContent = ""; showLimitNote(err.message);
           limited = true; q.value = ""; q.placeholder = "Daily limit reached"; document.getElementById("query").classList.add("limited"); closeQMenu();
         }
         else if (!err?.skip) status.textContent = "ERROR: " + err.message;
