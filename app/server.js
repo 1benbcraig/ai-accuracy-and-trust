@@ -6,7 +6,55 @@ const path = require("path");
 const { verify, MODEL } = require("./verifier");
 const { scoreAbilities } = require("./abilities"); // separate ability-scoring layer (Ben, 10/21)
 
-const PORT = 3000;
+// Hosting (11/16): Render gives the port in PORT. On Ben's Mac there's no PORT, so it stays 3000 and local-only, and no limits apply.
+const HOSTED = !!process.env.PORT;
+const PORT = Number(process.env.PORT) || 3000;
+
+// ---------- Limits when hosted (Ben, 11/16) ----------
+// 20 questions per visitor per day, 100 for everyone combined per day. Email alerts to Ben at 50 and at 100.
+// Days run midnight to midnight Pacific. Counts are kept in memory, so a restart or redeploy resets them.
+const PER_VISITOR = 20, PER_DAY = 100, WARN_AT = 50;
+let day = "", total = 0, perIp = new Map(), alerted = new Set();
+const credits = new Map(); // each answered question allows one check and one ability scoring, so those routes can't be used on their own
+function today() { return new Date().toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" }); }
+function rollDay() { const d = today(); if (d !== day) { day = d; total = 0; perIp = new Map(); alerted = new Set(); credits.clear(); } }
+function visitor(req) { return String(req.headers["x-forwarded-for"] || req.socket.remoteAddress || "").split(",")[0].trim(); }
+function contactLine() { return process.env.CONTACT_EMAIL ? ` Questions? Email ${process.env.CONTACT_EMAIL}.` : ""; }
+const LIMIT_VISITOR = () => `You've reached today's limit of ${PER_VISITOR} questions. Thanks for trying the Verifier. The limit resets at midnight Pacific time.` + contactLine();
+const LIMIT_ALL = () => `The Verifier has reached its daily limit for all visitors. Thanks for trying it. The limit resets at midnight Pacific time.` + contactLine();
+// Returns null if the question may go ahead (and counts it), or the message to show if not.
+function takeQuestion(req) {
+  rollDay();
+  if (total >= PER_DAY) return LIMIT_ALL();
+  const ip = visitor(req), n = perIp.get(ip) || 0;
+  if (n >= PER_VISITOR) return LIMIT_VISITOR();
+  perIp.set(ip, n + 1); total++;
+  if (total === WARN_AT && !alerted.has(WARN_AT)) { alerted.add(WARN_AT); sendAlert(`Verifier: ${WARN_AT} questions today`, `The Verifier has had ${WARN_AT} questions today (${day}). It stops at ${PER_DAY}. Busiest visitor so far: ${Math.max(...perIp.values())} questions.`); }
+  if (total === PER_DAY && !alerted.has(PER_DAY)) { alerted.add(PER_DAY); sendAlert(`Verifier: daily limit of ${PER_DAY} reached`, `The Verifier reached ${PER_DAY} questions today (${day}) and is now showing the limit message to everyone until midnight Pacific. Visitors today: ${perIp.size}. Busiest visitor: ${Math.max(...perIp.values())} questions.`); }
+  const c = credits.get(ip) || { verify: 0, abilities: 0 };
+  credits.set(ip, { verify: Math.min(c.verify + 1, 3), abilities: Math.min(c.abilities + 1, 3) });
+  return null;
+}
+function takeCredit(req, kind) {
+  rollDay();
+  const c = credits.get(visitor(req));
+  if (!c || c[kind] < 1) return false;
+  c[kind]--; return true;
+}
+// Email alert through Resend (Ben, 11/16). Needs RESEND_API_KEY and ALERT_EMAIL in Render's settings; skipped if either is missing.
+async function sendAlert(subject, text) {
+  const key = process.env.RESEND_API_KEY, to = process.env.ALERT_EMAIL;
+  if (!key || !to) { console.log("Alert not sent (no RESEND_API_KEY or ALERT_EMAIL):", subject); return; }
+  try {
+    const r = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { authorization: `Bearer ${key}`, "content-type": "application/json" },
+      body: JSON.stringify({ from: "Verifier <onboarding@resend.dev>", to: [to], subject, text }),
+    });
+    console.log("Alert", r.ok ? "sent:" : `failed (${r.status}):`, subject);
+  } catch (e) { console.log("Alert failed:", e.message); }
+}
+const MAX_QUESTION = 2000, MAX_BODY = 500000; // characters; stops oversized requests
 
 // Build line (Ben, 10/7): when the app started, and when its code last changed.
 // If server.js or verifier.js changed after the app started, the running app is out of date until restarted.
@@ -18,6 +66,7 @@ function buildInfo() {
 }
 
 function readKey() {
+  if (process.env.ANTHROPIC_API_KEY) return process.env.ANTHROPIC_API_KEY.trim(); // hosted: from Render's private settings
   try {
     const text = fs.readFileSync(path.join(__dirname, ".env"), "utf8");
     const m = text.match(/^ANTHROPIC_API_KEY=(.+)$/m);
@@ -182,7 +231,11 @@ function logResult(entry) {
   fs.appendFileSync(path.join(__dirname, "log.jsonl"), JSON.stringify(entry) + "\n");
 }
 
-async function readBody(req) { let b = ""; for await (const c of req) b += c; return JSON.parse(b); }
+async function readBody(req) {
+  let b = "";
+  for await (const c of req) { b += c; if (HOSTED && b.length > MAX_BODY) throw new Error("Request too large."); }
+  return JSON.parse(b);
+}
 function send(res, code, obj) { res.writeHead(code, { "content-type": "application/json" }); res.end(JSON.stringify(obj)); }
 
 http.createServer(async (req, res) => {
@@ -190,7 +243,7 @@ http.createServer(async (req, res) => {
     res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
     return res.end(fs.readFileSync(path.join(__dirname, "index.html")));
   }
-  if (req.method === "GET" && req.url === "/version") return send(res, 200, buildInfo());
+  if (req.method === "GET" && req.url === "/version") return send(res, 200, { ...buildInfo(), hosted: HOSTED });
   // Screenshot library, served from this folder (html2canvas 1.4.1, MIT license).
   if (req.method === "GET" && req.url === "/html2canvas.min.js") {
     res.writeHead(200, { "content-type": "text/javascript; charset=utf-8" });
@@ -199,6 +252,7 @@ http.createServer(async (req, res) => {
   // Automatic screenshots (Ben, 10/7): the page sends a picture of itself after each answer;
   // it's saved to the Documentarian folder as date_time_2S_question.png.
   if (req.method === "POST" && req.url === "/screenshot") {
+    if (HOSTED) return send(res, 200, { saved: null }); // screenshots are for Ben's Mac only
     try {
       const { image, question } = await readBody(req);
       const d = new Date(); const two = (n) => String(n).padStart(2, "0");
@@ -221,6 +275,12 @@ http.createServer(async (req, res) => {
   if (req.method === "POST" && req.url === "/ask") {
     try {
       const { question } = await readBody(req); lastQuestion = question;
+      if (HOSTED) {
+        if (typeof question !== "string" || !question.trim()) return send(res, 400, { error: "Please type a question." });
+        if (question.length > MAX_QUESTION) return send(res, 400, { error: `Please keep questions under ${MAX_QUESTION} characters.` });
+        const stop = takeQuestion(req);
+        if (stop) return send(res, 429, { error: stop, limit: true });
+      }
       const [{ parsed, usage, searches, resultUrls, repaired, multiple, rawReply, retried, citeTags }, gateOut] = await Promise.all([ask(question), gate(question)]);
       parsed.gate = gateOut.label; parsed.gateReason = gateOut.reason;
       // Replier's searches and the addresses it got back are logged (no page text) (Ben, 10/8).
@@ -237,6 +297,7 @@ http.createServer(async (req, res) => {
   if (req.method === "POST" && req.url === "/verify") {
     try {
       const { question, segments } = await readBody(req);
+      if (HOSTED && !takeCredit(req, "verify")) return send(res, 429, { error: "Please ask a question first.", limit: true });
       const out = await verify(question, segments); // pieces + their sentences (Ben, 10/7)
       // Log stores source-sentence labels and web addresses, not page text (Exa's terms) (Ben, 10/7).
       const ref = (p) => ({ id: p.id, url: p.url });
@@ -253,13 +314,14 @@ http.createServer(async (req, res) => {
   if (req.method === "POST" && req.url === "/abilities") {
     try {
       const { question, claims } = await readBody(req);
+      if (HOSTED && !takeCredit(req, "abilities")) return send(res, 429, { error: "Please ask a question first.", limit: true });
       const out = await scoreAbilities(question, claims || [], readKey());
       logResult({ time: new Date().toISOString(), kind: "abilities", model: require("./verifier").MODEL, question, claims: out.claims, readable: out.readable, repaired: out.repaired, reply: out.reply, usage: out.usage });
       return send(res, 200, out);
     } catch (err) { return send(res, 500, { error: err.message }); }
   }
   res.writeHead(404); res.end();
-}).listen(PORT, "127.0.0.1", () => {
-  console.log(`AI Trust app running. Open http://localhost:${PORT} in your browser.`);
+}).listen(PORT, HOSTED ? "0.0.0.0" : "127.0.0.1", () => {
+  console.log(HOSTED ? `AI Trust app running on port ${PORT} (hosted; limits on).` : `AI Trust app running. Open http://localhost:${PORT} in your browser.`);
   console.log("To stop it, press Control+C in this window.");
 });

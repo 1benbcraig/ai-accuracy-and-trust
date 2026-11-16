@@ -9,6 +9,7 @@ const DIR = __dirname;
 
 // ---------- keys (.env) ----------
 function readEnv(name) {
+  if (process.env[name]) return process.env[name].trim(); // hosted: keys come from Render's private settings (11/16)
   try {
     const text = fs.readFileSync(path.join(DIR, ".env"), "utf8");
     const m = text.match(new RegExp("^" + name + "=(.+)$", "m"));

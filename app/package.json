@@ -1,0 +1,7 @@
+{
+  "name": "ai-trust-verifier",
+  "private": true,
+  "description": "The Verifier (Prototype 1). No dependencies; runs on Node alone.",
+  "scripts": { "start": "node server.js" },
+  "engines": { "node": ">=20" }
+}

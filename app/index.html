@@ -361,7 +361,7 @@
     async function post(url, body) {
       const res = await fetch(url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
       const data = await res.json();
-      if (data.error) throw new Error(data.error);
+      if (data.error) { const e = new Error(data.error); if (data.limit) e.limit = true; throw e; }
       return data;
     }
 
@@ -955,9 +955,12 @@
     // Build line (Ben, 10/7): shows which version is running; warns when the app needs a restart.
     const buildLine = document.getElementById("build");
     const when = (t) => new Date(t).toLocaleString([], { month: "numeric", day: "numeric", hour: "numeric", minute: "2-digit" });
+    let hosted = false; // on the public site, no build line and no screenshots (11/16)
     async function showBuild() {
       try {
         const b = await (await fetch("/version")).json();
+        hosted = !!b.hosted;
+        if (hosted) { buildLine.textContent = ""; return; }
         buildLine.textContent = `Build: code ${when(b.codeChanged)} · page ${when(b.pageChanged)} · app started ${when(b.started)}` +
           (b.stale ? " · CODE CHANGED SINCE START: restart the app" : "");
         buildLine.className = b.stale ? "stale" : "";
@@ -1106,7 +1109,8 @@
         }
         status.textContent = "";
       } catch (err) {
-        if (!err?.skip) status.textContent = "ERROR: " + err.message;
+        if (err?.limit) { answer.textContent = ""; answer.append(el("p", "bucket-note", err.message)); } // daily limit message, shown plainly (11/16)
+        else if (!err?.skip) status.textContent = "ERROR: " + err.message;
         verified.querySelectorAll(".v-working").forEach((w) => w.remove()); answer.querySelectorAll(".v-working").forEach((w) => w.remove()); // no spinner left running after an error
       }
       q.disabled = false; send.disabled = false; verifyOn.disabled = false;
@@ -1117,6 +1121,7 @@
 
     // Automatic screenshots (Ben, 10/7): after each answer, the page draws itself and the app saves it to Documentarian.
     async function saveScreenshot() {
+      if (hosted) return;
       try {
         const canvas = await html2canvas(document.body, { backgroundColor: "#f9f9f7", scale: window.devicePixelRatio || 1 });
         await post("/screenshot", { image: canvas.toDataURL("image/png"), question: q.value });
