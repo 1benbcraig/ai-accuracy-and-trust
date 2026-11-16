@@ -54,6 +54,10 @@
     #question { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; font: inherit; color: var(--text-primary); padding: 0; }
     #send { border: 0; background: none; padding: 0; cursor: pointer; display: flex; }
     #send:disabled { cursor: default; opacity: 0.5; }
+    /* Daily limit reached (Ben, 11/16): the question box is greyed out and can't be used */
+    #query.limited { background: var(--bg-secondary, #efeee9); filter: none; }
+    #query.limited #question { color: var(--text-tertiary); cursor: not-allowed; }
+    #query.limited #question::placeholder { color: var(--text-tertiary); }
     #status { margin: -24px 0 0; min-height: 0; color: var(--text-tertiary); font-size: 14px; }
     #status:empty { display: none; }
     #limit-note { margin: 0; max-width: 765px; color: var(--text-secondary); } /* daily limit message, below the question box (Ben, 11/16) */
@@ -326,6 +330,7 @@
   <script>
     const q = document.getElementById("question");
     const send = document.getElementById("send");
+    let limited = false; // set when the daily limit is reached; the box stays off until the page is reloaded
     const verifyOn = document.getElementById("verify-on");
     const status = document.getElementById("status");
     const answer = document.getElementById("answer");
@@ -1113,11 +1118,14 @@
         }
         status.textContent = "";
       } catch (err) {
-        if (err?.limit) { answer.textContent = ""; document.getElementById("limit-note").textContent = err.message; } // daily limit message, below the question box (Ben, 11/16)
+        if (err?.limit) { // daily limit: message below the question box, and the box greyed out (Ben, 11/16)
+          answer.textContent = ""; document.getElementById("limit-note").textContent = err.message;
+          limited = true; q.value = ""; q.placeholder = "Daily limit reached"; document.getElementById("query").classList.add("limited"); closeQMenu();
+        }
         else if (!err?.skip) status.textContent = "ERROR: " + err.message;
         verified.querySelectorAll(".v-working").forEach((w) => w.remove()); answer.querySelectorAll(".v-working").forEach((w) => w.remove()); // no spinner left running after an error
       }
-      q.disabled = false; send.disabled = false; verifyOn.disabled = false;
+      if (!limited) { q.disabled = false; send.disabled = false; } verifyOn.disabled = false;
       // No refocus after the answer: it reopened the question menu (Ben, 10/23). The user clicks the box to ask again.
       await showBuild();
       saveScreenshot();
