@@ -323,5 +323,7 @@ http.createServer(async (req, res) => {
   res.writeHead(404); res.end();
 }).listen(PORT, HOSTED ? "0.0.0.0" : "127.0.0.1", () => {
   console.log(HOSTED ? `AI Trust app running on port ${PORT} (hosted; limits on).` : `AI Trust app running. Open http://localhost:${PORT} in your browser.`);
+  // One-time test of the alert email (Ben, 11/16): set SEND_TEST_ALERT=yes in Render, it sends once on start, then remove the setting.
+  if (HOSTED && process.env.SEND_TEST_ALERT === "yes") sendAlert("Verifier: test alert", "This is a test of the Verifier's alert email. If you got this, the alerts at 50 and 100 questions will reach you. Remove SEND_TEST_ALERT in Render's Environment settings now.");
   console.log("To stop it, press Control+C in this window.");
 });
