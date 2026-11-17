@@ -702,7 +702,8 @@ Ben designed the XSearch screens in Figma (not built in code; nothing here is te
 ## 2026-11-16 — Getting the Verifier ready to host (app/ changed; not live yet)
 
 **Ben's decisions**
-- Host the Verifier on Render (Starter plan) so anyone with the link can use it; email alerts through Resend.
+- Host the Verifier on Render (Starter plan) so anyone with the link can use it. Live 11/16 at https://verifier-wqsj.onrender.com.
+- Alerts: email through Resend (tested 11/16), plus phone alerts through the free ntfy app, so Ben hears within hours if something drains the daily 100 (he suspects bots if it ever happens). Ben didn't want Gmail notifications on or new accounts; ntfy needs neither.
 - Limits: 20 questions per visitor per day, 100 for all visitors combined per day. Email Ben at 50 and at 100. Ben raised the daily cap back to 100 after considering 60, because the worst case is real visitors hitting the wall on a day the portfolio gets passed around.
 - Limit message wording (Ben): "...Thanks for trying The Verifier. The limit resets at midnight Pacific time. Email [Ben's address] with any questions." Shown below the question box, above Claude's response. When the limit is hit, the question box greys out with "Daily limit reached" and can't be used until the page is reloaded (Ben chose this over a red error outline, since hitting the limit isn't the visitor's mistake). The address comes from the host's settings, not the code.
 

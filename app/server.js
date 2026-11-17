@@ -41,18 +41,29 @@ function takeCredit(req, kind) {
   if (!c || c[kind] < 1) return false;
   c[kind]--; return true;
 }
-// Email alert through Resend (Ben, 11/16). Needs RESEND_API_KEY and ALERT_EMAIL in Render's settings; skipped if either is missing.
-async function sendAlert(subject, text) {
+// Alerts go to the ntfy phone app and by email (Ben, 11/16). Each is skipped if its setting is missing in Render.
+async function sendAlert(subject, text) { await Promise.all([sendPhone(subject, text), sendEmail(subject, text)]); }
+// Phone alert through ntfy.sh (Ben, 11/16): no account; NTFY_TOPIC is a hard-to-guess name, kept in Render's settings, not in this code.
+async function sendPhone(subject, text) {
+  const topic = process.env.NTFY_TOPIC;
+  if (!topic) { console.log("Phone alert not sent (no NTFY_TOPIC):", subject); return; }
+  try {
+    const r = await fetch(`https://ntfy.sh/${encodeURIComponent(topic)}`, { method: "POST", headers: { Title: subject, Priority: "high" }, body: text });
+    console.log("Phone alert", r.ok ? "sent:" : `failed (${r.status}):`, subject);
+  } catch (e) { console.log("Phone alert failed:", e.message); }
+}
+// Email alert through Resend. Needs RESEND_API_KEY and ALERT_EMAIL; skipped if either is missing.
+async function sendEmail(subject, text) {
   const key = process.env.RESEND_API_KEY, to = process.env.ALERT_EMAIL;
-  if (!key || !to) { console.log("Alert not sent (no RESEND_API_KEY or ALERT_EMAIL):", subject); return; }
+  if (!key || !to) { console.log("Email alert not sent (no RESEND_API_KEY or ALERT_EMAIL):", subject); return; }
   try {
     const r = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { authorization: `Bearer ${key}`, "content-type": "application/json" },
       body: JSON.stringify({ from: "Verifier <onboarding@resend.dev>", to: [to], subject, text }),
     });
-    console.log("Alert", r.ok ? "sent:" : `failed (${r.status}):`, subject);
-  } catch (e) { console.log("Alert failed:", e.message); }
+    console.log("Email alert", r.ok ? "sent:" : `failed (${r.status}):`, subject);
+  } catch (e) { console.log("Email alert failed:", e.message); }
 }
 const MAX_QUESTION = 2000, MAX_BODY = 500000; // characters; stops oversized requests
 
@@ -324,6 +335,6 @@ http.createServer(async (req, res) => {
 }).listen(PORT, HOSTED ? "0.0.0.0" : "127.0.0.1", () => {
   console.log(HOSTED ? `AI Trust app running on port ${PORT} (hosted; limits on).` : `AI Trust app running. Open http://localhost:${PORT} in your browser.`);
   // One-time test of the alert email (Ben, 11/16): set SEND_TEST_ALERT=yes in Render, it sends once on start, then remove the setting.
-  if (HOSTED && process.env.SEND_TEST_ALERT === "yes") sendAlert("Verifier: test alert", "This is a test of the Verifier's alert email. If you got this, the alerts at 50 and 100 questions will reach you. Remove SEND_TEST_ALERT in Render's Environment settings now.");
+  if (HOSTED && process.env.SEND_TEST_ALERT === "yes") sendAlert("Verifier: test alert", "This is a test of the Verifier's alert email. If you got this, the alerts at 50 and 100 questions will reach you here. Remove SEND_TEST_ALERT in Render's Environment settings now.");
   console.log("To stop it, press Control+C in this window.");
 });
