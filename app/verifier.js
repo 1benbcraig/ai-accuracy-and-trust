@@ -119,7 +119,9 @@ async function exaSearch(query, retried = false) {
     headers: { "x-api-key": key, "content-type": "application/json" },
     body: JSON.stringify({ query, type: "auto", numResults: RESULTS_PER_SEARCH, includeDomains: trustedSites(), contents: { text: { maxCharacters: CHARS_PER_PAGE } } }),
   });
-  const data = await res.json();
+  // Out of Exa credit (Exa's billing docs: "requests return 402 Payment Required"). Tells server.js to alert Ben (Ben, 11/18).
+  if (res.status === 402) process.emit("exa-out-of-credit");
+  const data = await res.json().catch(() => ({}));
   if (res.status === 429 && !retried) { await new Promise((r) => setTimeout(r, 1500)); return exaSearch(query, true); }
   if (!res.ok) throw new Error(`Exa error ${res.status}: ${data?.error ?? JSON.stringify(data)}`);
   return data;

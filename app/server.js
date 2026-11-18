@@ -65,6 +65,13 @@ async function sendEmail(subject, text) {
     console.log("Email alert", r.ok ? "sent:" : `failed (${r.status}):`, subject);
   } catch (e) { console.log("Email alert failed:", e.message); }
 }
+// Exa out of credit (Ben, 11/18): alert once a day, by phone and email, when Exa refuses a search for lack of credit.
+process.on("exa-out-of-credit", () => {
+  rollDay();
+  if (alerted.has("exa")) return;
+  alerted.add("exa");
+  sendAlert("Verifier: Exa credit has run out", "Exa refused a search because the account is out of credit, so the Verifier can't check claims until you add credit at dashboard.exa.ai. Claude's answers still show. You'll get this at most once a day.");
+});
 const MAX_QUESTION = 2000, MAX_BODY = 500000; // characters; stops oversized requests
 
 // Build line (Ben, 10/7): when the app started, and when its code last changed.
