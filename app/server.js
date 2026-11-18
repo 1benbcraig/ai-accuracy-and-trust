@@ -72,6 +72,13 @@ process.on("exa-out-of-credit", () => {
   alerted.add("exa");
   sendAlert("Verifier: Exa credit has run out", "Exa refused a search because the account is out of credit, so the Verifier can't check claims until you add credit at dashboard.exa.ai. Claude's answers still show. You'll get this at most once a day.");
 });
+// Anthropic out of credit or over its spend limit (Ben, 11/18): same once-a-day alert. Matched on the error message ("Your credit balance is too low…"); the spend-limit wording is a guess.
+process.on("anthropic-out-of-credit", () => {
+  rollDay();
+  if (alerted.has("anthropic")) return;
+  alerted.add("anthropic");
+  sendAlert("Verifier: Anthropic credit or limit reached", "Anthropic refused a request because the credit balance is too low or a spending limit was reached. The Verifier can't answer questions until you add credit or raise the limit at platform.claude.com (Verifier workspace). You'll get this at most once a day.");
+});
 const MAX_QUESTION = 2000, MAX_BODY = 500000; // characters; stops oversized requests
 
 // Build line (Ben, 10/7): when the app started, and when its code last changed.
@@ -119,6 +126,7 @@ async function askOnce(question) {
       body: JSON.stringify({ model: MODEL, max_tokens: 4000, system: SYSTEM, tools: [WEB_SEARCH], messages }),
     });
     data = await res.json();
+    if (!res.ok && /credit balance|spend limit|usage limit/i.test(data?.error?.message || "")) process.emit("anthropic-out-of-credit"); // Ben, 11/18
     if (!res.ok) throw new Error(`API error ${res.status}: ${data?.error?.message ?? JSON.stringify(data)}`);
     content = content.concat(data.content);
     rounds.push({ stop_reason: data.stop_reason, blocks: (data.content || []).map((c) => c.type), usage: data.usage });
@@ -238,6 +246,7 @@ async function gate(question) {
     body: JSON.stringify({ model: MODEL, max_tokens: 300, system: GATE_PROMPT, messages: [{ role: "user", content: question }] }),
   });
   const data = await res.json();
+  if (!res.ok && /credit balance|spend limit|usage limit/i.test(data?.error?.message || "")) process.emit("anthropic-out-of-credit"); // Ben, 11/18
   if (!res.ok) throw new Error(`Gate API error ${res.status}: ${data?.error?.message ?? JSON.stringify(data)}`);
   const word = (data.content || []).filter((b) => b.type === "text").map((b) => b.text).join("").trim().toUpperCase().match(/CHECKABLE|OPINION|CREATIVE|DRAFT|CHAT|CODE|REASONING|OTHER/)?.[0];
   // If the gate's reply can't be read, the question is treated as checkable (the old behavior), and the log says so.

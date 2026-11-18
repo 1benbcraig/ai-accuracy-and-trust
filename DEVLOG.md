@@ -715,7 +715,7 @@ Ben designed the XSearch screens in Figma (not built in code; nothing here is te
 **Untested**
 - Tested only on a local test run with a fake key. Not yet run on Render, and the alert emails haven't been sent for real.
 
-## 2026-11-18 — Alert when Exa credit runs out (app/ changed)
+## 2026-11-18 — Alerts when Exa or Anthropic credit runs out (app/ changed)
 
 **Ben's decisions**
 - Spending caps: the Verifier has its own Anthropic workspace with a $50 monthly limit (11/16). Exa has no card saved, so its prepaid balance is the cap (11/18).
@@ -723,9 +723,10 @@ Ben designed the XSearch screens in Figma (not built in code; nothing here is te
 
 **Claude's work**
 - When Exa refuses a search with "402 Payment Required" (what its billing docs say happens at zero credit), the server sends one phone and email alert per day.
+- Same for Anthropic (Ben asked): when Anthropic refuses a request because the credit balance is too low or a spending limit is hit, one alert per day. Matched on the error wording; the spend-limit wording is a guess.
 
 **Untested**
-- Tested only by faking the signal locally; it fired once for two triggers, as intended. Not tested against a real empty Exa account.
+- Tested only with faked replies locally; each alert fired once for two triggers, as intended. Not tested against real empty accounts. Visitors still see the raw error text when this happens (part of the open error-state work).
 
 ---
 

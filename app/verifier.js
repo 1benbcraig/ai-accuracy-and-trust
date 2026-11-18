@@ -305,6 +305,7 @@ async function claudeVerify(question, items, src) {
     body: JSON.stringify({ model: MODEL, max_tokens: 16000, system: SYSTEM, messages: [{ role: "user", content: text }] }),
   });
   const data = await res.json();
+  if (!res.ok && /credit balance|spend limit|usage limit/i.test(data?.error?.message || "")) process.emit("anthropic-out-of-credit"); // Ben, 11/18
   if (!res.ok) throw new Error(`API error ${res.status}: ${data?.error?.message ?? JSON.stringify(data)}`);
   return data;
 }

@@ -45,6 +45,7 @@ async function scoreAbilities(question, claims, key) {
     body: JSON.stringify({ model: MODEL, max_tokens: 3000, system: PROMPT, messages: [{ role: "user", content: `Question: ${question}\n\nClaims:\n${list}` }] }),
   });
   const data = await res.json();
+  if (!res.ok && /credit balance|spend limit|usage limit/i.test(data?.error?.message || "")) process.emit("anthropic-out-of-credit"); // Ben, 11/18
   if (!res.ok) throw new Error(`Abilities API error ${res.status}: ${data?.error?.message ?? JSON.stringify(data)}`);
   const text = (data.content || []).filter((b) => b.type === "text").map((b) => b.text).join("");
   let parsed = null;
