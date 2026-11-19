@@ -728,6 +728,28 @@ Ben designed the XSearch screens in Figma (not built in code; nothing here is te
 **Untested**
 - Tested only with faked replies locally; each alert fired once for two triggers, as intended. Not tested against real empty accounts. Visitors still see the raw error text when this happens (part of the open error-state work).
 
+## 2026-11-18 (later) — Slideshow moved into Figma, slide 9 reshot, walkthrough on YouTube (no app/ changes)
+
+**Ben's decisions**
+- The slideshow now lives in Ben's portfolio Figma file, using the newspaper style (H). The Claude Design decks are now just the source.
+- Font stays Libre Franklin. Images swapped for the smaller original files; image and video layers named for accessibility.
+- "Try it live" link kept on slides 2 and 10 only, removed from slide 5 (three links to the same place felt repetitive). Ben added the Verifier and YouTube links. The essay link waits until the essay is hosted.
+- Slide 8's faded left half is on purpose.
+- Slide 9 video reshot: 2 seconds per claim (was 4), sidebar tooltip off, dots and arrows above the claim, browser bar cropped out. Ben: "I think that's as good as it gets."
+- ExSearch's five-minute walkthrough is on YouTube, unlisted: https://youtu.be/XS07iGzdzg0
+
+**Claude's work**
+- Built one standalone page per slide so Ben could capture each with Figma's Chrome extension (the extension couldn't select a whole slide inside the deck editor). Image crops didn't carry over; Ben fixed them by hand.
+- Encoded the slide 9 video (the first tool tried made it look worse).
+
+**Known limits**
+- Figma blurs videos in presentation mode (reported on Figma's forum; no confirmed fix).
+- Figma shows a "Leaving Figma" pop-up on outside links; it can't be turned off.
+
+**Claude's suggestions, not agreed**
+- Widen slide 9's text column now that the video is smaller.
+- Reword "To unlock required another click" to "Unlocking took another click."
+
 ---
 
 ## Open questions
