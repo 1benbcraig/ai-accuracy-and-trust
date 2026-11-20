@@ -750,6 +750,24 @@ Ben designed the XSearch screens in Figma (not built in code; nothing here is te
 - Widen slide 9's text column now that the video is smaller.
 - Reword "To unlock required another click" to "Unlocking took another click."
 
+## November 19 — Essay flow pass, and the essay as a web page
+
+**Ben's decisions**
+- The essay now opens with the Gemini "Susan from Indiana" story instead of a general statement about AI. The work-framed paragraph ("While AI has become a critical part of my workflow…") stays as the turn from story to point, and tells readers Ben uses AI every day.
+- New section heading "Why they all get it wrong." The 68% figure moved under it; the "How wrong are they?" heading was cut.
+- "Trained to sound right" reworked for flow; the hedging paragraph now says the AI hedges because it's mimicking people who hedge on that topic.
+- Prototype links use the names ("The Verifier," "ExSearch"), not raw web addresses; each prototype gets a captioned image.
+- Dancing bearware moved back into "What's a doc (or lawyer) to do?" The essay now ends with a short paragraph on the future: a good enough pocket knife may someday beat the best scalpel, but not yet, "and for work where accuracy matters, the limits are the point."
+- Note numbers must link to their notes. The essay gets its own free Render static site, named ai-accuracy-essay, not a page on the Verifier, because the essay covers more than the Verifier. The title stays "Why do we keep building machines that lie to us?"; slide links will use short text.
+
+**Claude's work**
+- Renumbered the 27 notes into reading order and moved one note to the sentence it actually supports.
+- Built the essay as a single web page in [`essay/`](essay/): each note number jumps to its note, the note highlights, and a ↩ link jumps back. Note numbers are larger than usual, with a padded click area.
+
+**Not done yet**
+- The two images are placeholders; Ben will supply new ones.
+- The page isn't live until Ben sets up the Render static site.
+
 ---
 
 ## Open questions
