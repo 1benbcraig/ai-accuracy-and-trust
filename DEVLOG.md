@@ -768,6 +768,14 @@ Ben designed the XSearch screens in Figma (not built in code; nothing here is te
 - The two images are placeholders; Ben will supply new ones.
 - The page isn't live until Ben sets up the Render static site.
 
+## 2026-11-20 — Essay: two clarity fixes after a read-aloud (no app changes)
+
+**Ben's decisions**
+- After reading the essay aloud to a listener, Ben made the "Are you sure?" study clearer: users "asked the AI" the question.
+- "The wrong fix" now builds to its main point: an AI hedges because it mimics how people talk about a topic, not because it knows it might be wrong. That leads straight into "It sounds careful without being careful." The research paragraph now ends on "So even when an AI hedges, readers don't agree on what it means." A sentence about numbers that interrupted the point was cut.
+
+**Claude's suggestions, adopted by Ben:** where to move the sentences, and the new closing line of the research paragraph.
+
 ---
 
 ## Open questions
