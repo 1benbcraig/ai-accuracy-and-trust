@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
 <title>Why do we keep building machines that lie to us?</title>
 <meta name="description" content="An essay by Ben Craig on why AI tools sound sure when they're wrong, and what designers can do about it.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,10 +13,6 @@
 :root {
   --bg: #fbfaf7; --text: #1d1d1b; --muted: #5d5d58; --rule: #dedbd2;
   --link: #1f5fa8; --note-bg: #e8eef7; --highlight: #fff3c4;
-}
-@media (prefers-color-scheme: dark) {
-  :root { --bg: #161615; --text: #ecebe7; --muted: #a9a8a2; --rule: #3a3936;
-          --link: #8cb8ee; --note-bg: #22303f; --highlight: #4a4120; }
 }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
@@ -37,7 +34,7 @@ a.ref:hover, a.ref:focus-visible { text-decoration: underline; }
 .fig { margin: 32px 0; }
 .fig img { display: block; width: 100%; height: auto; }
 .fig-link { display: block; text-decoration: none; }
-figcaption { font-style: italic; margin-top: 10px; font-size: 0.95rem; }
+figcaption { font-style: italic; margin-bottom: 10px; font-size: 0.95rem; }
 .notes { margin-top: 72px; padding-top: 24px; border-top: 1px solid var(--rule); font-size: 0.85rem; line-height: 1.55; }
 .notes h2 { margin-top: 0; }
 .notes li { margin-bottom: 14px; scroll-margin-top: 24px; padding: 4px 6px; border-radius: 4px; }
@@ -70,7 +67,7 @@ a.back { text-decoration: none; padding: 0 4px; }
 <p>LLMs are stronger at some abilities than others. Under the hood, they keep a rough score of how sure they are of each answer.<sup class="refs"><a class="ref" href="#note-8" id="ref-8-1" aria-label="Note 8">8</a></sup> Ask, and they&#8217;ll even rate their own confidence (though they still tend to be overconfident<sup class="refs"><a class="ref" href="#note-9" id="ref-9-1" aria-label="Note 9">9</a></sup>).</p>
 <p>None of that is on the screen. I&#8217;d used these tools for months and never knew about abilities or AI confidence. Instead, every answer arrives in the same confident voice, whatever went into it. Why did the designers choose to hide such information? How did they intend to tell users when their LLMs are less than sure?</p>
 <p>My design for <a href="https://verifier-wqsj.onrender.com/" target="_blank" rel="noopener">The Verifier</a> puts the missing information on screen. For each claim in an answer, it shows the AI&#8217;s confidence, the kinds of thinking involved, and quotes from trusted sources that support or contradict it. The point is to help users make their own judgments about accuracy. Try it out with a question of your own.</p>
-<figure class="fig" id="fig-verifier"><a class="fig-link" href="https://verifier-wqsj.onrender.com/" target="_blank" rel="noopener"><img src="images/verifier-checked-claim.png" alt="The Verifier checking the claim that Snow White (1937) was not the first feature-length animated film: Claude is 95% confident, and two citations, from the BBC and NPR, contradict the claim." width="688" height="208" loading="lazy"></a><figcaption><a href="https://verifier-wqsj.onrender.com/" target="_blank" rel="noopener">A checked claim from Prototype 1, The Verifier ↗</a></figcaption></figure>
+<figure class="fig" id="fig-verifier"><figcaption><a href="https://verifier-wqsj.onrender.com/" target="_blank" rel="noopener">Prototype 1, The Verifier: showing what LLMs hide ↗</a></figcaption><a class="fig-link" href="https://verifier-wqsj.onrender.com/" target="_blank" rel="noopener"><img src="images/verifier-checked-claim.png" alt="The Verifier checking the claim that Snow White (1937) was not the first feature-length animated film: Claude is 95% confident, and two citations, from the BBC and NPR, contradict the claim." width="688" height="208" loading="lazy"></a></figure>
 
 <h2>The wrong fix: softer words</h2>
 <p>One day Claude.ai told me I needed to use Claude Cowork to accomplish a task. I pushed back, saying that I&#8217;d seen advertisements announcing how Claude.ai and Claude Cowork had merged. Since I was still being asked to bounce between the two products, I said the advertising had lied. Claude described the discrepancy like this:</p>
@@ -106,7 +103,7 @@ a.back { text-decoration: none; padding: 0 4px; }
 <li><strong>Every rewrite is checked, automatically.</strong> The tool compares the rewrite to its sources and flags anywhere it drifted.</li>
 </ol>
 <p>Most similar tools give you an answer and let you click to see its sources. ExSearch gives you the sources first and lets you decide how much answer you want.</p>
-<figure class="fig" id="fig-exsearch"><a class="fig-link" href="https://youtu.be/XS07iGzdzg0" target="_blank" rel="noopener"><img src="images/exsearch-prototype.png" alt="ExSearch answering whether a patient on warfarin can take ibuprofen: drug-label excerpts on the left, a generative rewrite on the right with a slider, a 68% source accuracy score, and flagged phrases such as 'roughly double the risk of serious bleeding,' which goes beyond the source." width="1443" height="786" loading="lazy"></a><figcaption><a href="https://youtu.be/XS07iGzdzg0" target="_blank" rel="noopener">Prototype 2, ExSearch (5 min video walkthrough) ↗</a></figcaption></figure>
+<figure class="fig" id="fig-exsearch"><figcaption><a href="https://youtu.be/XS07iGzdzg0" target="_blank" rel="noopener">Prototype 2, ExSearch (5 min video walkthrough) ↗</a></figcaption><a class="fig-link" href="https://youtu.be/XS07iGzdzg0" target="_blank" rel="noopener"><img src="images/exsearch-prototype.png" alt="ExSearch answering whether a patient on warfarin can take ibuprofen: drug-label excerpts on the left, a generative rewrite on the right with a slider, a 68% source accuracy score, and flagged phrases such as 'roughly double the risk of serious bleeding,' which goes beyond the source." width="1443" height="786" loading="lazy"></a></figure>
 
 <h2>Scalpels over pocket knives</h2>
 <p>Like pocket knives, LLMs aim to be the single solution for every problem. Instead, many professionals would be better served by scalpels: tools designed for their specific work and needs. That&#8217;s why ExSearch uses a limited database (instead of the entire web) and a limited generative AI that can only summarize text. It does less than a modern LLM, but it&#8217;s designed to do everything these professionals need, and to avoid much of what makes LLMs so inaccurate. Those limits are what make it a scalpel.</p>
