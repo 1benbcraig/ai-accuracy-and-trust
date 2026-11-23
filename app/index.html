@@ -1003,12 +1003,12 @@
     // Collapsed shows the first two. Open/closed is remembered as last used. Clicking a question fills the box and submits.
     // Closes on a click outside, Escape, or submitting. Typing narrows both lists to questions containing the typed text.
     // Recent questions: the last 6 this visitor asked, kept in this browser only; asking again moves it to the top.
-    // Suggested list chosen by Ben 10/23; Ben 11/12: gouda replaced Napoleon, job seekers replaced startups. Empty recent list says "none" (Ben, 10/23); filter details are Claude's.
+    // Suggested list chosen by Ben 10/23; Ben 11/12: gouda replaced Napoleon, job seekers replaced startups. Ben 11/23: North Pole replaced gouda, Edison light bulb replaced job seekers (both gave some contradictions on the live site; gouda and job seekers mostly came back supported or unsourced). Empty recent list says "none" (Ben, 10/23); filter details are Claude's.
     const SUGGESTED = [ // Ben, 10/23: the two questions about LLMs are kept apart, two questions between them
       "Was Walt Disney Studios' Snow White and the Seven Dwarfs the first animated film to be feature-length?",
-      "How long does gouda cheese take to digest?",
+      "Who was the first person to reach the North Pole?",
       "Which modern LLM is the most powerful? Which is best to act as a coworker to a UX designer?",
-      "What percentage of job seekers lie on their résumés?",
+      "Why was Thomas Edison's 1879 light bulb the first electric light ever invented?",
       "How many r's are in the word strawberry?"
     ];
     const qmenu = document.getElementById("qmenu"), qwrap = document.getElementById("qwrap");
