@@ -784,6 +784,7 @@ Ben designed the XSearch screens in Figma (not built in code; nothing here is te
 - Ben deleted the old video from YouTube.
 - Notes text raised from 13.6px to 16px (Ben asked).
 - Verifier suggested questions: "Who was the first person to reach the North Pole?" replaces the gouda question, and "Why was Thomas Edison's 1879 light bulb the first electric light ever invented?" replaces the job-seekers question. Ben wants suggested questions that show contradictions. In his live-site tests today, gouda came back all supported and job seekers half unsourced; North Pole and the Edison question each showed some contradictions, though not every run.
+- Order changed (Ben): Edison question second, North Pole fourth.
 
 **Found while testing (Ben's live runs, 11/23):** only Snow White reliably turns up contradictions. More than 20 other questions (habits, baby bones, first novel, first video game, words per day, unconscious bias, crypto, TruthfulQA myths) came back mostly supported, and crypto questions mostly unsourced. Untested explanation (Claude's): when a topic is openly disputed, the answering Claude hedges, and sources back the hedge.
 
