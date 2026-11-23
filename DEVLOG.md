@@ -781,6 +781,8 @@ Ben designed the XSearch screens in Figma (not built in code; nothing here is te
 **Ben's decisions**
 - Ben re-encoded the ExSearch walkthrough with louder audio and uploaded it to YouTube as a new video: https://youtu.be/xGw2LScJHio. YouTube can't replace a video's file, so the link changed.
 - The essay's ExSearch links now point to the new video. Ben updated the Figma slideshow himself.
+- Ben deleted the old video from YouTube.
+- Notes text raised from 13.6px to 16px (Ben asked).
 
 ---
 
