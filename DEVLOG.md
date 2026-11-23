@@ -776,6 +776,12 @@ Ben designed the XSearch screens in Figma (not built in code; nothing here is te
 
 **Claude's suggestions, adopted by Ben:** where to move the sentences, and the new closing line of the research paragraph.
 
+## 2026-11-23 — Essay: new ExSearch walkthrough link (no app changes)
+
+**Ben's decisions**
+- Ben re-encoded the ExSearch walkthrough with louder audio and uploaded it to YouTube as a new video: https://youtu.be/xGw2LScJHio. YouTube can't replace a video's file, so the link changed.
+- The essay's ExSearch links now point to the new video. Ben updated the Figma slideshow himself.
+
 ---
 
 ## Open questions
